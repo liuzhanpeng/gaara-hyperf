@@ -1,0 +1,45 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Lzpeng\HyperfAuthGuard;
+
+use Lzpeng\HyperfAuthGuard\RquestMatcher\RequestMatcherResolverInteface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
+
+/**
+ * Guard 管理器
+ * 
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
+class GuardManager implements GuardManagerInterface
+{
+    /**
+     * @param RequestMatcherResolverInteface $requestMatcherResolver
+     * @param GuardResolverInterface $guardResolver
+     */
+    public function __construct(
+        private RequestMatcherResolverInteface $requestMatcherResolver,
+        private GuardResolverInterface $guardResolver,
+    ) {}
+
+    /**
+     * @inheritDoc
+     */
+    public function process(ServerRequestInterface $request): ?ResponseInterface
+    {
+        foreach ($this->guardResolver->getGuardNames() as $guardName) {
+            $matcher = $this->requestMatcherResolver->resolve($guardName);
+            if (!$matcher->matches($request)) {
+                continue;
+            }
+
+            $guard = $this->guardResolver->resolve($guardName);
+
+            return $guard->authenticate($request);
+        }
+
+        return null;
+    }
+}

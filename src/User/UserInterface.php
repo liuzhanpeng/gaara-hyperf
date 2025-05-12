@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Lzpeng\HyperfAuthGuard\User;
+
+/**
+ * 用户接口
+ * 
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
+interface UserInterface
+{
+    /**
+     * 返回用户标识
+     *
+     * @return string
+     */
+    public function getIdentifier(): string;
+}

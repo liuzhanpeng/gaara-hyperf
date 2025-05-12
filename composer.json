@@ -1,0 +1,29 @@
+{
+    "name": "lzpeng/hyperf-auth-guard",
+    "description": "authentication library for hyperf",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Lzpeng\\HyperfAuthGuard\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "liuzhanpeng",
+            "email": "liuzhanpeng@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "hyperf/session": "^3.1",
+        "hyperf/event": "^3.1",
+        "hyperf/di": "^3.1",
+        "hyperf/framework": "^3.1"
+    },
+    "extra": {
+        "hyperf": {
+            "config": "Lzpeng\\HyperfAuthGuard\\ConfigProvider"
+        }
+    }
+}
