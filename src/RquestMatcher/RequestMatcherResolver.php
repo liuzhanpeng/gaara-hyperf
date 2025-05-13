@@ -32,7 +32,6 @@ class RequestMatcherResolver implements RequestMatcherResolverInteface
         }
 
         $matcherId = $this->matcherMap[$guardName];
-
         $matcher = $this->container->get($matcherId);
         if (!$matcher instanceof RequestMatcherInterface) {
             throw new \InvalidArgumentException("RequestMatcherResolver: $matcherId not RequestMatcherInterface");

@@ -8,10 +8,10 @@ use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorResolverInterface;
 use Lzpeng\HyperfAuthGuard\Authorization\AccessDeniedHandlerInterface;
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerInterface;
+use Lzpeng\HyperfAuthGuard\Event\AuthenticatedTokenCreatedEvent;
 use Lzpeng\HyperfAuthGuard\Event\AuthenticationFailureEvent;
 use Lzpeng\HyperfAuthGuard\Event\AuthenticationSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
-use Lzpeng\HyperfAuthGuard\Event\TokenCreatedEvent;
 use Lzpeng\HyperfAuthGuard\Exception\AccessDeniedException;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Exception\UnauthenticatedException;
@@ -19,7 +19,8 @@ use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Token\AuthenticatedToken;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
-use Lzpeng\HyperfAuthGuard\Token\TokenStorageInterface;
+use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageInterface;
+use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageResolverInterface;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandlerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -35,8 +36,8 @@ class Guard implements GuardInterface
     public function __construct(
         private string $name,
         private AuthenticatorResolverInterface $authenticatorResolver,
-        private TokenStorageInterface $tokenStorage,
         private TokenContextInterface $tokenContext,
+        private TokenStorageResolverInterface $tokenStorageResolver,
         private UnauthenticatedHandlerInterface $unauthenticatedHandler,
         private AuthorizationCheckerInterface $authorizationChecker,
         private AccessDeniedHandlerInterface $accessDeniedHandler,
@@ -53,9 +54,15 @@ class Guard implements GuardInterface
         return $this->name;
     }
 
+    /**
+     * 认证 
+     *
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface|null
+     */
     public function authenticate(ServerRequestInterface $request): ?ResponseInterface
     {
-        $token = $this->tokenStorage->get($this->name);
+        $token = $this->getTokenStorage()->get($this->name);
         $this->tokenContext->setToken($token);
 
         foreach ($this->authenticatorResolver->getAuthenticatorIds($this->name) as $authenticatorId) {
@@ -72,45 +79,18 @@ class Guard implements GuardInterface
 
         $token = $this->tokenContext->getToken();
         if (is_null($token) || !$token instanceof AuthenticatedToken) {
-            // 2fa通过自定义unauthenticatedHandler处理逻辑
-            return $this->handleUnauthenticated($request, new UnauthenticatedException($token));
+            return $this->unauthenticatedHandler->handle($request, UnauthenticatedException::from($token));
         }
 
         $attribute = $request->getAttribute('authorization_attribute');
         $subject = $request->getAttribute('authorization_subject');
         $request->withoutAttribute('authorization_attribute')->withoutAttribute('authorization_subject');
         if (!$this->authorizationChecker->check($token, $attribute, $subject)) {
-            return $this->handleAccessDenied($request, new AccessDeniedException(), $token);
+            return $this->accessDeniedHandler->handle($request, AccessDeniedException::from($token, $attribute, $subject));
         }
 
         return null;
     }
-
-    /**
-     * 未认证处理
-     *
-     * @param ServerRequestInterface $request
-     * @param UnauthenticatedException $unauthenticatedException
-     * @return ResponseInterface
-     */
-    public function handleUnauthenticated(ServerRequestInterface $request, UnauthenticatedException $unauthenticatedException): ResponseInterface
-    {
-        return $this->unauthenticatedHandler->handle($request, $unauthenticatedException);
-    }
-
-    /**
-     * 无权限处理器
-     *
-     * @param ServerRequestInterface $request
-     * @param AccessDeniedException $accessDeniedException
-     * @param TokenInterface $token
-     * @return ResponseInterface
-     */
-    public function handleAccessDenied(ServerRequestInterface $request, AccessDeniedException $accessDeniedException, TokenInterface $token): ResponseInterface
-    {
-        return $this->accessDeniedHandler->handle($request, $accessDeniedException, $token);
-    }
-
 
     /**
      * 执行指定的认证器认证逻辑
@@ -154,7 +134,7 @@ class Guard implements GuardInterface
     {
         $this->tokenContext->setToken($token);
 
-        $this->tokenStorage->set($this->name, $token);
+        $this->getTokenStorage()->set($this->name, $token);
 
         $response = $authenticator->onAuthenticationSuccess($request, $token);
 
@@ -195,5 +175,15 @@ class Guard implements GuardInterface
         $this->eventDispatcher->dispatch($authenticationFailureEvent);
 
         return $authenticationFailureEvent->getResponse();
+    }
+
+    /**
+     * 返回认证守卫的Token存储器
+     *
+     * @return TokenStorageInterface
+     */
+    private function getTokenStorage(): TokenStorageInterface
+    {
+        return $this->tokenStorageResolver->resolve($this->name);
     }
 }

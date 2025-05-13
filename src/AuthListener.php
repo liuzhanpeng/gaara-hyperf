@@ -34,5 +34,10 @@ class AuthListener implements ListenerInterface
     /**
      * @inheritDoc
      */
-    public function process(object $event): void {}
+    public function process(object $event): void
+    {
+        $serviceProvider = $this->container->get(ServiceProvider::class);
+
+        $serviceProvider->register();
+    }
 }

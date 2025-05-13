@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard;
 
+use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolverInterface;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\RequestMatcherResolverInteface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -22,6 +23,7 @@ class GuardManager implements GuardManagerInterface
     public function __construct(
         private RequestMatcherResolverInteface $requestMatcherResolver,
         private GuardResolverInterface $guardResolver,
+        private LogoutHandlerResolverInterface $logoutHandlerResolver,
     ) {}
 
     /**
@@ -33,6 +35,11 @@ class GuardManager implements GuardManagerInterface
             $matcher = $this->requestMatcherResolver->resolve($guardName);
             if (!$matcher->matches($request)) {
                 continue;
+            }
+
+            $logoutHandler = $this->logoutHandlerResolver->resolve($guardName);
+            if ($logoutHandler->supports($request)) {
+                return $logoutHandler->handle($request);
             }
 
             $guard = $this->guardResolver->resolve($guardName);

@@ -13,7 +13,6 @@ use Psr\Http\Server\RequestHandlerInterface;
  * 认证中间件
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
-
  */
 class AuthMiddleware implements MiddlewareInterface
 {

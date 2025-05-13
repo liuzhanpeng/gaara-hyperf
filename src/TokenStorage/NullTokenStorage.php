@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Token;
+namespace Lzpeng\HyperfAuthGuard\TokenStorage;
+
+use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 
 /**
  * 用于无状态认证的TokenStorage实现

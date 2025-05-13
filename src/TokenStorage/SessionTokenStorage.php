@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Token;
+namespace Lzpeng\HyperfAuthGuard\TokenStorage;
 
 use Hyperf\Contract\SessionInterface;
+use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 
 /**
  * 基于Session的TokenStorage实现
@@ -19,7 +20,7 @@ class SessionTokenStorage implements TokenStorageInterface
      */
     public function __construct(
         private SessionInterface $session,
-        private string $prefix = 'auth_guard_token:',
+        private string $prefix,
     ) {}
 
     /**
@@ -54,6 +55,6 @@ class SessionTokenStorage implements TokenStorageInterface
      */
     private function getKey(string $key): string
     {
-        return $this->prefix . $key;
+        return sprintf('%s.%s', $this->prefix, $key);
     }
 }

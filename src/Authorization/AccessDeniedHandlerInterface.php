@@ -21,8 +21,7 @@ interface AccessDeniedHandlerInterface
      *
      * @param ServerRequestInterface $request
      * @param AccessDeniedException $accessDeniedException
-     * @param TokenInterface $token
      * @return ResponseInterface|null
      */
-    public function handle(ServerRequestInterface $request, AccessDeniedException $accessDeniedException, TokenInterface $token): ?ResponseInterface;
+    public function handle(ServerRequestInterface $request, AccessDeniedException $accessDeniedException): ?ResponseInterface;
 }
