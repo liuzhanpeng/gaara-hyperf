@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Config;
 
+use Lzpeng\HyperfAuthGuard\Authorization\NullAuthorizationChecker;
+
 /**
  * 认证守卫配置
  * 
@@ -18,6 +20,7 @@ class GuardConfig
         private AuthenticatorConfigCollection $authenticatorConfigCollection,
         private LogoutConfig $logoutConfig,
         private ListenerConfigCollection $listenerConfigCollection,
+        private AuthorizationCheckerConfig $authorizationCheckerConfig,
     ) {}
 
     /**
@@ -36,6 +39,9 @@ class GuardConfig
         $authenticatorConfigCollection = AuthenticatorConfigCollection::from($config['authenticators'] ?? []);
         $logoutConfig = LogoutConfig::from($config['logout'] ?? []);
         $listenerConfigCollection = new ListenerConfigCollection($config['listeners'] ?? []);
+        $authorizationCheckerConfig = AuthorizationCheckerConfig::from($config['authorization_checker'] ?? [
+            'class' => NullAuthorizationChecker::class,
+        ]);
 
         return new self(
             $matcherConfig,
@@ -44,6 +50,7 @@ class GuardConfig
             $authenticatorConfigCollection,
             $logoutConfig,
             $listenerConfigCollection,
+            $authorizationCheckerConfig,
         );
     }
 
@@ -105,5 +112,15 @@ class GuardConfig
     public function listenerConfigCollection(): ListenerConfigCollection
     {
         return $this->listenerConfigCollection;
+    }
+
+    /**
+     * 授权检查器配置
+     *
+     * @return AuthorizationCheckerConfig
+     */
+    public function authorizationCheckerConfig(): AuthorizationCheckerConfig
+    {
+        return $this->authorizationCheckerConfig;
     }
 }

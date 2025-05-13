@@ -81,8 +81,8 @@ class Guard implements GuardInterface
             return $this->unauthenticatedHandler->handle($request, UnauthenticatedException::from($token));
         }
 
-        $attribute = $request->getAttribute('authorization_attribute');
-        $subject = $request->getAttribute('authorization_subject');
+        $attribute = $request->getAttribute('authorization_attribute', '');
+        $subject = $request->getAttribute('authorization_subject', null);
         $request->withoutAttribute('authorization_attribute')->withoutAttribute('authorization_subject');
         if (!$this->authorizationChecker->check($token, $attribute, $subject)) {
             return $this->accessDeniedHandler->handle($request, AccessDeniedException::from($token, $attribute, $subject));

@@ -12,6 +12,7 @@ use Lzpeng\HyperfAuthGuard\Authorization\AccessDeniedHandler;
 use Lzpeng\HyperfAuthGuard\Authorization\AccessDeniedHandlerInterface;
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerInterface;
 use Lzpeng\HyperfAuthGuard\Config\AuthenticatorConfig;
+use Lzpeng\HyperfAuthGuard\Config\AuthorizationCheckerConfig;
 use Lzpeng\HyperfAuthGuard\Config\Config;
 use Lzpeng\HyperfAuthGuard\Config\MatcherConfig;
 use Lzpeng\HyperfAuthGuard\Config\TokenStorageConfig;
@@ -90,16 +91,22 @@ class ServiceProvider
                 return new AuthenticatorResolver($authenticatorMap, $this->container);
             });
 
+            $authorizationCheckerId = sprintf('auth.guards.%s.authorization_checker', $guardName);
+            $authorizationCheckerConfig = $guardConfig->authorizationCheckerConfig();
+            $this->container->set($authorizationCheckerId, function () use ($authorizationCheckerConfig) {
+                return $this->createAuthorizationChecker($authorizationCheckerConfig);
+            });
+
             $guardId = sprintf('auth.guards.%s', $guardName);
             $guardMap[$guardName] = $guardId;
-            $this->container->set($guardId, function () use ($guardName, $tokenStorageId, $authenticatorResolverId) {
+            $this->container->set($guardId, function () use ($guardName, $tokenStorageId, $authenticatorResolverId, $authorizationCheckerId) {
                 return new Guard(
                     name: $guardName,
                     authenticatorResolver: $this->container->get($authenticatorResolverId),
                     tokenContext: $this->container->get(TokenContextInterface::class),
                     tokenStorage: $this->container->get($tokenStorageId),
                     unauthenticatedHandler: $this->container->get(UnauthenticatedHandlerInterface::class),
-                    authorizationChecker: $this->container->get(AuthorizationCheckerInterface::class),
+                    authorizationChecker: $this->container->get($authorizationCheckerId),
                     accessDeniedHandler: $this->container->get(AccessDeniedHandlerInterface::class),
                     eventDispatcher: $this->container->make(EventDispatcherInterface::class),
                 );
@@ -107,7 +114,7 @@ class ServiceProvider
         }
 
         $this->container->set(TokenContextInterface::class, function () {
-            return new TokenContext();
+            return new TokenContext('auth');
         });
 
         $this->container->set(UnauthenticatedHandlerInterface::class, function () {
@@ -153,6 +160,20 @@ class ServiceProvider
             default:
                 throw new \InvalidArgumentException(sprintf('Invalid request matcher type: %s', $type));
         }
+    }
+
+    /**
+     * 创建授权检查器
+     *
+     * @param AuthorizationCheckerConfig $authorizationCheckerConfig
+     * @return AuthorizationCheckerInterface
+     */
+    private function createAuthorizationChecker(AuthorizationCheckerConfig $authorizationCheckerConfig): AuthorizationCheckerInterface
+    {
+        return $this->container->make(
+            $authorizationCheckerConfig->class(),
+            $authorizationCheckerConfig->params()
+        );
     }
 
     /**

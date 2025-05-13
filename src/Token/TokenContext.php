@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Token;
 
+use Hyperf\Context\Context;
+
 /**
  * 内置的用户令牌上下文
  *
@@ -12,18 +14,16 @@ namespace Lzpeng\HyperfAuthGuard\Token;
 class TokenContext implements TokenContextInterface
 {
     /**
-     * 用户令牌
-     *
-     * @var TokenInterface|null
+     * @param string $prefix
      */
-    private ?TokenInterface $token = null;
+    public function __construct(private string $prefix) {}
 
     /**
      * @inheritDoc
      */
     public function getToken(): ?TokenInterface
     {
-        return $this->token;
+        return Context::get($this->getKey('token'));
     }
 
     /**
@@ -31,6 +31,17 @@ class TokenContext implements TokenContextInterface
      */
     public function setToken(?TokenInterface $token): void
     {
-        $this->token = $token;
+        Context::set($this->getKey('token'), $token);
+    }
+
+    /**
+     * 返回令牌存储的键
+     *
+     * @param string $key
+     * @return string
+     */
+    private function getKey(string $key): string
+    {
+        return sprintf('%s.%s', $this->prefix, $key);
     }
 }
