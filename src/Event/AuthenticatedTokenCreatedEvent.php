@@ -8,11 +8,11 @@ use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 
 /**
- * 用户令牌已创建事件
+ * 用户认证令牌已创建事件
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class TokenCreatedEvent
+class AuthenticatedTokenCreatedEvent
 {
     /**
      * @param Passport $passport 可能需要Passport的信息对Token进行修改

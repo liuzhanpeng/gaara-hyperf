@@ -14,11 +14,11 @@ use Lzpeng\HyperfAuthGuard\User\UserInterface;
 interface TokenInterface extends \Stringable
 {
     /**
-     * 返回认证守卫ID
+     * 返回认证守卫名称
      *
      * @return string
      */
-    public function getGuardId(): string;
+    public function getGuardName(): string;
 
     /**
      * 返回用户
@@ -28,20 +28,12 @@ interface TokenInterface extends \Stringable
     public function getUser(): ?UserInterface;
 
     /**
-     * 设置用户
-     *
-     * @param UserInterface $user
-     * @return void
-     */
-    public function setUser(UserInterface $user): void;
-
-    /**
      * 是否有属性
      *
      * @param string $name
      * @return boolean
      */
-    public function hasAttrubute(string $name): bool;
+    public function hasAttribute(string $name): bool;
 
     /**
      * 返回指定属性的值
@@ -50,13 +42,4 @@ interface TokenInterface extends \Stringable
      * @return mixed
      */
     public function getAttribute(string $name): mixed;
-
-    /**
-     * 设置属性
-     *
-     * @param string $name
-     * @param mixed $value
-     * @return void
-     */
-    public function setAttribute(string $name, mixed $value): void;
 }
