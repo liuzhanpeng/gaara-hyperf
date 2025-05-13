@@ -13,7 +13,7 @@ class MatcherConfig
 {
     public function __construct(
         private string $type,
-        private string|array $value
+        private string|array $options
     ) {}
 
     /**
@@ -27,9 +27,9 @@ class MatcherConfig
         }
 
         $type = array_key_first($config);
-        $value = $config[$type];
+        $options = $config[$type];
 
-        return new self($type, $value);
+        return new self($type, $options);
     }
 
     /**
@@ -47,8 +47,8 @@ class MatcherConfig
      *
      * @return string|array
      */
-    public function value(): string|array
+    public function options(): string|array
     {
-        return $this->value;
+        return $this->options;
     }
 }

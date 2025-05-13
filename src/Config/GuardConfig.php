@@ -20,6 +20,10 @@ class GuardConfig
         private ListenerConfigCollection $listenerConfigCollection,
     ) {}
 
+    /**
+     * @param array $config
+     * @return self
+     */
     public static function from(array $config): self
     {
         $matcherConfig = MatcherConfig::from($config['matcher'] ?? []);
@@ -101,14 +105,5 @@ class GuardConfig
     public function listenerConfigCollection(): ListenerConfigCollection
     {
         return $this->listenerConfigCollection;
-    }
-    /**
-     * 是否无状态认证
-     *
-     * @return boolean
-     */
-    public function stateless(): bool
-    {
-        return $this->stateless;
     }
 }

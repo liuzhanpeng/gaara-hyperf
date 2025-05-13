@@ -13,11 +13,11 @@ class TokenStorageConfig
 {
     /**
      * @param string $type
-     * @param array $params
+     * @param array $options
      */
     public function __construct(
         private string $type,
-        private array $params = []
+        private array $options = []
     ) {}
 
     public static function from(array $config): self
@@ -32,10 +32,10 @@ class TokenStorageConfig
             throw new \InvalidArgumentException('TokenStorage config must be a single array');
         }
 
-        $id = array_key_first($config);
-        $params = $config[$id];
+        $type = array_key_first($config);
+        $options = $config[$type];
 
-        return new self($id, $params);
+        return new self($type, $options);
     }
 
     /**
@@ -53,8 +53,8 @@ class TokenStorageConfig
      * 
      * @return array
      */
-    public function params(): array
+    public function options(): array
     {
-        return $this->params;
+        return $this->options;
     }
 }

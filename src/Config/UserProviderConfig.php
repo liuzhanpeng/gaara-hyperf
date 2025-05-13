@@ -12,12 +12,12 @@ namespace Lzpeng\HyperfAuthGuard\Config;
 class UserProviderConfig
 {
     /**
-     * @param string $id
-     * @param array $params
+     * @param string $type
+     * @param array $options
      */
     public function __construct(
-        private string $id,
-        private array $params
+        private string $type,
+        private array $options
     ) {}
 
     public static function from(array $config): self
@@ -26,10 +26,10 @@ class UserProviderConfig
             throw new \InvalidArgumentException('UserProvider config must be a single array');
         }
 
-        $id = array_key_first($config);
-        $params = $config[$id];
+        $type = array_key_first($config);
+        $options = $config[$type];
 
-        return new self($id, $params);
+        return new self($type, $options);
     }
 
     /**
@@ -37,9 +37,9 @@ class UserProviderConfig
      *
      * @return string
      */
-    public function id(): string
+    public function type(): string
     {
-        return $this->id;
+        return $this->type;
     }
 
     /**
@@ -47,8 +47,8 @@ class UserProviderConfig
      *
      * @return array
      */
-    public function params(): array
+    public function options(): array
     {
-        return $this->params;
+        return $this->options;
     }
 }

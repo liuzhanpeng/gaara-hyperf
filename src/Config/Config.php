@@ -16,6 +16,10 @@ class Config
      */
     public function __construct(private array $guardConfigCollection) {}
 
+    /**
+     * @param array $config
+     * @return self
+     */
     public static function from(array $config): self
     {
         if (!isset($config['guards'])) {

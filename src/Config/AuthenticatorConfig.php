@@ -12,7 +12,7 @@ namespace Lzpeng\HyperfAuthGuard\Config;
 class AuthenticatorConfig
 {
     public function __construct(
-        private string $id,
+        private string $name,
         private array $params
     ) {}
 
@@ -21,9 +21,9 @@ class AuthenticatorConfig
      *
      * @return string
      */
-    public function id(): string
+    public function name(): string
     {
-        return $this->id;
+        return $this->name;
     }
 
     /**

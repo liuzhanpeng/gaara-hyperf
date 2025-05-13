@@ -20,7 +20,6 @@ use Lzpeng\HyperfAuthGuard\Token\AuthenticatedToken;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageInterface;
-use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageResolverInterface;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandlerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -36,8 +35,8 @@ class Guard implements GuardInterface
     public function __construct(
         private string $name,
         private AuthenticatorResolverInterface $authenticatorResolver,
+        private TokenStorageInterface $tokenStorage,
         private TokenContextInterface $tokenContext,
-        private TokenStorageResolverInterface $tokenStorageResolver,
         private UnauthenticatedHandlerInterface $unauthenticatedHandler,
         private AuthorizationCheckerInterface $authorizationChecker,
         private AccessDeniedHandlerInterface $accessDeniedHandler,
@@ -62,7 +61,7 @@ class Guard implements GuardInterface
      */
     public function authenticate(ServerRequestInterface $request): ?ResponseInterface
     {
-        $token = $this->getTokenStorage()->get($this->name);
+        $token = $this->tokenStorage->get($this->name);
         $this->tokenContext->setToken($token);
 
         foreach ($this->authenticatorResolver->getAuthenticatorIds($this->name) as $authenticatorId) {
@@ -134,7 +133,7 @@ class Guard implements GuardInterface
     {
         $this->tokenContext->setToken($token);
 
-        $this->getTokenStorage()->set($this->name, $token);
+        $this->tokenStorage->set($this->name, $token);
 
         $response = $authenticator->onAuthenticationSuccess($request, $token);
 
@@ -175,15 +174,5 @@ class Guard implements GuardInterface
         $this->eventDispatcher->dispatch($authenticationFailureEvent);
 
         return $authenticationFailureEvent->getResponse();
-    }
-
-    /**
-     * 返回认证守卫的Token存储器
-     *
-     * @return TokenStorageInterface
-     */
-    private function getTokenStorage(): TokenStorageInterface
-    {
-        return $this->tokenStorageResolver->resolve($this->name);
     }
 }
