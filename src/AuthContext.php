@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard;
 
+use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorResolverInterface;
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerInterface;
+use Lzpeng\HyperfAuthGuard\Exception\AccessDeniedException;
+use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolverInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\User\UserInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * 认证上下文
@@ -16,14 +21,47 @@ use Lzpeng\HyperfAuthGuard\User\UserInterface;
  */
 class AuthContext
 {
-    /**
-     * @param TokenContextInterface $tokenContext
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(
+        private ServerRequestInterface $request,
         private TokenContextInterface $tokenContext,
+        private GuardResolverInterface $guardResolver,
+        private AuthenticatorResolverInterface $authenticatorResolver,
+        private LogoutHandlerResolverInterface $logoutHandlerResolver,
         private AuthorizationCheckerInterface $authorizationChecker,
     ) {}
+
+    /**
+     * 登录
+     *
+     * @param UserInterface $user
+     * @param string $guardName
+     * @param string $authenticator
+     * @param array $badges
+     * @return ResponseInterface
+     */
+    public function login(UserInterface $user, string $guardName, string $authenticator, array $badges = []): ResponseInterface
+    {
+        $guard = $this->guardResolver->resolve($guardName);
+        $authenticatorId = sprintf('auth.guards.%s.authenticators.%s', $guardName, $authenticator);
+        $authenticator = $this->authenticatorResolver->resolve($authenticatorId);
+
+        return $guard->authenticateUser($user, $authenticator, $this->request, $badges);
+    }
+
+    /**
+     * 登出
+     *
+     * @return ResponseInterface
+     */
+    public function logout(): ResponseInterface
+    {
+        if (! $this->isAuthenticated()) {
+            throw new AccessDeniedException('未登录或会话已过期');
+        }
+
+        $logoutHandler = $this->logoutHandlerResolver->resolve($this->getToken()->getGuardName());
+        return $logoutHandler->handle($this->request);
+    }
 
     /**
      * 返回当前令牌

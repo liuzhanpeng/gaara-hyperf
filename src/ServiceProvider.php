@@ -97,7 +97,7 @@ class ServiceProvider
 
             $authenticatorMap = [];
             foreach ($guardConfig->authenticatorConfigCollection() as $authenticatorConfig) {
-                $authenticatorId = sprintf('auth.guards.%s.authenticators.%s', $guardName, $authenticatorConfig->name());
+                $authenticatorId = sprintf('auth.guards.%s.authenticators.%s', $guardName, $authenticatorConfig->type());
                 $authenticatorMap[$guardName][] = $authenticatorId;
                 $this->container->set($authenticatorId, function () use ($authenticatorConfig, $userProviderId) {
                     return $this->createAuthenticator($authenticatorConfig, $userProviderId);

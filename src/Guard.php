@@ -21,6 +21,7 @@ use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageInterface;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandlerInterface;
+use Lzpeng\HyperfAuthGuard\User\UserInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -54,10 +55,19 @@ class Guard implements GuardInterface
     }
 
     /**
-     * 认证 
-     *
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface|null
+     * @inheritDoc
+     */
+    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, ServerRequestInterface $request, array $badges = []): ?ResponseInterface
+    {
+        $passport = new Passport($user->getIdentifier(), fn() => $user, $badges);
+        $token = $authenticator->createToken($passport, $this->name);
+        $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($this->name, $passport, $token))->getToken();
+
+        return $this->handleAuthenticationSuccess($token, $request, $authenticator, $passport);
+    }
+
+    /**
+     * @inheritDoc
      */
     public function authenticate(ServerRequestInterface $request): ?ResponseInterface
     {
