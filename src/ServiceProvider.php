@@ -5,18 +5,28 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard;
 
 use Hyperf\Contract\ContainerInterface;
+use Hyperf\Event\Contract\ListenerInterface;
+use Hyperf\Event\ListenerData;
+use Hyperf\Event\ListenerProvider;
+use Lzpeng\HyperfAuthGuar\TokenStorage\TokenStorageResolver;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorResolver;
-use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorResolverInterface;
 use Lzpeng\HyperfAuthGuard\Authorization\AccessDeniedHandler;
 use Lzpeng\HyperfAuthGuard\Authorization\AccessDeniedHandlerInterface;
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerInterface;
+use Lzpeng\HyperfAuthGuard\Config\AccessDeniedHandlerConfig;
 use Lzpeng\HyperfAuthGuard\Config\AuthenticatorConfig;
 use Lzpeng\HyperfAuthGuard\Config\AuthorizationCheckerConfig;
 use Lzpeng\HyperfAuthGuard\Config\Config;
-use Lzpeng\HyperfAuthGuard\Config\MatcherConfig;
+use Lzpeng\HyperfAuthGuard\Config\LogoutConfig;
+use Lzpeng\HyperfAuthGuard\Config\RequestMatcherConfig;
 use Lzpeng\HyperfAuthGuard\Config\TokenStorageConfig;
 use Lzpeng\HyperfAuthGuard\Config\UserProviderConfig;
+use Lzpeng\HyperfAuthGuard\EventListener\GuardFilteredListener;
+use Lzpeng\HyperfAuthGuard\Logout\LogoutHandler;
+use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerInterface;
+use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolver;
+use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolverInterface;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\PatternRequestMatcher;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\PrefixRequestMatcher;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\RequestMatcherInterface;
@@ -27,10 +37,13 @@ use Lzpeng\HyperfAuthGuard\TokenStorage\NullTokenStorage;
 use Lzpeng\HyperfAuthGuard\TokenStorage\SessionTokenStorage;
 use Lzpeng\HyperfAuthGuard\Token\TokenContext;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
+use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageResolverInterface;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandler;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandlerInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
+use Lzpeng\HyperfAuthGuard\Util\Util;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\EventDispatcher\ListenerProviderInterface;
 
 /**
  * 认证组件服务提供者
@@ -57,15 +70,20 @@ class ServiceProvider
     {
         $guardMap = [];
         $matcherMap = [];
-        foreach ($this->config->guardConfigCollection() as $guardName => $guardConfig) {
+        $tokenStorageMap = [];
+        $logoutHandlerMap = [];
+        foreach ($this->config->guardConfigCollection() as $guardConfig) {
+            $guardName = $guardConfig->name();
+
             $matcherId = sprintf('auth.guards.%s.matcher', $guardName);
             $matcherMap[$guardName] = $matcherId;
-            $matcherConfig = $guardConfig->matcherConfig();
-            $this->container->set($matcherId, function () use ($matcherConfig) {
-                return $this->createRequestMatcher($matcherConfig);
+            $requestMatcherConfig = $guardConfig->requestMatcherConfig();
+            $this->container->set($matcherId, function () use ($requestMatcherConfig) {
+                return $this->createRequestMatcher($requestMatcherConfig);
             });
 
             $tokenStorageId = sprintf('auth.guards.%s.token_storage', $guardName);
+            $tokenStorageMap[$guardName] = $tokenStorageId;
             $tokenStorageConfig = $guardConfig->tokenStorageConfig();
             $this->container->set($tokenStorageId, function () use ($tokenStorageConfig) {
                 return $this->createTokenStorage($tokenStorageConfig);
@@ -91,15 +109,57 @@ class ServiceProvider
                 return new AuthenticatorResolver($authenticatorMap, $this->container);
             });
 
+            $logoutHandlerId = sprintf('auth.guards.%s.logout_handler', $guardName);
+            $logoutHandlerMap[$guardName] = $logoutHandlerId;
+            $logoutConfig = $guardConfig->logoutConfig();
+            $this->container->set($logoutHandlerId, function () use ($logoutConfig) {
+                return $this->createLogoutHandler($logoutConfig);
+            });
+
             $authorizationCheckerId = sprintf('auth.guards.%s.authorization_checker', $guardName);
             $authorizationCheckerConfig = $guardConfig->authorizationCheckerConfig();
             $this->container->set($authorizationCheckerId, function () use ($authorizationCheckerConfig) {
                 return $this->createAuthorizationChecker($authorizationCheckerConfig);
             });
 
+            $accessDeniedHandlerId = sprintf('auth.guards.%s.access_denied_handler', $guardName);
+            $accessDeniedHandlerConfig = $guardConfig->accessDeniedHandlerConfig();
+            $this->container->set($accessDeniedHandlerId, function () use ($accessDeniedHandlerConfig) {
+                return $this->createAccessDeniedHandler($accessDeniedHandlerConfig);
+            });
+
+            foreach ($guardConfig->listenerConfigCollection() as $listenerConfig) {
+                $listenerId = sprintf('auth.guards.%s.listeners.%s', $guardName, $listenerConfig->class());
+                $this->container->set($listenerId, function () use ($guardName, $listenerConfig) {
+                    $listener = $this->container->make($listenerConfig->class(), $listenerConfig->params());
+
+                    return new GuardFilteredListener($guardName, $listener);
+                });
+
+                $listenerProvider = $this->container->get(ListenerProviderInterface::class);
+                if (!$listenerProvider instanceof ListenerProvider) {
+                    throw new \RuntimeException('ListenerProvider not found');
+                }
+
+                /**
+                 * @var ListenerInterface
+                 */
+                $listenerInstance = $this->container->get($listenerId);
+                $events = $listenerInstance->listen();
+                foreach ($events as $event) {
+                    $listenerProvider->on($event, [$listenerInstance, 'process'], ListenerData::DEFAULT_PRIORITY + 1);
+                }
+            }
+
             $guardId = sprintf('auth.guards.%s', $guardName);
             $guardMap[$guardName] = $guardId;
-            $this->container->set($guardId, function () use ($guardName, $tokenStorageId, $authenticatorResolverId, $authorizationCheckerId) {
+            $this->container->set($guardId, function () use (
+                $guardName,
+                $tokenStorageId,
+                $authenticatorResolverId,
+                $authorizationCheckerId,
+                $accessDeniedHandlerId
+            ) {
                 return new Guard(
                     name: $guardName,
                     authenticatorResolver: $this->container->get($authenticatorResolverId),
@@ -107,14 +167,22 @@ class ServiceProvider
                     tokenStorage: $this->container->get($tokenStorageId),
                     unauthenticatedHandler: $this->container->get(UnauthenticatedHandlerInterface::class),
                     authorizationChecker: $this->container->get($authorizationCheckerId),
-                    accessDeniedHandler: $this->container->get(AccessDeniedHandlerInterface::class),
-                    eventDispatcher: $this->container->make(EventDispatcherInterface::class),
+                    accessDeniedHandler: $this->container->get($accessDeniedHandlerId),
+                    eventDispatcher: $this->container->get(EventDispatcherInterface::class),
                 );
             });
         }
 
         $this->container->set(TokenContextInterface::class, function () {
             return new TokenContext('auth');
+        });
+
+        $this->container->set(TokenStorageResolverInterface::class, function () use ($tokenStorageMap) {
+            return new TokenStorageResolver($tokenStorageMap, $this->container);
+        });
+
+        $this->container->set(LogoutHandlerResolverInterface::class, function () use ($logoutHandlerMap) {
+            return new LogoutHandlerResolver($logoutHandlerMap, $this->container);
         });
 
         $this->container->set(UnauthenticatedHandlerInterface::class, function () {
@@ -139,13 +207,13 @@ class ServiceProvider
     /**
      * 创建请求匹配器
      *
-     * @param MatcherConfig $matcherConfig
+     * @param RequestMatcherConfig $requestMatcherConfig
      * @return RequestMatcherInterface
      */
-    private function createRequestMatcher(MatcherConfig $matcherConfig): RequestMatcherInterface
+    private function createRequestMatcher(RequestMatcherConfig $requestMatcherConfig): RequestMatcherInterface
     {
-        $type = $matcherConfig->type();
-        $options = $matcherConfig->options();
+        $type = $requestMatcherConfig->type();
+        $options = $requestMatcherConfig->options();
 
         switch ($type) {
             case 'pattern':
@@ -163,6 +231,24 @@ class ServiceProvider
     }
 
     /**
+     * 创建登出处理器
+     *
+     * @param LogoutConfig $logoutConfig
+     * @return LogoutHandlerInterface
+     */
+    private function createLogoutHandler(LogoutConfig $logoutConfig): LogoutHandlerInterface
+    {
+        return new LogoutHandler(
+            config: $logoutConfig,
+            tokenStorageResolver: $this->container->get(TokenStorageResolverInterface::class),
+            tokenContext: $this->container->get(TokenContextInterface::class),
+            eventDispatcher: $this->container->get(EventDispatcherInterface::class),
+            response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
+            util: $this->container->get(Util::class),
+        );
+    }
+
+    /**
      * 创建授权检查器
      *
      * @param AuthorizationCheckerConfig $authorizationCheckerConfig
@@ -173,6 +259,20 @@ class ServiceProvider
         return $this->container->make(
             $authorizationCheckerConfig->class(),
             $authorizationCheckerConfig->params()
+        );
+    }
+
+    /**
+     * 创建拒绝访问处理器
+     *
+     * @param AccessDeniedHandlerConfig $accessDeniedHandlerConfig
+     * @return AccessDeniedHandlerInterface
+     */
+    private function createAccessDeniedHandler(AccessDeniedHandlerConfig $accessDeniedHandlerConfig): AccessDeniedHandlerInterface
+    {
+        return $this->container->make(
+            $accessDeniedHandlerConfig->class(),
+            $accessDeniedHandlerConfig->params()
         );
     }
 

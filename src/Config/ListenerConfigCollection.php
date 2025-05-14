@@ -13,13 +13,34 @@ use Traversable;
  */
 class ListenerConfigCollection implements \IteratorAggregate
 {
-    public function __construct(private array $listenerClasses) {}
+    /**
+     * @param ListenerConfig[] $listenerConfigCollection
+     */
+    public function __construct(
+        private array $listenerConfigCollection
+    ) {}
+
+    /**
+     * @param array $config
+     * @return self
+     */
+    public static function from(array $config): self
+    {
+        $listenerConfigCollection = [];
+        foreach ($config as $listenerConfig) {
+            $listenerConfigCollection[] = ListenerConfig::from($listenerConfig);
+        }
+
+        return new self($listenerConfigCollection);
+    }
 
     /**
      * @inheritDoc
+     * 
+     * @return Traversable<ListenerConfig>
      */
     public function getIterator(): Traversable
     {
-        yield from $this->listenerClasses;
+        yield from $this->listenerConfigCollection;
     }
 }

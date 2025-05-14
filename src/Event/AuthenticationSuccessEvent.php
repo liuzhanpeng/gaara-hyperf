@@ -15,9 +15,10 @@ use Psr\Http\Message\ServerRequestInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class AuthenticationSuccessEvent
+class AuthenticationSuccessEvent implements EventInterface
 {
     /**
+     * @param string $guardName
      * @param AuthenticatorInterface $authenticator
      * @param Passport $passport
      * @param TokenInterface $token
@@ -25,12 +26,21 @@ class AuthenticationSuccessEvent
      * @param ResponseInterface|null $response
      */
     public function __construct(
+        private string $guardName,
         private AuthenticatorInterface $authenticator,
         private Passport $passport,
         private TokenInterface $token,
         private ServerRequestInterface $request,
         private ?ResponseInterface $response
     ) {}
+
+    /**
+     * @inheritDoc
+     */
+    public function getGuardName(): string
+    {
+        return $this->guardName;
+    }
 
     /**
      * 返回认证器

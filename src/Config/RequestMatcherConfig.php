@@ -9,7 +9,7 @@ namespace Lzpeng\HyperfAuthGuard\Config;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class MatcherConfig
+class RequestMatcherConfig
 {
     public function __construct(
         private string $type,
@@ -23,7 +23,7 @@ class MatcherConfig
     public static function from(array $config): self
     {
         if (count($config) !== 1) {
-            throw new \InvalidArgumentException('Matcher config must be a single array');
+            throw new \InvalidArgumentException('RequestMatcher config must be a single array');
         }
 
         $type = array_key_first($config);

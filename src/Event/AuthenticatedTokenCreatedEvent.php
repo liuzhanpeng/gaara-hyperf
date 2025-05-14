@@ -12,16 +12,26 @@ use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class AuthenticatedTokenCreatedEvent
+class AuthenticatedTokenCreatedEvent implements EventInterface
 {
     /**
+     * @param string $guardName
      * @param Passport $passport 可能需要Passport的信息对Token进行修改
      * @param TokenInterface $token
      */
     public function __construct(
+        private string $guardName,
         private Passport $passport,
         private TokenInterface $token
     ) {}
+
+    /**
+     * @inheritDoc
+     */
+    public function getGuardName(): string
+    {
+        return $this->guardName;
+    }
 
     /**
      * 返回Passport

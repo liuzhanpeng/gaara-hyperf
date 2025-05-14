@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Config;
 
+use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerInterface;
+
 /**
  * 登出配置
  * 
@@ -11,22 +13,28 @@ namespace Lzpeng\HyperfAuthGuard\Config;
  */
 class LogoutConfig
 {
+    /**
+     * @param string $path 登出路径
+     * @param string|null $target 登出成功后跳转的页面 
+     */
     public function __construct(
         private string $path,
-        private string $target,
-        private array $handlers
+        private ?string $target,
     ) {}
 
+    /**
+     * @param array $config
+     * @return self
+     */
     public static function from(array $config): self
     {
-        if (!isset($config['path']) || !isset($config['target'])) {
-            throw new \InvalidArgumentException('参数错误');
+        if (!isset($config['path'])) {
+            throw new \InvalidArgumentException('logout path is required');
         }
 
         return new self(
             $config['path'],
-            $config['target'],
-            $config['handlers'] ?? []
+            $config['target'] ?? null,
         );
     }
 
@@ -43,20 +51,10 @@ class LogoutConfig
     /**
      * 登出成功后跳转的页面
      *
-     * @return string
+     * @return string|null
      */
-    public function target(): string
+    public function target(): string|null
     {
         return $this->target;
-    }
-
-    /**
-     * 返回登出处理器
-     *
-     * @return array
-     */
-    public function handlers(): array
-    {
-        return $this->handlers;
     }
 }

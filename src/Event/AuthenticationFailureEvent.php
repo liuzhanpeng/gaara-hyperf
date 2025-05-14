@@ -15,9 +15,10 @@ use Psr\Http\Message\ServerRequestInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class AuthenticationFailureEvent
+class AuthenticationFailureEvent implements EventInterface
 {
     /**
+     * @param string $guardName
      * @param AuthenticatorInterface $authenticator
      * @param Passport $passport
      * @param AuthenticationException $exception
@@ -25,12 +26,21 @@ class AuthenticationFailureEvent
      * @param ResponseInterface|null $response
      */
     public function __construct(
+        private string $guardName,
         private AuthenticatorInterface $authenticator,
         private Passport $passport,
         private AuthenticationException $exception,
         private ServerRequestInterface $request,
         private ?ResponseInterface $response
     ) {}
+
+    /**
+     * @inheritDoc
+     */
+    public function getGuardName(): string
+    {
+        return $this->guardName;
+    }
 
 
     /**

@@ -22,17 +22,13 @@ class Config
      */
     public static function from(array $config): self
     {
-        if (!isset($config['guards'])) {
-            throw new \InvalidArgumentException('配置中必须包含guards');
-        }
-
-        if (count($config['guards']) === 0) {
-            throw new \InvalidArgumentException('配置中必须包含至少一个guard');
+        if (!isset($config['guards']) || count($config['guards']) === 0) {
+            throw new \InvalidArgumentException('guards config is required');
         }
 
         $guardConfigCollection = [];
-        foreach ($config['guards'] as $name => $guardConfig) {
-            $guardConfigCollection[$name] = GuardConfig::from($guardConfig);
+        foreach ($config['guards'] as $guardName => $guardConfig) {
+            $guardConfigCollection[] = GuardConfig::from($guardName, $guardConfig);
         }
 
         return new self($guardConfigCollection);
@@ -41,7 +37,7 @@ class Config
     /**
      * 返回所有guard的配置
      * 
-     * @return array<string, GuardConfig>
+     * @return GuardConfig[]
      */
     public function guardConfigCollection(): array
     {

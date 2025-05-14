@@ -20,16 +20,24 @@ class AuthenticatorConfigCollection implements \IteratorAggregate
         private array $authenticatorConfigCollection,
     ) {}
 
+    /**
+     * @param array $config
+     * @return self
+     */
     public static function from(array $config): self
     {
         $authenticatorConfigCollection = [];
-        foreach ($config as $id => $params) {
-            if ($id === 'custom') {
-                foreach ($params as $customAuthenticator) {
-                    $authenticatorConfigCollection[] = new AuthenticatorConfig($customAuthenticator['class'], $customAuthenticator['params'] ?? []);
+        foreach ($config as $type => $params) {
+            if ($type === 'custom') {
+                foreach ($params as $customAuthenticatorConfig) {
+                    if (!isset($customAuthenticatorConfig['class'])) {
+                        throw new \InvalidArgumentException('Invalid custom authenticator config: class is required');
+                    }
+
+                    $authenticatorConfigCollection[] = new AuthenticatorConfig($customAuthenticatorConfig['class'], $customAuthenticatorConfig['params'] ?? []);
                 }
             } else {
-                $authenticatorConfigCollection[] = new AuthenticatorConfig($id, $params);
+                $authenticatorConfigCollection[] = new AuthenticatorConfig($type, $params);
             }
         }
 
@@ -38,6 +46,8 @@ class AuthenticatorConfigCollection implements \IteratorAggregate
 
     /**
      * @inheritDoc
+     * 
+     * @return Traversable<AuthenticatorConfig>
      */
     public function getIterator(): Traversable
     {

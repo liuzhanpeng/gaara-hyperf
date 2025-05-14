@@ -5,44 +5,33 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\Config;
 
 /**
- * 授权检查器配置
+ * 监听器配置
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class AuthorizationCheckerConfig
+class ListenerConfig
 {
-    /**
-     * @param string $class 授权检查器类名
-     * @param array $params 授权检查器构造参数
-     */
     public function __construct(
         private string $class,
         private array $params,
     ) {}
 
     /**
-     * @param array|string $config
+     * @param string|array $config
      * @return self
      */
-    public static function from(array|string $config): self
+    public static function from(string|array $config): self
     {
         if (is_string($config)) {
             return new self($config, []);
         }
 
-        if (!isset($config['class'])) {
-            throw new \InvalidArgumentException('AuthorizationCheckerConfig class is required');
-        }
-
-        return new self(
-            $config['class'],
-            $config['params'] ?? []
-        );
+        return new self($config['class'], $config['params'] ?? []);
     }
 
     /**
-     * 返回授权检查器类名
-     * 
+     * 监听器类名
+     *
      * @return string
      */
     public function class(): string
@@ -51,7 +40,7 @@ class AuthorizationCheckerConfig
     }
 
     /**
-     * 返回授权检查器构造参数
+     * 监听器构造参数
      *
      * @return array
      */

@@ -11,23 +11,27 @@ namespace Lzpeng\HyperfAuthGuard\Config;
  */
 class AuthenticatorConfig
 {
+    /**
+     * @param string $type
+     * @param array $params
+     */
     public function __construct(
-        private string $name,
+        private string $type,
         private array $params
     ) {}
 
     /**
-     * 返回认证器id
+     * 返回认证器类型
      *
      * @return string
      */
-    public function name(): string
+    public function type(): string
     {
-        return $this->name;
+        return $this->type;
     }
 
     /**
-     * 返回认证器参数
+     * 返回认证器构造参数
      *
      * @return array
      */

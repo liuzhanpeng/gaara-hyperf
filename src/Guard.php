@@ -102,7 +102,7 @@ class Guard implements GuardInterface
     {
         try {
             $passport = $authenticator->authenticate($request);
-            $checkPassportEvent = new CheckPassportEvent($authenticator, $passport);
+            $checkPassportEvent = new CheckPassportEvent($this->name, $authenticator, $passport);
             $this->eventDispatcher->dispatch($checkPassportEvent);
 
             foreach ($passport->getBadges() as $badge) {
@@ -112,7 +112,7 @@ class Guard implements GuardInterface
             }
 
             $token = $authenticator->createToken($passport, $this->name);
-            $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($passport, $token))->getToken();
+            $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($this->name, $passport, $token))->getToken();
 
             return $this->handleAuthenticationSuccess($token, $request, $authenticator, $passport);
         } catch (AuthenticationException $exception) {
@@ -138,6 +138,7 @@ class Guard implements GuardInterface
         $response = $authenticator->onAuthenticationSuccess($request, $token);
 
         $authenticationSuccessEvent = new AuthenticationSuccessEvent(
+            $this->name,
             $authenticator,
             $passport,
             $token,
@@ -164,6 +165,7 @@ class Guard implements GuardInterface
         $response = $authenticator->onAuthenticationFailure($request, $exception, $passport);
 
         $authenticationFailureEvent = new AuthenticationFailureEvent(
+            $this->name,
             $authenticator,
             $passport,
             $exception,
