@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard;
 
-use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorResolverInterface;
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AccessDeniedException;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolverInterface;
@@ -24,29 +23,9 @@ class AuthContext
     public function __construct(
         private ServerRequestInterface $request,
         private TokenContextInterface $tokenContext,
-        private GuardResolverInterface $guardResolver,
-        private AuthenticatorResolverInterface $authenticatorResolver,
         private LogoutHandlerResolverInterface $logoutHandlerResolver,
         private AuthorizationCheckerInterface $authorizationChecker,
     ) {}
-
-    /**
-     * 登录
-     *
-     * @param UserInterface $user
-     * @param string $guardName
-     * @param string $authenticator
-     * @param array $badges
-     * @return ResponseInterface
-     */
-    public function login(UserInterface $user, string $guardName, string $authenticator, array $badges = []): ResponseInterface
-    {
-        $guard = $this->guardResolver->resolve($guardName);
-        $authenticatorId = sprintf('auth.guards.%s.authenticators.%s', $guardName, $authenticator);
-        $authenticator = $this->authenticatorResolver->resolve($authenticatorId);
-
-        return $guard->authenticateUser($user, $authenticator, $this->request, $badges);
-    }
 
     /**
      * 登出
