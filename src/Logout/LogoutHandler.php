@@ -47,7 +47,7 @@ class LogoutHandler implements LogoutHandlerInterface
             return $this->createDefaultResponse($request);
         }
 
-        $logoutEvent = new LogoutEvent($token, $request);
+        $logoutEvent = new LogoutEvent($token->getGuardName(), $token, $request);
         $this->eventDispatcher->dispatch($logoutEvent);
 
         $response = $logoutEvent->getResponse();
