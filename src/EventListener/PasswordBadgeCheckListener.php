@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\EventListener;
 
 use Hyperf\Event\Contract\ListenerInterface;
-use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherInterface;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
 use Lzpeng\HyperfAuthGuard\Exception\InvalidPasswordException;
 use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
+use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolverInterface;
 use Lzpeng\HyperfAuthGuard\User\PasswordUserInterface;
 
 /**
@@ -19,10 +19,10 @@ use Lzpeng\HyperfAuthGuard\User\PasswordUserInterface;
 class PasswordBadgeCheckListener implements ListenerInterface
 {
     /**
-     * @param PasswordHasherInterface $passwordHasher
+     * @param PasswordHasherResolverInterface $passwordHasherResolver
      */
     public function __construct(
-        private PasswordHasherInterface $passwordHasher
+        private PasswordHasherResolverInterface $passwordHasherResolver
     ) {}
 
     /**
@@ -59,7 +59,8 @@ class PasswordBadgeCheckListener implements ListenerInterface
             throw new \LogicException('The user must implement PasswordUserInterface');
         }
 
-        if (!$this->passwordHasher->verify($badge->getPassword(), $user->getPassword())) {
+        $passwordHasher = $this->passwordHasherResolver->resolve($event->getGuardName());
+        if (!$passwordHasher->verify($badge->getPassword(), $user->getPassword())) {
             throw InvalidPasswordException::from('密码错误', $user);
         }
 

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Logout;
 
-use Lzpeng\HyperfAuthGuard\Config\LogoutConfig;
 use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
+use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
-use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageResolverInterface;
+use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageInterface;
 use Lzpeng\HyperfAuthGuard\Util\Util;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -21,8 +21,9 @@ use Psr\Http\Message\ServerRequestInterface;
 class LogoutHandler implements LogoutHandlerInterface
 {
     public function __construct(
-        private LogoutConfig $config,
-        private TokenStorageResolverInterface $tokenStorageResolver,
+        private string $path,
+        private string $target,
+        private TokenStorageInterface $tokenStorage,
         private TokenContextInterface $tokenContext,
         private EventDispatcherInterface $eventDispatcher,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
@@ -34,7 +35,7 @@ class LogoutHandler implements LogoutHandlerInterface
      */
     public function supports(ServerRequestInterface $request): bool
     {
-        return $request->getUri()->getPath() === $this->config->path() && $request->getMethod() === 'POST';
+        return $request->getUri()->getPath() === $this->path && $request->getMethod() === 'POST';
     }
 
     /**
@@ -44,21 +45,19 @@ class LogoutHandler implements LogoutHandlerInterface
     {
         $token = $this->tokenContext->getToken();
         if (is_null($token)) {
-            return $this->createDefaultResponse($request);
+            throw AuthenticationException::from('未登录或会话已过期');
         }
 
         $logoutEvent = new LogoutEvent($token->getGuardName(), $token, $request);
         $this->eventDispatcher->dispatch($logoutEvent);
 
+        $this->tokenStorage->delete($token->getGuardName());
+        $this->tokenContext->setToken(null);
+
         $response = $logoutEvent->getResponse();
         if (!is_null($response)) {
             return $response;
         }
-
-        $tokenStorage = $this->tokenStorageResolver->resolve($token->getGuardName());
-        $tokenStorage->delete($token->getGuardName());
-
-        $this->tokenContext->setToken(null);
 
         return $this->createDefaultResponse($request);
     }
@@ -73,10 +72,11 @@ class LogoutHandler implements LogoutHandlerInterface
     {
         if ($this->util->expectJson($request)) {
             return $this->response->json([
-                'message' => 'Logout failed',
+                'code' => 0,
+                'msg' => '登出成功'
             ]);
         } else {
-            return $this->response->redirect($this->config->path() ?? '/');
+            return $this->response->redirect($this->target ?? '/');
         }
     }
 }

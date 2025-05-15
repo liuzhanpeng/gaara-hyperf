@@ -34,7 +34,7 @@ class RequestMatcherResolver implements RequestMatcherResolverInteface
         $matcherId = $this->matcherMap[$guardName];
         $matcher = $this->container->get($matcherId);
         if (!$matcher instanceof RequestMatcherInterface) {
-            throw new \InvalidArgumentException("请求匹配器('{$matcherId}')必须实现RequestMatcherInterface接口");
+            throw new \LogicException("请求匹配器('{$matcherId}')必须实现RequestMatcherInterface接口");
         }
 
         return $matcher;

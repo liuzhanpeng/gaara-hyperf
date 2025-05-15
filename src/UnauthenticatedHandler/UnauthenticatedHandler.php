@@ -15,21 +15,13 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class UnauthenticatedHandler implements UnauthenticatedHandlerInterface
 {
-    public function __construct(
-        private array $strategies,
-    ) {}
+    public function __construct() {}
 
     /**
      * @inheritDoc
      */
     public function handle(ServerRequestInterface $request, UnauthenticatedException $unauthenticatedException): ResponseInterface
     {
-        foreach ($this->strategies as $strategy) {
-            if ($strategy->supports($request, $unauthenticatedException)) {
-                return $strategy->handle($request, $unauthenticatedException);
-            }
-        }
-
-        throw new \RuntimeException('No unauthenticated handling strategy found for this request');
+        throw $unauthenticatedException;
     }
 }

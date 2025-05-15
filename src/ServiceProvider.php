@@ -8,7 +8,6 @@ use Hyperf\Contract\ContainerInterface;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Event\ListenerData;
 use Hyperf\Event\ListenerProvider;
-use Lzpeng\HyperfAuthGuar\TokenStorage\TokenStorageResolver;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorResolver;
 use Lzpeng\HyperfAuthGuard\Authorization\AccessDeniedHandler;
@@ -22,6 +21,7 @@ use Lzpeng\HyperfAuthGuard\Config\LogoutConfig;
 use Lzpeng\HyperfAuthGuard\Config\PasswordHasherConfig;
 use Lzpeng\HyperfAuthGuard\Config\RequestMatcherConfig;
 use Lzpeng\HyperfAuthGuard\Config\TokenStorageConfig;
+use Lzpeng\HyperfAuthGuard\Config\UnauthenticatedHandlerConfig;
 use Lzpeng\HyperfAuthGuard\Config\UserProviderConfig;
 use Lzpeng\HyperfAuthGuard\EventListener\GuardFilteredListener;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandler;
@@ -30,6 +30,8 @@ use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolver;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolverInterface;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasher;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherInterface;
+use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolver;
+use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolverInterface;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\PatternRequestMatcher;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\PrefixRequestMatcher;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\RequestMatcherInterface;
@@ -40,7 +42,6 @@ use Lzpeng\HyperfAuthGuard\TokenStorage\NullTokenStorage;
 use Lzpeng\HyperfAuthGuard\TokenStorage\SessionTokenStorage;
 use Lzpeng\HyperfAuthGuard\Token\TokenContext;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
-use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageResolverInterface;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandler;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandlerInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\MemoryUserProvider;
@@ -75,8 +76,8 @@ class ServiceProvider
     {
         $guardMap = [];
         $matcherMap = [];
-        $tokenStorageMap = [];
         $logoutHandlerMap = [];
+        $passwordHasherMap = [];
         foreach ($this->config->guardConfigCollection() as $guardConfig) {
             $guardName = $guardConfig->name();
 
@@ -93,22 +94,20 @@ class ServiceProvider
                 return $this->createUserProvider($userProviderConfig);
             });
 
-            $authenticatorMap = [];
+            $authenticatorIds = [];
             foreach ($guardConfig->authenticatorConfigCollection() as $authenticatorConfig) {
                 $authenticatorId = sprintf('auth.guards.%s.authenticators.%s', $guardName, $authenticatorConfig->type());
-                $authenticatorMap[$guardName][] = $authenticatorId;
+                $authenticatorIds[] = $authenticatorId;
                 $this->container->set($authenticatorId, function () use ($authenticatorConfig, $userProviderId) {
                     return $this->createAuthenticator($authenticatorConfig, $userProviderId);
                 });
             }
-
             $authenticatorResolverId = sprintf('auth.guards.%s.authenticator_resolver', $guardName);
-            $this->container->set($authenticatorResolverId, function () use ($authenticatorMap) {
-                return new AuthenticatorResolver($authenticatorMap, $this->container);
+            $this->container->set($authenticatorResolverId, function () use ($authenticatorIds) {
+                return new AuthenticatorResolver($authenticatorIds, $this->container);
             });
 
             $tokenStorageId = sprintf('auth.guards.%s.token_storage', $guardName);
-            $tokenStorageMap[$guardName] = $tokenStorageId;
             $tokenStorageConfig = $guardConfig->tokenStorageConfig();
             $this->container->set($tokenStorageId, function () use ($tokenStorageConfig) {
                 return $this->createTokenStorage($tokenStorageConfig);
@@ -117,8 +116,14 @@ class ServiceProvider
             $logoutHandlerId = sprintf('auth.guards.%s.logout_handler', $guardName);
             $logoutHandlerMap[$guardName] = $logoutHandlerId;
             $logoutConfig = $guardConfig->logoutConfig();
-            $this->container->set($logoutHandlerId, function () use ($logoutConfig) {
-                return $this->createLogoutHandler($logoutConfig);
+            $this->container->set($logoutHandlerId, function () use ($logoutConfig, $tokenStorageId) {
+                return $this->createLogoutHandler($logoutConfig, $tokenStorageId);
+            });
+
+            $unauthenticatedHandlerId = sprintf('auth.guards.%s.unauthenticated_handler', $guardName);
+            $unauthenticatedHandlerConfig = $guardConfig->unauthenticatedHandlerConfig();
+            $this->container->set($unauthenticatedHandlerId, function () use ($unauthenticatedHandlerConfig) {
+                $this->createUnauthenticatedHandler($unauthenticatedHandlerConfig);
             });
 
             $authorizationCheckerId = sprintf('auth.guards.%s.authorization_checker', $guardName);
@@ -143,7 +148,7 @@ class ServiceProvider
 
                 $listenerProvider = $this->container->get(ListenerProviderInterface::class);
                 if (!$listenerProvider instanceof ListenerProvider) {
-                    throw new \RuntimeException('ListenerProvider not found');
+                    throw new \LogicException('ListenerProvider not found');
                 }
 
                 /**
@@ -155,6 +160,13 @@ class ServiceProvider
                     $listenerProvider->on($event, [$listenerInstance, 'process'], ListenerData::DEFAULT_PRIORITY + 1);
                 }
             }
+
+            $passwordHasherId = sprintf('auth.guards.%s.password_hasher', $guardName);
+            $passwordHasherMap[$guardName] = $passwordHasherId;
+            $passwordHasherConfig = $guardConfig->passwordHasherConfig();
+            $this->container->set($passwordHasherId, function () use ($passwordHasherConfig) {
+                return $this->createPasswordHasher($passwordHasherConfig);
+            });
 
             $guardId = sprintf('auth.guards.%s', $guardName);
             $guardMap[$guardName] = $guardId;
@@ -182,24 +194,6 @@ class ServiceProvider
             return new TokenContext('auth');
         });
 
-        $this->container->set(TokenStorageResolverInterface::class, function () use ($tokenStorageMap) {
-            return new TokenStorageResolver($tokenStorageMap, $this->container);
-        });
-
-        $this->container->set(LogoutHandlerResolverInterface::class, function () use ($logoutHandlerMap) {
-            return new LogoutHandlerResolver($logoutHandlerMap, $this->container);
-        });
-
-        $this->container->set(UnauthenticatedHandlerInterface::class, function () {
-            // TODO: 注册strategies
-            return new UnauthenticatedHandler();
-        });
-
-        $this->container->set(AccessDeniedHandlerInterface::class, function () {
-            // TODO
-            return new AccessDeniedHandler();
-        });
-
         $this->container->set(RequestMatcherResolverInteface::class, function () use ($matcherMap) {
             return new RequestMatcherResolver($matcherMap, $this->container);
         });
@@ -208,9 +202,12 @@ class ServiceProvider
             return new GuardResolver($guardMap, $this->container);
         });
 
-        $passwordHasherConfig = $this->config->passwordHasherConfig();
-        $this->container->set(PasswordHasherInterface::class, function () use ($passwordHasherConfig) {
-            return $this->createPasswordHasher($passwordHasherConfig);
+        $this->container->set(LogoutHandlerResolverInterface::class, function () use ($logoutHandlerMap) {
+            return new LogoutHandlerResolver($logoutHandlerMap, $this->container);
+        });
+
+        $this->container->set(PasswordHasherResolverInterface::class, function () use ($passwordHasherMap) {
+            return new PasswordHasherResolver($passwordHasherMap, $this->container);
         });
     }
 
@@ -236,7 +233,12 @@ class ServiceProvider
                     throw new \InvalidArgumentException("自定定义匹配器必须指定class选项");
                 }
 
-                return $this->container->make($options['class'], $options['params'] ?? []);
+                $requestMatcher = $this->container->make($options['class'], $options['params'] ?? []);
+                if (!$requestMatcher instanceof RequestMatcherInterface) {
+                    throw new \LogicException("自定义匹配器必须实现RequestMatcherInterface接口");
+                }
+
+                return $requestMatcher;
             default:
                 throw new \InvalidArgumentException("不支持的匹配类型: {$type}");
         }
@@ -275,84 +277,14 @@ class ServiceProvider
                     throw new \InvalidArgumentException("自定义类型的用户提供器必须配置class选项");
                 }
 
-                return $this->container->make($options['class'], $options['params'] ?? []);
-            default:
-                throw new \InvalidArgumentException("未支持的用户提供者类型: {$type}");
-        }
-    }
-
-    /**
-     * 创建登出处理器
-     *
-     * @param LogoutConfig $logoutConfig
-     * @return LogoutHandlerInterface
-     */
-    private function createLogoutHandler(LogoutConfig $logoutConfig): LogoutHandlerInterface
-    {
-        return new LogoutHandler(
-            config: $logoutConfig,
-            tokenStorageResolver: $this->container->get(TokenStorageResolverInterface::class),
-            tokenContext: $this->container->get(TokenContextInterface::class),
-            eventDispatcher: $this->container->get(EventDispatcherInterface::class),
-            response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
-            util: $this->container->get(Util::class),
-        );
-    }
-
-    /**
-     * 创建授权检查器
-     *
-     * @param AuthorizationCheckerConfig $authorizationCheckerConfig
-     * @return AuthorizationCheckerInterface
-     */
-    private function createAuthorizationChecker(AuthorizationCheckerConfig $authorizationCheckerConfig): AuthorizationCheckerInterface
-    {
-        return $this->container->make(
-            $authorizationCheckerConfig->class(),
-            $authorizationCheckerConfig->params()
-        );
-    }
-
-    /**
-     * 创建拒绝访问处理器
-     *
-     * @param AccessDeniedHandlerConfig $accessDeniedHandlerConfig
-     * @return AccessDeniedHandlerInterface
-     */
-    private function createAccessDeniedHandler(AccessDeniedHandlerConfig $accessDeniedHandlerConfig): AccessDeniedHandlerInterface
-    {
-        return $this->container->make(
-            $accessDeniedHandlerConfig->class(),
-            $accessDeniedHandlerConfig->params()
-        );
-    }
-
-    /**
-     * 创建Token存储器
-     *
-     * @param TokenStorageConfig $tokenStorageConfig
-     * @return TokenStorageInterface
-     */
-    private function createTokenStorage(TokenStorageConfig $tokenStorageConfig): TokenStorageInterface
-    {
-        $type = $tokenStorageConfig->type();
-        $options = $tokenStorageConfig->options();
-
-        switch ($type) {
-            case 'session':
-                return $this->container->make(SessionTokenStorage::class, [
-                    'prefix' => $options['prefix'] ?? 'auth.token',
-                ]);
-            case 'null':
-                return $this->container->get(NullTokenStorage::class);
-            case 'custom':
-                if (!isset($tokenStorageConfig['class'])) {
-                    throw new \InvalidArgumentException('Invalid token storage config: custom token storage must have class');
+                $userProvider = $this->container->make($options['class'], $options['params'] ?? []);
+                if (!$userProvider instanceof UserProviderInterface) {
+                    throw new \LogicException("自定义类型的用户提供器必须实现UserProviderInterface接口");
                 }
 
-                return $this->container->make($options['class'], $options['params'] ?? []);
+                return $userProvider;
             default:
-                throw new \InvalidArgumentException(sprintf('Invalid token storage type: %s', $type));
+                throw new \InvalidArgumentException("未支持的用户提供者类型: {$type}");
         }
     }
 
@@ -387,6 +319,102 @@ class ServiceProvider
     }
 
     /**
+     * 创建Token存储器
+     *
+     * @param TokenStorageConfig $tokenStorageConfig
+     * @return TokenStorageInterface
+     */
+    private function createTokenStorage(TokenStorageConfig $tokenStorageConfig): TokenStorageInterface
+    {
+        $type = $tokenStorageConfig->type();
+        $options = $tokenStorageConfig->options();
+
+        switch ($type) {
+            case 'session':
+                return $this->container->make(SessionTokenStorage::class, [
+                    'prefix' => $options['prefix'] ?? 'auth.token',
+                ]);
+            case 'null':
+                return new NullTokenStorage();
+            case 'custom':
+                if (!isset($tokenStorageConfig['class'])) {
+                    throw new \InvalidArgumentException("自定义Token存储器必须配置class选项");
+                }
+
+                $tokenStorage = $this->container->make($options['class'], $options['params'] ?? []);
+                if (!$tokenStorage instanceof TokenStorageInterface) {
+                    throw new \LogicException("自定义Token存储器必须实现TokenStorageInterface接口");
+                }
+
+                return $tokenStorage;
+            default:
+                throw new \InvalidArgumentException(sprintf('Invalid token storage type: %s', $type));
+        }
+    }
+
+    /**
+     * 创建登出处理器
+     *
+     * @param LogoutConfig $logoutConfig
+     * @param string $tokenStorageId
+     * @return LogoutHandlerInterface
+     */
+    private function createLogoutHandler(LogoutConfig $logoutConfig, string $tokenStorageId): LogoutHandlerInterface
+    {
+        return new LogoutHandler(
+            path: $logoutConfig->path(),
+            target: $logoutConfig->target(),
+            tokenStorage: $this->container->get($tokenStorageId),
+            tokenContext: $this->container->get(TokenContextInterface::class),
+            eventDispatcher: $this->container->get(EventDispatcherInterface::class),
+            response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
+            util: $this->container->get(Util::class),
+        );
+    }
+
+    /**
+     * 创建未认证处理器
+     *
+     * @param UnauthenticatedHandlerConfig $unauthenticatedHandlerConfig
+     * @return UnauthenticatedHandlerInterface
+     */
+    private function createUnauthenticatedHandler(UnauthenticatedHandlerConfig $unauthenticatedHandlerConfig): UnauthenticatedHandlerInterface
+    {
+        return $this->container->make(
+            $unauthenticatedHandlerConfig->class(),
+            $unauthenticatedHandlerConfig->params()
+        );
+    }
+
+    /**
+     * 创建授权检查器
+     *
+     * @param AuthorizationCheckerConfig $authorizationCheckerConfig
+     * @return AuthorizationCheckerInterface
+     */
+    private function createAuthorizationChecker(AuthorizationCheckerConfig $authorizationCheckerConfig): AuthorizationCheckerInterface
+    {
+        return $this->container->make(
+            $authorizationCheckerConfig->class(),
+            $authorizationCheckerConfig->params()
+        );
+    }
+
+    /**
+     * 创建拒绝访问处理器
+     *
+     * @param AccessDeniedHandlerConfig $accessDeniedHandlerConfig
+     * @return AccessDeniedHandlerInterface
+     */
+    private function createAccessDeniedHandler(AccessDeniedHandlerConfig $accessDeniedHandlerConfig): AccessDeniedHandlerInterface
+    {
+        return $this->container->make(
+            $accessDeniedHandlerConfig->class(),
+            $accessDeniedHandlerConfig->params()
+        );
+    }
+
+    /**
      * 创建密码哈希器
      *
      * @return PasswordHasherInterface
@@ -406,7 +434,7 @@ class ServiceProvider
 
                 $passwordHasher = $this->container->make($options['class'], $options['params'] ?? []);
                 if (!$passwordHasher instanceof PasswordHasherInterface) {
-                    throw new \InvalidArgumentException('Custom PasswordHasher class must be an instance of PasswordHasherInterface');
+                    throw new \LogicException('Custom PasswordHasher class must be an instance of PasswordHasherInterface');
                 }
 
                 return $passwordHasher;

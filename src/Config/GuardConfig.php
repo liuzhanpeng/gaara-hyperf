@@ -6,6 +6,7 @@ namespace Lzpeng\HyperfAuthGuard\Config;
 
 use Lzpeng\HyperfAuthGuard\Authorization\AccessDeniedHandler;
 use Lzpeng\HyperfAuthGuard\Authorization\NullAuthorizationChecker;
+use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandler;
 
 /**
  * 认证守卫配置
@@ -17,13 +18,14 @@ class GuardConfig
     public function __construct(
         private string $name,
         private RequestMatcherConfig $requestMatcherConfig,
-        private TokenStorageConfig $tokenStorageConfig,
         private UserProviderConfig $userProviderConfig,
         private AuthenticatorConfigCollection $authenticatorConfigCollection,
+        private TokenStorageConfig $tokenStorageConfig,
         private LogoutConfig $logoutConfig,
-        private ListenerConfigCollection $listenerConfigCollection,
+        private UnauthenticatedHandlerConfig $unauthenticatedHandlerConfig,
         private AuthorizationCheckerConfig $authorizationCheckerConfig,
         private AccessDeniedHandlerConfig $accessDeniedHandlerConfig,
+        private ListenerConfigCollection $listenerConfigCollection,
         private PasswordHasherConfig $passwordHasherConfig
     ) {}
 
@@ -36,19 +38,22 @@ class GuardConfig
         $reqeustMatcherConfig = RequestMatcherConfig::from($config['matcher'] ??  throw new \InvalidArgumentException('matcher config is required'));
         $userProviderConfig = UserProviderConfig::from($config['user_provider'] ?? throw new \InvalidArgumentException('user_provider config is required'));
         $authenticatorConfigCollection = AuthenticatorConfigCollection::from($config['authenticators'] ?? throw new \InvalidArgumentException('authenticators config is required'));
-        $logoutConfig = LogoutConfig::from($config['logout'] ?? []);
         $tokenStorageConfig = TokenStorageConfig::from($config['token_storage'] ?? [
             'session' => [
                 'prefix' => 'auth.token'
             ]
         ]);
-        $listenerConfigCollection = new ListenerConfigCollection($config['listeners'] ?? []);
+        $logoutConfig = LogoutConfig::from($config['logout'] ?? throw new \InvalidArgumentException('logout config is required'));
+        $unauthenticatedHandlerConfig = UnauthenticatedHandlerConfig::from($config['unauthenticated_handler'] ?? [
+            'class' => UnauthenticatedHandler::class,
+        ]);
         $authorizationCheckerConfig = AuthorizationCheckerConfig::from($config['authorization_checker'] ?? [
             'class' => NullAuthorizationChecker::class,
         ]);
         $accessDeniedHandlerConfig = AccessDeniedHandlerConfig::from($config['access_denied_handler'] ?? [
             'class' => AccessDeniedHandler::class,
         ]);
+        $listenerConfigCollection = new ListenerConfigCollection($config['listeners'] ?? []);
         $passwordHasherConfig = PasswordHasherConfig::from($config['password_hasher'] ?? [
             'default' => [
                 'algo' => PASSWORD_BCRYPT,
@@ -58,13 +63,14 @@ class GuardConfig
         return new self(
             $name,
             $reqeustMatcherConfig,
-            $tokenStorageConfig,
             $userProviderConfig,
             $authenticatorConfigCollection,
+            $tokenStorageConfig,
             $logoutConfig,
-            $listenerConfigCollection,
+            $unauthenticatedHandlerConfig,
             $authorizationCheckerConfig,
             $accessDeniedHandlerConfig,
+            $listenerConfigCollection,
             $passwordHasherConfig,
         );
     }
@@ -130,13 +136,13 @@ class GuardConfig
     }
 
     /**
-     * 返回监听器配置集合
+     * 返回未认证处理器配置
      *
-     * @return ListenerConfigCollection
+     * @return UnauthenticatedHandlerConfig
      */
-    public function listenerConfigCollection(): ListenerConfigCollection
+    public function unauthenticatedHandlerConfig(): UnauthenticatedHandlerConfig
     {
-        return $this->listenerConfigCollection;
+        return $this->unauthenticatedHandlerConfig;
     }
 
     /**
@@ -157,6 +163,16 @@ class GuardConfig
     public function accessDeniedHandlerConfig(): AccessDeniedHandlerConfig
     {
         return $this->accessDeniedHandlerConfig;
+    }
+
+    /**
+     * 返回监听器配置集合
+     *
+     * @return ListenerConfigCollection
+     */
+    public function listenerConfigCollection(): ListenerConfigCollection
+    {
+        return $this->listenerConfigCollection;
     }
 
     /**

@@ -14,20 +14,20 @@ use Hyperf\Contract\ContainerInterface;
 class AuthenticatorResolver implements AuthenticatorResolverInterface
 {
     /**
-     * @param array $authenticatorMap 结构: [guardName => [authenticatorId]]
+     * @param string[] $authenticatorIds
      * @param ContainerInterface $container
      */
     public function __construct(
-        private array $authenticatorMap,
+        private array $authenticatorIds,
         private ContainerInterface $container
     ) {}
 
     /**
      * @inheritDoc
      */
-    public function getAuthenticatorIds(string $guardName): array
+    public function getAuthenticatorIds(): array
     {
-        return $this->authenticatorMap[$guardName] ?? [];
+        return $this->authenticatorIds;
     }
 
     /**
@@ -37,7 +37,7 @@ class AuthenticatorResolver implements AuthenticatorResolverInterface
     {
         $authenticator = $this->container->get($authenticatorId);
         if (!$authenticator instanceof AuthenticatorInterface) {
-            throw new \InvalidArgumentException(sprintf('Authenticator "%s" must implement AuthenticatorInterface', $authenticatorId));
+            throw new \LogicException(sprintf('Authenticator "%s" must implement AuthenticatorInterface', $authenticatorId));
         }
 
         return $authenticator;

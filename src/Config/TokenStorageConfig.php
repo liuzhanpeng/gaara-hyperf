@@ -24,12 +24,12 @@ class TokenStorageConfig
     {
         if (is_null($config)) {
             $config = [
-                'null' => null,
+                'null' => [],
             ];
         }
 
         if (count($config) !== 1) {
-            throw new \InvalidArgumentException('TokenStorage config must be a single array');
+            throw new \InvalidArgumentException('token_storage配置必须是单个数组');
         }
 
         $type = array_key_first($config);

@@ -12,12 +12,11 @@ namespace Lzpeng\HyperfAuthGuard\Authenticator;
 interface AuthenticatorResolverInterface
 {
     /**
-     * 返回指定认证守卫下所有认证器的id
+     * 返回所有认证器的id
      *
-     * @param string $guardName 认证守卫名称
      * @return string[]
      */
-    public function getAuthenticatorIds(string $guardName): array;
+    public function getAuthenticatorIds(): array;
 
     /**
      * 解析认证器

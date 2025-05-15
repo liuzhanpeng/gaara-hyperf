@@ -74,7 +74,7 @@ class Guard implements GuardInterface
         $token = $this->tokenStorage->get($this->name);
         $this->tokenContext->setToken($token);
 
-        foreach ($this->authenticatorResolver->getAuthenticatorIds($this->name) as $authenticatorId) {
+        foreach ($this->authenticatorResolver->getAuthenticatorIds() as $authenticatorId) {
             $authenticator = $this->authenticatorResolver->resolve($authenticatorId);
             if (!$authenticator->supports($request)) {
                 continue;

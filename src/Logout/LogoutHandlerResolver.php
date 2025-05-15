@@ -11,7 +11,7 @@ use Hyperf\Contract\ContainerInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class LogoutHandlerResolver
+class LogoutHandlerResolver implements LogoutHandlerResolverInterface
 {
     public function __construct(
         private array $logoutHandlerMap,
@@ -23,14 +23,14 @@ class LogoutHandlerResolver
      */
     public function resolve(string $guardName): LogoutHandlerInterface
     {
-        $logoutHandlerId = $this->logoutHandlerMap[$guardName] ?? null;
-        if (!$logoutHandlerId) {
-            throw new \InvalidArgumentException(sprintf('Guard %s logout handler not found', $guardName));
+        if (!isset($this->logoutHandlerMap[$guardName])) {
+            throw new \InvalidArgumentException("未找到guard:{$guardName}的登出处理器");
         }
 
+        $logoutHandlerId = $this->logoutHandlerMap[$guardName];
         $logoutHandler = $this->container->get($logoutHandlerId);
         if (!$logoutHandler instanceof LogoutHandlerInterface) {
-            throw new \InvalidArgumentException(sprintf('Guard %s logout handler must be an instance of %s', $guardName, LogoutHandlerInterface::class));
+            throw new \LogicException(sprintf('Guard %s logout handler must be an instance of %s', $guardName, LogoutHandlerInterface::class));
         }
 
         return $logoutHandler;

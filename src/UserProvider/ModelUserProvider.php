@@ -36,7 +36,7 @@ class ModelUserProvider implements UserProviderInterface
         }
 
         if (!$model instanceof UserInterface) {
-            throw new \Exception("{$this->class} must implement UserInterface");
+            throw new \LogicException("{$this->class} must implement UserInterface");
         }
 
         return $model;

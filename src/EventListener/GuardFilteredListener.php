@@ -37,7 +37,7 @@ class GuardFilteredListener implements ListenerInterface
     public function process(object $event): void
     {
         if (!$event instanceof EventInterface) {
-            throw new \InvalidArgumentException('Event must be instance of ' . EventInterface::class);
+            throw new \LogicException('Event must be instance of ' . EventInterface::class);
         }
 
         if ($event->getGuardName() === $this->guardName) {
