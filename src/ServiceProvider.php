@@ -10,6 +10,7 @@ use Hyperf\Event\ListenerData;
 use Hyperf\Event\ListenerProvider;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorResolver;
+use Lzpeng\HyperfAuthGuard\Authenticator\JsonLoginAuthenticator;
 use Lzpeng\HyperfAuthGuard\Authorization\AccessDeniedHandler;
 use Lzpeng\HyperfAuthGuard\Authorization\AccessDeniedHandlerInterface;
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerInterface;
@@ -297,24 +298,40 @@ class ServiceProvider
      */
     private function createAuthenticator(AuthenticatorConfig $authenticatorConfig, string $userProviderId): AuthenticatorInterface
     {
-        $name = $authenticatorConfig->name();
-        $params = $authenticatorConfig->params();
+        $type = $authenticatorConfig->type();
+        $options = $authenticatorConfig->options();
 
-        switch ($name) {
-            case 'form_login':
-                return new FormLoginAuthenticator(
-                    $this->container->get($userProviderId),
-                    $params['login_path'],
-                    $params['check_path'],
-                );
+        switch ($type) {
+            // case 'form_login':
+            //     return new FormLoginAuthenticator(
+            //         $this->container->get($userProviderId),
+            //         $params['login_path'],
+            //         $params['check_path'],
+            //     );
             case 'json_login':
+                $successHandler = null;
+                if (isset($options['success_handler'])) {
+                }
+
+                $failureHander = null;
+
                 return new JsonLoginAuthenticator(
-                    $this->container->get($userProviderId),
-                    $params['check_path'],
-                    $params['success_handler'] ?? null,
+                    userProvider: $this->container->get($userProviderId),
+                    successHandler: $successHandler,
+                    failureHandler: $failureHander,
+                    response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
+                    util: $this->container->get(Util::class),
+                    options: [
+                        'check_path' => $options['check_path'],
+                    ]
                 );
             default:
-                throw new \InvalidArgumentException(sprintf('Invalid authenticator name: %s', $name));
+                $authenticator = $this->container->make($type, $options['params'] ?? []);
+                if (!$authenticator instanceof AuthenticatorInterface) {
+                    throw new \LogicException();
+                }
+
+                return $authenticator;
         }
     }
 
