@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Event;
 
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * 登出事件
@@ -23,12 +23,12 @@ class LogoutEvent implements EventInterface
     /**
      * @param string $guardName
      * @param TokenInterface $token
-     * @param ServerRequestInterface $request
+     * @param RequestInterface $request
      */
     public function __construct(
         private string $guardName,
         private TokenInterface $token,
-        private ServerRequestInterface $request,
+        private RequestInterface $request,
     ) {}
 
     /**
@@ -52,9 +52,9 @@ class LogoutEvent implements EventInterface
     /**
      * 返回请求
      *
-     * @return ServerRequestInterface
+     * @return RequestInterface
      */
-    public function getRequest(): ServerRequestInterface
+    public function getRequest(): RequestInterface
     {
         return $this->request;
     }

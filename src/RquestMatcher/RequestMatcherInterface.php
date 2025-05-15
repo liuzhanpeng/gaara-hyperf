@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\RquestMatcher;
 
-use Psr\Http\Message\ServerRequestInterface;
+use Hyperf\HttpServer\Contract\RequestInterface;
 
 /**
  * 请求匹配器接口
@@ -16,8 +16,8 @@ interface RequestMatcherInterface
     /**
      * 是否匹配
      *
-     * @param ServerRequestInterface $request
+     * @param RequestInterface $request
      * @return boolean
      */
-    public function matches(ServerRequestInterface $request): bool;
+    public function matches(RequestInterface $request): bool;
 }

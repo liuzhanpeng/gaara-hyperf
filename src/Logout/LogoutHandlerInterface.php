@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Logout;
 
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * 登出处理器接口
@@ -17,16 +17,16 @@ interface LogoutHandlerInterface
     /**
      * 是否支持当前请求
      * 
-     * @param ServerRequestInterface $request
+     * @param RequestInterface $request
      * @return boolean
      */
-    public function supports(ServerRequestInterface $request): bool;
+    public function supports(RequestInterface $request): bool;
 
     /**
      * 处理登出请求
      *
-     * @param ServerRequestInterface $request
+     * @param RequestInterface $request
      * @return ResponseInterface
      */
-    public function handle(ServerRequestInterface $request): ResponseInterface;
+    public function handle(RequestInterface $request): ResponseInterface;
 }

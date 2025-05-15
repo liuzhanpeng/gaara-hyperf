@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * 表单登录认证器
@@ -30,17 +30,17 @@ class FormLogAuthenticator implements AuthenticatorInterface
         ], $this->options);
     }
 
-    public function supports(ServerRequestInterface $request): bool
+    public function supports(RequestInterface $request): bool
     {
         return $request->getUri()->getPath() === $this->checkPath
             && $request->getMethod() === 'POST';
     }
 
-    public function authenticate(ServerRequestInterface $request): Passport {}
+    public function authenticate(RequestInterface $request): Passport {}
 
     public function createToken(Passport $passport, string $guardName): TokenInterface {}
 
-    public function onAuthenticationSuccess(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface {}
+    public function onAuthenticationSuccess(RequestInterface $request, TokenInterface $token): ?ResponseInterface {}
 
-    public function onAuthenticationFailure(ServerRequestInterface $request, AuthenticationException $exception): ?ResponseInterface {}
+    public function onAuthenticationFailure(RequestInterface $request, AuthenticationException $exception): ?ResponseInterface {}
 }

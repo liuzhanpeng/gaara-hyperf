@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard;
 
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolverInterface;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\RequestMatcherResolverInteface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -29,7 +29,7 @@ class GuardManager implements GuardManagerInterface
     /**
      * @inheritDoc
      */
-    public function process(ServerRequestInterface $request): ?ResponseInterface
+    public function process(RequestInterface $request): ?ResponseInterface
     {
         foreach ($this->guardResolver->getGuardNames() as $guardName) {
             $matcher = $this->requestMatcherResolver->resolve($guardName);

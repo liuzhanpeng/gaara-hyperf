@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard;
 
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Guard 管理器接口
@@ -17,8 +17,8 @@ interface GuardManagerInterface
     /**
      * 处理请求
      *
-     * @param ServerRequestInterface $request
+     * @param RequestInterface $request
      * @return ResponseInterface|null
      */
-    public function process(ServerRequestInterface $request): ?ResponseInterface;
+    public function process(RequestInterface $request): ?ResponseInterface;
 }

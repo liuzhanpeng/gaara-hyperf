@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Util;
 
-use Psr\Http\Message\ServerRequestInterface;
+use Hyperf\HttpServer\Contract\RequestInterface;
 
 class Util
 {
     /**
      * 判断是JSON请求
      *
-     * @param ServerRequestInterface $request
+     * @param RequestInterface $request
      * @return boolean
      */
-    public function expectJson(ServerRequestInterface $request): bool
+    public function expectJson(RequestInterface $request): bool
     {
         $acceptHeader = $request->getHeaderLine('Accept');
         if (empty($acceptHeader) || $acceptHeader === '*/*') {

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Event;
 
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * 认证失败事件
@@ -22,7 +22,7 @@ class AuthenticationFailureEvent implements EventInterface
      * @param AuthenticatorInterface $authenticator
      * @param Passport $passport
      * @param AuthenticationException $exception
-     * @param ServerRequestInterface $request
+     * @param RequestInterface $request
      * @param ResponseInterface|null $response
      */
     public function __construct(
@@ -30,7 +30,7 @@ class AuthenticationFailureEvent implements EventInterface
         private AuthenticatorInterface $authenticator,
         private Passport $passport,
         private AuthenticationException $exception,
-        private ServerRequestInterface $request,
+        private RequestInterface $request,
         private ?ResponseInterface $response
     ) {}
 
@@ -76,9 +76,9 @@ class AuthenticationFailureEvent implements EventInterface
     /**
      * 返回请求
      *
-     * @return ServerRequestInterface
+     * @return RequestInterface
      */
-    public function getRequest(): ServerRequestInterface
+    public function getRequest(): RequestInterface
     {
         return $this->request;
     }

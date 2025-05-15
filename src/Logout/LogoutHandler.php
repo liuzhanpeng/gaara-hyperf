@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Logout;
 
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
@@ -11,7 +12,6 @@ use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageInterface;
 use Lzpeng\HyperfAuthGuard\Util\Util;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * 内置的登出处理器
@@ -33,7 +33,7 @@ class LogoutHandler implements LogoutHandlerInterface
     /**
      * @inheritDoc
      */
-    public function supports(ServerRequestInterface $request): bool
+    public function supports(RequestInterface $request): bool
     {
         return $request->getUri()->getPath() === $this->path && $request->getMethod() === 'POST';
     }
@@ -41,7 +41,7 @@ class LogoutHandler implements LogoutHandlerInterface
     /**
      * @inheritDoc
      */
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    public function handle(RequestInterface $request): ResponseInterface
     {
         $token = $this->tokenContext->getToken();
         if (is_null($token)) {
@@ -65,10 +65,10 @@ class LogoutHandler implements LogoutHandlerInterface
     /**
      * 创建默认的登出响应
      *
-     * @param ServerRequestInterface $request
+     * @param RequestInterface $request
      * @return ResponseInterface
      */
-    private function createDefaultResponse(ServerRequestInterface $request): ResponseInterface
+    private function createDefaultResponse(RequestInterface $request): ResponseInterface
     {
         if ($this->util->expectJson($request)) {
             return $this->response->json([

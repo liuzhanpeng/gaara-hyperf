@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\RquestMatcher;
 
-use Psr\Http\Message\ServerRequestInterface;
+use Hyperf\HttpServer\Contract\RequestInterface;
 
 /**
  * 路径前缀匹配器
@@ -25,10 +25,10 @@ class PrefixRequestMatcher implements RequestMatcherInterface
     /**
      * @inheritDoc
      */
-    public function matches(ServerRequestInterface $request): bool
+    public function matches(RequestInterface $request): bool
     {
         foreach ($this->exclusions as $exclusion) {
-            if (str_starts_with($request->getUri()->getPath(), $exclusion)) {
+            if ($request->is($exclusion)) {
                 return false;
             }
         }

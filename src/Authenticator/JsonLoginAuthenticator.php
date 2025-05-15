@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
@@ -12,7 +13,6 @@ use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Lzpeng\HyperfAuthGuard\Util\Util;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * 用于API登录认证
@@ -41,7 +41,7 @@ class JsonLoginAuthenticator implements AuthenticatorInterface
     /**
      * @inheritDoc
      */
-    public function supports(ServerRequestInterface $request): bool
+    public function supports(RequestInterface $request): bool
     {
         return $request->getUri()->getPath() === $this->options['check_path']
             && $this->util->expectJson($request)
@@ -51,7 +51,7 @@ class JsonLoginAuthenticator implements AuthenticatorInterface
     /**
      * @inheritDoc
      */
-    public function authenticate(ServerRequestInterface $request): Passport
+    public function authenticate(RequestInterface $request): Passport
     {
         $credientials = $this->getCredentials($request);
 
@@ -75,7 +75,7 @@ class JsonLoginAuthenticator implements AuthenticatorInterface
     /**
      * @inheritDoc
      */
-    public function onAuthenticationSuccess(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
+    public function onAuthenticationSuccess(RequestInterface $request, TokenInterface $token): ?ResponseInterface
     {
         if (is_null($this->successHandler)) {
             return null;
@@ -87,7 +87,7 @@ class JsonLoginAuthenticator implements AuthenticatorInterface
     /**
      * @inheritDoc
      */
-    public function onAuthenticationFailure(ServerRequestInterface $request, AuthenticationException $exception): ?ResponseInterface
+    public function onAuthenticationFailure(RequestInterface $request, AuthenticationException $exception): ?ResponseInterface
     {
         if (is_null($this->failureHandler)) {
             return $this->response->json([
@@ -102,16 +102,14 @@ class JsonLoginAuthenticator implements AuthenticatorInterface
     /**
      * 获取认证凭证
      *
-     * @param ServerRequestInterface $request
+     * @param RequestInterface $request
      * @return array
      */
-    private function getCredentials(ServerRequestInterface $request): array
+    private function getCredentials(RequestInterface $request): array
     {
-        $data = $request->getParsedBody();
-
         return [
-            'username' => $data['username'],
-            'password' => $data['password'],
+            'username' => $request->input($this->options['username_parameter']),
+            'password' => $request->input($this->options['password_parameter'])
         ];
     }
 }
