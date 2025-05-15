@@ -110,6 +110,7 @@ class Guard implements GuardInterface
      */
     private function executeAuthenticator(AuthenticatorInterface $authenticator, RequestInterface $request): ?ResponseInterface
     {
+        $passport = null;
         try {
             $passport = $authenticator->authenticate($request);
             $checkPassportEvent = new CheckPassportEvent($this->name, $authenticator, $passport);
@@ -141,8 +142,8 @@ class Guard implements GuardInterface
      */
     public function handleAuthenticationSuccess(TokenInterface $token, RequestInterface $request, AuthenticatorInterface $authenticator, Passport $passport): ?ResponseInterface
     {
+        $previousToken = $this->tokenContext->getToken();
         $this->tokenContext->setToken($token);
-
         $this->tokenStorage->set($this->name, $token);
 
         $response = $authenticator->onAuthenticationSuccess($request, $token);
@@ -153,7 +154,8 @@ class Guard implements GuardInterface
             $passport,
             $token,
             $request,
-            $response
+            $response,
+            $previousToken
         );
 
         $this->eventDispatcher->dispatch($authenticationSuccessEvent);

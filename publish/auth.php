@@ -45,7 +45,11 @@ return [
                 ],
                 'json_login' => [
                     'check_path' => '/admin/check_login',
-                    'success_handler' => CustomSuccessHandler::class,
+                    'success_handler' => [
+                        'class' => CustomSuccessHandler::class,
+                        'params' => []
+                    ],
+                    'failure_handler' => CustomFailureHandler::class,
                 ],
                 'custom' => [ // 自定义认证器
                     [

@@ -10,8 +10,14 @@ class ConfigProvider
     {
         return [
             'dependencies' => [],
-            'listeners' => [],
-            'middlewares' => [],
+            'listeners' => [
+                AuthListener::class,
+            ],
+            // 'middlewares' => [
+            //     'http' => [
+            //         AuthMiddleware::class
+            //     ],
+            // ],
             'commands' => [],
             'publish' => [
                 [

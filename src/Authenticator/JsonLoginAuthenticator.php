@@ -22,30 +22,24 @@ use Psr\Http\Message\ResponseInterface;
 class JsonLoginAuthenticator implements AuthenticatorInterface
 {
     public function __construct(
+        private string $checkPath,
+        private string $usernameParam,
+        private string $passwordParam,
+        private ?AuthenticationSuccessHandlerInterface $successHandler,
+        private ?AuthenticationFailureHandlerInterface $failureHandler,
         private UserProviderInterface $userProvider,
-        private ?AuthenticationSuccessHandlerInterface $successHandler = null,
-        private ?AuthenticationFailureHandlerInterface $failureHandler = null,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
         private Util $util,
-        private array $options
-    ) {
-        $this->options = array_merge([
-            'check_path' => '/login',
-            'username_parameter' => 'username',
-            'password_parameter' => 'password',
-            'success_handler' => null,
-            'failure_handler' => null,
-        ], $this->options);
-    }
+    ) {}
 
     /**
      * @inheritDoc
      */
     public function supports(RequestInterface $request): bool
     {
-        return $request->getUri()->getPath() === $this->options['check_path']
-            && $this->util->expectJson($request)
-            && $request->getMethod() === 'POST';
+        return $this->util->expectJson($request)
+            && $request->getPathInfo() === $this->checkPath
+            && $request->isMethod('POST');
     }
 
     /**
@@ -66,7 +60,9 @@ class JsonLoginAuthenticator implements AuthenticatorInterface
         return $passport;
     }
 
-
+    /**
+     * @inheritDoc
+     */
     public function createToken(Passport $passport, string $guardName): TokenInterface
     {
         return new AuthenticatedToken($guardName, $passport->getUser());
@@ -90,10 +86,7 @@ class JsonLoginAuthenticator implements AuthenticatorInterface
     public function onAuthenticationFailure(RequestInterface $request, AuthenticationException $exception): ?ResponseInterface
     {
         if (is_null($this->failureHandler)) {
-            return $this->response->json([
-                'code' => $exception->getCode(),
-                'message' => $exception->getMessage(),
-            ]);
+            throw $exception;
         }
 
         return $this->failureHandler->handle($request, $exception);
@@ -108,8 +101,8 @@ class JsonLoginAuthenticator implements AuthenticatorInterface
     private function getCredentials(RequestInterface $request): array
     {
         return [
-            'username' => $request->input($this->options['username_parameter']),
-            'password' => $request->input($this->options['password_parameter'])
+            'username' => $request->input($this->usernameParam),
+            'password' => $request->input($this->passwordParam),
         ];
     }
 }

@@ -24,6 +24,7 @@ class AuthenticationSuccessEvent implements EventInterface
      * @param TokenInterface $token
      * @param RequestInterface $request
      * @param ResponseInterface|null $response
+     * @param TokenInterface|null $previousToken
      */
     public function __construct(
         private string $guardName,
@@ -31,7 +32,8 @@ class AuthenticationSuccessEvent implements EventInterface
         private Passport $passport,
         private TokenInterface $token,
         private RequestInterface $request,
-        private ?ResponseInterface $response
+        private ?ResponseInterface $response,
+        private ?TokenInterface $previousToken
     ) {}
 
     /**
@@ -101,5 +103,15 @@ class AuthenticationSuccessEvent implements EventInterface
     public function setResponse(?ResponseInterface $response): void
     {
         $this->response = $response;
+    }
+
+    /**
+     * 返回上一次认证的token
+     *
+     * @return TokenInterface|null
+     */
+    public function getPreviousToken(): ?TokenInterface
+    {
+        return $this->previousToken;
     }
 }

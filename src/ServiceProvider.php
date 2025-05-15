@@ -309,22 +309,7 @@ class ServiceProvider
             //         $params['check_path'],
             //     );
             case 'json_login':
-                $successHandler = null;
-                if (isset($options['success_handler'])) {
-                }
-
-                $failureHander = null;
-
-                return new JsonLoginAuthenticator(
-                    userProvider: $this->container->get($userProviderId),
-                    successHandler: $successHandler,
-                    failureHandler: $failureHander,
-                    response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
-                    util: $this->container->get(Util::class),
-                    options: [
-                        'check_path' => $options['check_path'],
-                    ]
-                );
+                return $this->createJsonLoginAuthenticator($options, $userProviderId);
             default:
                 $authenticator = $this->container->make($type, $options['params'] ?? []);
                 if (!$authenticator instanceof AuthenticatorInterface) {
@@ -333,6 +318,55 @@ class ServiceProvider
 
                 return $authenticator;
         }
+    }
+
+    /**
+     * 创建JsonLoginAuthenticator
+     *
+     * @param array $options
+     * @param string $userProviderId
+     * @return JsonLoginAuthenticator
+     */
+    private function createJsonLoginAuthenticator(array $options, string $userProviderId): JsonLoginAuthenticator
+    {
+        $successHandler = null;
+        if (isset($options['success_handler'])) {
+            if (is_string($options['success_handler'])) {
+                $options['success_handler'] = [
+                    'class' => $options['success_handler']
+                ];
+            }
+
+            $successHandler = $this->container->make(
+                $options['success_handler']['class'],
+                $options['success_handler']['params'] ?? []
+            );
+        }
+
+        $failureHander = null;
+        if (isset($options['failure_handler'])) {
+            if (is_string($options['failure_handler'])) {
+                $options['failure_handler'] = [
+                    'class' => $options['failure_handler']
+                ];
+            }
+
+            $failureHander = $this->container->make(
+                $options['failure_handler']['class'],
+                $options['failure_handler']['params'] ?? []
+            );
+        }
+
+        return new JsonLoginAuthenticator(
+            checkPath: $options['check_path'],
+            usernameParam: $options['username_param'] ?? 'username',
+            passwordParam: $options['password_param'] ?? 'password',
+            successHandler: $successHandler,
+            failureHandler: $failureHander,
+            userProvider: $this->container->get($userProviderId),
+            response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
+            util: $this->container->get(Util::class),
+        );
     }
 
     /**
