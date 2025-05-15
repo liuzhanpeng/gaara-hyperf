@@ -24,6 +24,7 @@ class GuardConfig
         private ListenerConfigCollection $listenerConfigCollection,
         private AuthorizationCheckerConfig $authorizationCheckerConfig,
         private AccessDeniedHandlerConfig $accessDeniedHandlerConfig,
+        private PasswordHasherConfig $passwordHasherConfig
     ) {}
 
     /**
@@ -34,7 +35,7 @@ class GuardConfig
     {
         $reqeustMatcherConfig = RequestMatcherConfig::from($config['matcher'] ??  throw new \InvalidArgumentException('matcher config is required'));
         $userProviderConfig = UserProviderConfig::from($config['user_provider'] ?? throw new \InvalidArgumentException('user_provider config is required'));
-        $authenticatorConfigCollection = AuthenticatorConfigCollection::from($config['authenticators'] ?? []);
+        $authenticatorConfigCollection = AuthenticatorConfigCollection::from($config['authenticators'] ?? throw new \InvalidArgumentException('authenticators config is required'));
         $logoutConfig = LogoutConfig::from($config['logout'] ?? []);
         $tokenStorageConfig = TokenStorageConfig::from($config['token_storage'] ?? [
             'session' => [
@@ -48,6 +49,11 @@ class GuardConfig
         $accessDeniedHandlerConfig = AccessDeniedHandlerConfig::from($config['access_denied_handler'] ?? [
             'class' => AccessDeniedHandler::class,
         ]);
+        $passwordHasherConfig = PasswordHasherConfig::from($config['password_hasher'] ?? [
+            'default' => [
+                'algo' => PASSWORD_BCRYPT,
+            ],
+        ]);
 
         return new self(
             $name,
@@ -59,6 +65,7 @@ class GuardConfig
             $listenerConfigCollection,
             $authorizationCheckerConfig,
             $accessDeniedHandlerConfig,
+            $passwordHasherConfig,
         );
     }
 
@@ -150,5 +157,15 @@ class GuardConfig
     public function accessDeniedHandlerConfig(): AccessDeniedHandlerConfig
     {
         return $this->accessDeniedHandlerConfig;
+    }
+
+    /**
+     * 返回密码哈希器配置
+     * 
+     * @return PasswordHasherConfig
+     */
+    public function passwordHasherConfig(): PasswordHasherConfig
+    {
+        return $this->passwordHasherConfig;
     }
 }

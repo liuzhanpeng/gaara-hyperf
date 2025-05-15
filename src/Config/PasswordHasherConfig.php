@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Config;
+namespace  Lzpeng\HyperfAuthGuard\Config;
 
 /**
- * 用用户提供者配置
+ * 密码哈希器配置
  * 
- * @author lzpeng <liuzhanpeng@gmail.com> 
+ * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class UserProviderConfig
+class PasswordHasherConfig
 {
     /**
      * @param string $type
@@ -20,10 +20,14 @@ class UserProviderConfig
         private array $options
     ) {}
 
+    /**
+     * @param array $config
+     * @return self
+     */
     public static function from(array $config): self
     {
         if (count($config) !== 1) {
-            throw new \InvalidArgumentException('user_provider配置必须是单数组');
+            throw new \InvalidArgumentException('PasswordHasherConfig must a be a single array');
         }
 
         $type = array_key_first($config);
@@ -33,8 +37,6 @@ class UserProviderConfig
     }
 
     /**
-     * 返回类型
-     *
      * @return string
      */
     public function type(): string
@@ -43,8 +45,6 @@ class UserProviderConfig
     }
 
     /**
-     * 返回选项
-     *
      * @return array
      */
     public function options(): array

@@ -13,11 +13,11 @@ class AuthenticatorConfig
 {
     /**
      * @param string $type
-     * @param array $params
+     * @param array $options
      */
     public function __construct(
         private string $type,
-        private array $params
+        private array $options
     ) {}
 
     /**
@@ -31,12 +31,12 @@ class AuthenticatorConfig
     }
 
     /**
-     * 返回认证器构造参数
+     * 返回选项
      *
      * @return array
      */
-    public function params(): array
+    public function options(): array
     {
-        return $this->params;
+        return $this->options;
     }
 }

@@ -26,18 +26,22 @@ class AuthenticatorConfigCollection implements \IteratorAggregate
      */
     public static function from(array $config): self
     {
+        if (count($config) === 0) {
+            throw new \InvalidArgumentException('Authenticator config can not be empty');
+        }
+
         $authenticatorConfigCollection = [];
-        foreach ($config as $type => $params) {
+        foreach ($config as $type => $options) {
             if ($type === 'custom') {
-                foreach ($params as $customAuthenticatorConfig) {
+                foreach ($options as $customAuthenticatorConfig) {
                     if (!isset($customAuthenticatorConfig['class'])) {
-                        throw new \InvalidArgumentException('Invalid custom authenticator config: class is required');
+                        throw new \InvalidArgumentException("自定义认证器配置缺少class选项");
                     }
 
                     $authenticatorConfigCollection[] = new AuthenticatorConfig($customAuthenticatorConfig['class'], $customAuthenticatorConfig['params'] ?? []);
                 }
             } else {
-                $authenticatorConfigCollection[] = new AuthenticatorConfig($type, $params);
+                $authenticatorConfigCollection[] = new AuthenticatorConfig($type, $options);
             }
         }
 

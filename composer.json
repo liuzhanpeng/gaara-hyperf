@@ -20,7 +20,8 @@
         "hyperf/event": "^3.1",
         "hyperf/di": "^3.1",
         "hyperf/framework": "^3.1",
-        "hyperf/http-server": "^3.1"
+        "hyperf/http-server": "^3.1",
+        "hyperf/db-connection": "^3.1"
     },
     "extra": {
         "hyperf": {

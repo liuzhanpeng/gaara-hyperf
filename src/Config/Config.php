@@ -14,7 +14,9 @@ class Config
     /**
      * @param GuardConfig[] $guardConfigCollection
      */
-    public function __construct(private array $guardConfigCollection) {}
+    public function __construct(
+        private array $guardConfigCollection,
+    ) {}
 
     /**
      * @param array $config

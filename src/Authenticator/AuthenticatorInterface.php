@@ -30,7 +30,7 @@ interface AuthenticatorInterface
     public function supports(ServerRequestInterface $request): bool;
 
     /**
-     * 认证
+     * 对请求进行认证
      *
      * @param ServerRequestInterface $request
      * @return Passport
@@ -56,7 +56,7 @@ interface AuthenticatorInterface
     public function onAuthenticationSuccess(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface;
 
     /**
-     * 认证失败处理
+     * 认证失败处理函数
      *
      * @param ServerRequestInterface $request
      * @param AuthenticationException $exception

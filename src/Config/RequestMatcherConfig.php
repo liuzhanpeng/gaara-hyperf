@@ -11,9 +11,13 @@ namespace Lzpeng\HyperfAuthGuard\Config;
  */
 class RequestMatcherConfig
 {
+    /**
+     * @param string $type
+     * @param array $options
+     */
     public function __construct(
         private string $type,
-        private string|array $options
+        private array $options
     ) {}
 
     /**
@@ -23,7 +27,7 @@ class RequestMatcherConfig
     public static function from(array $config): self
     {
         if (count($config) !== 1) {
-            throw new \InvalidArgumentException('RequestMatcher config must be a single array');
+            throw new \InvalidArgumentException('matcher配置必须是单个数组');
         }
 
         $type = array_key_first($config);
@@ -43,11 +47,11 @@ class RequestMatcherConfig
     }
 
     /**
-     * 返回匹配值
+     * 返回选项
      *
-     * @return string|array
+     * @return array
      */
-    public function options(): string|array
+    public function options(): array
     {
         return $this->options;
     }

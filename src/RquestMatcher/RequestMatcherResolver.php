@@ -28,13 +28,13 @@ class RequestMatcherResolver implements RequestMatcherResolverInteface
     public function resolve(string $guardName): RequestMatcherInterface
     {
         if (!isset($this->matcherMap[$guardName])) {
-            throw new \InvalidArgumentException("RequestMatcherResolver: $guardName not found");
+            throw new \InvalidArgumentException("找不到指定guard('{$guardName}')的请求匹配器");
         }
 
         $matcherId = $this->matcherMap[$guardName];
         $matcher = $this->container->get($matcherId);
         if (!$matcher instanceof RequestMatcherInterface) {
-            throw new \InvalidArgumentException("RequestMatcherResolver: $matcherId not RequestMatcherInterface");
+            throw new \InvalidArgumentException("请求匹配器('{$matcherId}')必须实现RequestMatcherInterface接口");
         }
 
         return $matcher;

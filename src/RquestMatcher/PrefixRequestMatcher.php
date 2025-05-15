@@ -14,18 +14,25 @@ use Psr\Http\Message\ServerRequestInterface;
 class PrefixRequestMatcher implements RequestMatcherInterface
 {
     /**
-     * @param string $prefix
+     * @param string $prefix 路径前缀
+     * @param string[] $exclusions 排除的path集合(也支持正则模式)
      */
-    public function __construct(private string $prefix) {}
+    public function __construct(
+        private string $prefix,
+        private array $exclusions
+    ) {}
 
     /**
      * @inheritDoc
-     *
-     * @param ServerRequestInterface $request
-     * @return boolean
      */
     public function matches(ServerRequestInterface $request): bool
     {
+        foreach ($this->exclusions as $exclusion) {
+            if (str_starts_with($request->getUri()->getPath(), $exclusion)) {
+                return false;
+            }
+        }
+
         return str_starts_with($request->getUri()->getPath(), $this->prefix);
     }
 }

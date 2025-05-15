@@ -19,6 +19,7 @@ use Lzpeng\HyperfAuthGuard\Config\AuthenticatorConfig;
 use Lzpeng\HyperfAuthGuard\Config\AuthorizationCheckerConfig;
 use Lzpeng\HyperfAuthGuard\Config\Config;
 use Lzpeng\HyperfAuthGuard\Config\LogoutConfig;
+use Lzpeng\HyperfAuthGuard\Config\PasswordHasherConfig;
 use Lzpeng\HyperfAuthGuard\Config\RequestMatcherConfig;
 use Lzpeng\HyperfAuthGuard\Config\TokenStorageConfig;
 use Lzpeng\HyperfAuthGuard\Config\UserProviderConfig;
@@ -27,6 +28,8 @@ use Lzpeng\HyperfAuthGuard\Logout\LogoutHandler;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerInterface;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolver;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolverInterface;
+use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasher;
+use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherInterface;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\PatternRequestMatcher;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\PrefixRequestMatcher;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\RequestMatcherInterface;
@@ -40,6 +43,8 @@ use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
 use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageResolverInterface;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandler;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandlerInterface;
+use Lzpeng\HyperfAuthGuard\UserProvider\MemoryUserProvider;
+use Lzpeng\HyperfAuthGuard\UserProvider\ModelUserProvider;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Lzpeng\HyperfAuthGuard\Util\Util;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -75,18 +80,11 @@ class ServiceProvider
         foreach ($this->config->guardConfigCollection() as $guardConfig) {
             $guardName = $guardConfig->name();
 
-            $matcherId = sprintf('auth.guards.%s.matcher', $guardName);
+            $matcherId = sprintf('auth.guards.%s.request_matcher', $guardName);
             $matcherMap[$guardName] = $matcherId;
             $requestMatcherConfig = $guardConfig->requestMatcherConfig();
             $this->container->set($matcherId, function () use ($requestMatcherConfig) {
                 return $this->createRequestMatcher($requestMatcherConfig);
-            });
-
-            $tokenStorageId = sprintf('auth.guards.%s.token_storage', $guardName);
-            $tokenStorageMap[$guardName] = $tokenStorageId;
-            $tokenStorageConfig = $guardConfig->tokenStorageConfig();
-            $this->container->set($tokenStorageId, function () use ($tokenStorageConfig) {
-                return $this->createTokenStorage($tokenStorageConfig);
             });
 
             $userProviderId = sprintf('auth.guards.%s.user_provider', $guardName);
@@ -107,6 +105,13 @@ class ServiceProvider
             $authenticatorResolverId = sprintf('auth.guards.%s.authenticator_resolver', $guardName);
             $this->container->set($authenticatorResolverId, function () use ($authenticatorMap) {
                 return new AuthenticatorResolver($authenticatorMap, $this->container);
+            });
+
+            $tokenStorageId = sprintf('auth.guards.%s.token_storage', $guardName);
+            $tokenStorageMap[$guardName] = $tokenStorageId;
+            $tokenStorageConfig = $guardConfig->tokenStorageConfig();
+            $this->container->set($tokenStorageId, function () use ($tokenStorageConfig) {
+                return $this->createTokenStorage($tokenStorageConfig);
             });
 
             $logoutHandlerId = sprintf('auth.guards.%s.logout_handler', $guardName);
@@ -202,7 +207,13 @@ class ServiceProvider
         $this->container->set(GuardResolverInterface::class, function () use ($guardMap) {
             return new GuardResolver($guardMap, $this->container);
         });
+
+        $passwordHasherConfig = $this->config->passwordHasherConfig();
+        $this->container->set(PasswordHasherInterface::class, function () use ($passwordHasherConfig) {
+            return $this->createPasswordHasher($passwordHasherConfig);
+        });
     }
+
 
     /**
      * 创建请求匹配器
@@ -217,16 +228,56 @@ class ServiceProvider
 
         switch ($type) {
             case 'pattern':
-                return new PatternRequestMatcher($options);
+                return new PatternRequestMatcher($options['expr'], $options['exclusion'] ?? []);
             case 'prefix':
-                return new PrefixRequestMatcher($options);
+                return new PrefixRequestMatcher($options['expr'], $options['exclusion'] ?? []);
             case 'custom':
                 if (!isset($options['class'])) {
-                    throw new \InvalidArgumentException('Invalid request matcher config: custom matcher must have class');
+                    throw new \InvalidArgumentException("自定定义匹配器必须指定class选项");
                 }
+
                 return $this->container->make($options['class'], $options['params'] ?? []);
             default:
-                throw new \InvalidArgumentException(sprintf('Invalid request matcher type: %s', $type));
+                throw new \InvalidArgumentException("不支持的匹配类型: {$type}");
+        }
+    }
+
+    /**
+     * 创建用户提供者
+     *
+     * @param UserProviderConfig $userProviderConfig
+     * @return UserProviderInterface
+     */
+    private function createUserProvider(UserProviderConfig $userProviderConfig): UserProviderInterface
+    {
+        $type = $userProviderConfig->type();
+        $options = $userProviderConfig->options();
+
+        switch ($type) {
+            case 'memory':
+                if (!isset($options['users'])) {
+                    throw new \InvalidArgumentException("memory类型的用户提供器必须配置users选项");
+                }
+
+                return new MemoryUserProvider($options['users']);
+            case 'model':
+                if (!isset($options['class'])) {
+                    throw new \InvalidArgumentException("model类型的用户提供器必须配置class选项");
+                }
+
+                if (!isset($options['identifier'])) {
+                    throw new \InvalidArgumentException("model类型的用户提供器必须配置identifier选项");
+                }
+
+                return new ModelUserProvider($options['class'], $options['identifier']);
+            case 'custom':
+                if (!isset($options['class'])) {
+                    throw new \InvalidArgumentException("自定义类型的用户提供器必须配置class选项");
+                }
+
+                return $this->container->make($options['class'], $options['params'] ?? []);
+            default:
+                throw new \InvalidArgumentException("未支持的用户提供者类型: {$type}");
         }
     }
 
@@ -306,31 +357,6 @@ class ServiceProvider
     }
 
     /**
-     * 创建用户提供者
-     *
-     * @param UserProviderConfig $userProviderConfig
-     * @return UserProviderInterface
-     */
-    private function createUserProvider(UserProviderConfig $userProviderConfig): UserProviderInterface
-    {
-        $type = $userProviderConfig->type();
-        $options = $userProviderConfig->options();
-
-        switch ($type) {
-            case 'memory':
-                throw new \InvalidArgumentException(sprintf('Invalid user provider type: %s', $type));
-            case 'custom':
-                if (!isset($options['class'])) {
-                    throw new \InvalidArgumentException('Invalid user provider config: custom user provider must have class');
-                }
-
-                return $this->container->make($options['class'], $options['params'] ?? []);
-            default:
-                throw new \InvalidArgumentException(sprintf('Invalid user provider type: %s', $type));
-        }
-    }
-
-    /**
      * 创建认证器
      *
      * @param AuthenticatorConfig $authenticatorConfig
@@ -357,6 +383,35 @@ class ServiceProvider
                 );
             default:
                 throw new \InvalidArgumentException(sprintf('Invalid authenticator name: %s', $name));
+        }
+    }
+
+    /**
+     * 创建密码哈希器
+     *
+     * @return PasswordHasherInterface
+     */
+    private function createPasswordHasher(PasswordHasherConfig $passwordHasherConfig): PasswordHasherInterface
+    {
+        $type = $passwordHasherConfig->type();
+        $options = $passwordHasherConfig->options();
+
+        switch ($type) {
+            case 'default':
+                return new PasswordHasher($options['algo'] ?? PASSWORD_BCRYPT);
+            case 'custom':
+                if (!isset($options['class'])) {
+                    throw new \InvalidArgumentException();
+                }
+
+                $passwordHasher = $this->container->make($options['class'], $options['params'] ?? []);
+                if (!$passwordHasher instanceof PasswordHasherInterface) {
+                    throw new \InvalidArgumentException('Custom PasswordHasher class must be an instance of PasswordHasherInterface');
+                }
+
+                return $passwordHasher;
+            default:
+                throw new \InvalidArgumentException(sprintf('Invalid password hasher type: %s', $type));
         }
     }
 }
