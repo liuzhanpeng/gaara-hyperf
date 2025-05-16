@@ -11,14 +11,13 @@ use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * 认证失败事件
+ * 登录失败事件
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class AuthenticationFailureEvent implements EventInterface
+class LoginFailureEvent
 {
     /**
-     * @param string $guardName
      * @param AuthenticatorInterface $authenticator
      * @param Passport $passport
      * @param AuthenticationException $exception
@@ -26,22 +25,12 @@ class AuthenticationFailureEvent implements EventInterface
      * @param ResponseInterface|null $response
      */
     public function __construct(
-        private string $guardName,
         private AuthenticatorInterface $authenticator,
         private Passport $passport,
         private AuthenticationException $exception,
         private RequestInterface $request,
         private ?ResponseInterface $response
     ) {}
-
-    /**
-     * @inheritDoc
-     */
-    public function getGuardName(): string
-    {
-        return $this->guardName;
-    }
-
 
     /**
      * 返回认证器
