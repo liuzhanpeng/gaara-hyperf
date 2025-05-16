@@ -15,7 +15,7 @@ use Lzpeng\HyperfAuthGuard\Util\Util;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * 用于API登录认证
+ * JSON登录认证
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */

@@ -13,6 +13,7 @@ use Lzpeng\HyperfAuthGuard\Event\AuthenticatedTokenCreatedEvent;
 use Lzpeng\HyperfAuthGuard\Event\AuthenticationFailureEvent;
 use Lzpeng\HyperfAuthGuard\Event\AuthenticationSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
+use Lzpeng\HyperfAuthGuard\Event\LoginSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Exception\AccessDeniedException;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Exception\UnauthenticatedException;
@@ -125,6 +126,8 @@ class Guard implements GuardInterface
             $token = $authenticator->createToken($passport, $this->name);
             $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($this->name, $passport, $token))->getToken();
 
+            $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($this->name, $token));
+
             return $this->handleAuthenticationSuccess($token, $request, $authenticator, $passport);
         } catch (AuthenticationException $exception) {
             return $this->handleAuthenticationFailure($exception, $request, $authenticator, $passport);
@@ -148,7 +151,7 @@ class Guard implements GuardInterface
 
         $response = $authenticator->onAuthenticationSuccess($request, $token);
 
-        $authenticationSuccessEvent = new AuthenticationSuccessEvent(
+        $loginSuccessEvent = new LoginSuccessEvent(
             $this->name,
             $authenticator,
             $passport,
@@ -158,9 +161,9 @@ class Guard implements GuardInterface
             $previousToken
         );
 
-        $this->eventDispatcher->dispatch($authenticationSuccessEvent);
+        $this->eventDispatcher->dispatch($loginSuccessEvent);
 
-        return $authenticationSuccessEvent->getResponse();
+        return $loginSuccessEvent->getResponse();
     }
 
     /**
