@@ -115,7 +115,7 @@ class Guard implements GuardInterface
         $passport = null;
         try {
             $passport = $authenticator->authenticate($request);
-            $checkPassportEvent = new CheckPassportEvent($authenticator, $passport);
+            $checkPassportEvent = new CheckPassportEvent($this->name, $authenticator, $passport);
             $this->eventDispatcher->dispatch($checkPassportEvent);
 
             foreach ($passport->getBadges() as $badge) {

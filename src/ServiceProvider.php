@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard;
 
 use Hyperf\Contract\ContainerInterface;
+use Hyperf\Contract\SessionInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Event\EventDispatcher;
@@ -12,8 +13,8 @@ use Hyperf\Event\ListenerData;
 use Hyperf\Event\ListenerProvider;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorResolver;
+use Lzpeng\HyperfAuthGuard\Authenticator\FormLogAuthenticator;
 use Lzpeng\HyperfAuthGuard\Authenticator\JsonLoginAuthenticator;
-use Lzpeng\HyperfAuthGuard\Authorization\AccessDeniedHandler;
 use Lzpeng\HyperfAuthGuard\Authorization\AccessDeniedHandlerInterface;
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerInterface;
 use Lzpeng\HyperfAuthGuard\Config\AccessDeniedHandlerConfig;
@@ -26,7 +27,6 @@ use Lzpeng\HyperfAuthGuard\Config\RequestMatcherConfig;
 use Lzpeng\HyperfAuthGuard\Config\TokenStorageConfig;
 use Lzpeng\HyperfAuthGuard\Config\UnauthenticatedHandlerConfig;
 use Lzpeng\HyperfAuthGuard\Config\UserProviderConfig;
-use Lzpeng\HyperfAuthGuard\EventListener\GuardFilteredListener;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandler;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerInterface;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolver;
@@ -45,14 +45,11 @@ use Lzpeng\HyperfAuthGuard\TokenStorage\NullTokenStorage;
 use Lzpeng\HyperfAuthGuard\TokenStorage\SessionTokenStorage;
 use Lzpeng\HyperfAuthGuard\Token\TokenContext;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
-use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandler;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandlerInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\MemoryUserProvider;
 use Lzpeng\HyperfAuthGuard\UserProvider\ModelUserProvider;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Lzpeng\HyperfAuthGuard\Util\Util;
-use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\EventDispatcher\ListenerProviderInterface;
 
 /**
  * 认证组件服务提供者
@@ -303,12 +300,8 @@ class ServiceProvider
         $options = $authenticatorConfig->options();
 
         switch ($type) {
-            // case 'form_login':
-            //     return new FormLoginAuthenticator(
-            //         $this->container->get($userProviderId),
-            //         $params['login_path'],
-            //         $params['check_path'],
-            //     );
+            case 'form_login':
+                return $this->createFormLoginAuthenticator($options, $userProviderId);
             case 'json_login':
                 return $this->createJsonLoginAuthenticator($options, $userProviderId);
             default:
@@ -322,7 +315,58 @@ class ServiceProvider
     }
 
     /**
-     * 创建JsonLoginAuthenticator
+     * 创建FormLogin认证器
+     *
+     * @param array $options
+     * @param string $userProviderId
+     * @return AuthenticatorInterface
+     */
+    private function createFormLoginAuthenticator(array $options, string $userProviderId): AuthenticatorInterface
+    {
+        $successHandler = null;
+        if (isset($options['success_handler'])) {
+            if (is_string($options['success_handler'])) {
+                $options['success_handler'] = [
+                    'class' => $options['success_handler']
+                ];
+            }
+
+            $successHandler = $this->container->make(
+                $options['success_handler']['class'],
+                $options['success_handler']['params'] ?? []
+            );
+        }
+
+        $failureHander = null;
+        if (isset($options['failure_handler'])) {
+            if (is_string($options['failure_handler'])) {
+                $options['failure_handler'] = [
+                    'class' => $options['failure_handler']
+                ];
+            }
+
+            $failureHander = $this->container->make(
+                $options['failure_handler']['class'],
+                $options['failure_handler']['params'] ?? []
+            );
+        }
+
+        return new FormLogAuthenticator(
+            checkPath: $options['check_path'],
+            successPath: $options['success_path'],
+            failurePath: $options['failure_path'],
+            usernameParam: $options['username_param'] ?? 'username',
+            passwordParam: $options['password_param'] ?? 'password',
+            successHandler: $successHandler,
+            failureHandler: $failureHander,
+            userProvider: $this->container->get($userProviderId),
+            response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
+            session: $this->container->get(SessionInterface::class)
+        );
+    }
+
+    /**
+     * 创建JsonLogin认证器
      *
      * @param array $options
      * @param string $userProviderId
