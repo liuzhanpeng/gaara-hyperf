@@ -11,6 +11,7 @@ use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Event\EventDispatcher;
 use Hyperf\Event\ListenerData;
 use Hyperf\Event\ListenerProvider;
+use Lzpeng\HyperfAuthGuard\Authenticator\ApiKeyAuthenticator;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorResolver;
 use Lzpeng\HyperfAuthGuard\Authenticator\FormLogAuthenticator;
@@ -304,6 +305,8 @@ class ServiceProvider
                 return $this->createFormLoginAuthenticator($options, $userProviderId);
             case 'json_login':
                 return $this->createJsonLoginAuthenticator($options, $userProviderId);
+            case 'api_key':
+                return $this->createApiKeyAuthenticator($options, $userProviderId);
             default:
                 $authenticator = $this->container->make($type, $options['params'] ?? []);
                 if (!$authenticator instanceof AuthenticatorInterface) {
@@ -337,7 +340,7 @@ class ServiceProvider
             );
         }
 
-        $failureHander = null;
+        $failureHandler = null;
         if (isset($options['failure_handler'])) {
             if (is_string($options['failure_handler'])) {
                 $options['failure_handler'] = [
@@ -345,7 +348,7 @@ class ServiceProvider
                 ];
             }
 
-            $failureHander = $this->container->make(
+            $failureHandler = $this->container->make(
                 $options['failure_handler']['class'],
                 $options['failure_handler']['params'] ?? []
             );
@@ -358,7 +361,7 @@ class ServiceProvider
             usernameParam: $options['username_param'] ?? 'username',
             passwordParam: $options['password_param'] ?? 'password',
             successHandler: $successHandler,
-            failureHandler: $failureHander,
+            failureHandler: $failureHandler,
             userProvider: $this->container->get($userProviderId),
             response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
             session: $this->container->get(SessionInterface::class)
@@ -388,7 +391,7 @@ class ServiceProvider
             );
         }
 
-        $failureHander = null;
+        $failureHandler = null;
         if (isset($options['failure_handler'])) {
             if (is_string($options['failure_handler'])) {
                 $options['failure_handler'] = [
@@ -396,7 +399,7 @@ class ServiceProvider
                 ];
             }
 
-            $failureHander = $this->container->make(
+            $failureHandler = $this->container->make(
                 $options['failure_handler']['class'],
                 $options['failure_handler']['params'] ?? []
             );
@@ -407,10 +410,48 @@ class ServiceProvider
             usernameParam: $options['username_param'] ?? 'username',
             passwordParam: $options['password_param'] ?? 'password',
             successHandler: $successHandler,
-            failureHandler: $failureHander,
+            failureHandler: $failureHandler,
             userProvider: $this->container->get($userProviderId),
             response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
             util: $this->container->get(Util::class),
+        );
+    }
+
+    private function createApiKeyAuthenticator(array $options, string $userProviderId): AuthenticatorInterface
+    {
+        $successHandler = null;
+        if (isset($options['success_handler'])) {
+            if (is_string($options['success_handler'])) {
+                $options['success_handler'] = [
+                    'class' => $options['success_handler']
+                ];
+            }
+
+            $successHandler = $this->container->make(
+                $options['success_handler']['class'],
+                $options['success_handler']['params'] ?? []
+            );
+        }
+
+        $failureHandler = null;
+        if (isset($options['failure_handler'])) {
+            if (is_string($options['failure_handler'])) {
+                $options['failure_handler'] = [
+                    'class' => $options['failure_handler']
+                ];
+            }
+
+            $failureHandler = $this->container->make(
+                $options['failure_handler']['class'],
+                $options['failure_handler']['params'] ?? []
+            );
+        }
+
+        return new ApiKeyAuthenticator(
+            apiKeyParam: $options['api_key_param'] ?? 'X-API-Key',
+            userProvider: $this->container->get($userProviderId),
+            successHandler: $successHandler,
+            failureHandler: $failureHandler
         );
     }
 

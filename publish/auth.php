@@ -56,6 +56,9 @@ return [
                     ],
                     'failure_handler' => CustomFailureHandler::class,
                 ],
+                'api_key' => [
+                    'api_key_param' => 'X-API-Key',
+                ],
                 'custom' => [ // 自定义认证器
                     [
                         'class' => CustomAuthenticator::class,
