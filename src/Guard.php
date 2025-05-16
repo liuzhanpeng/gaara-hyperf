@@ -62,7 +62,7 @@ class Guard implements GuardInterface
     {
         $passport = new Passport($user->getIdentifier(), fn() => $user, $badges);
         $token = $authenticator->createToken($passport, $this->name);
-        $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($this->name, $passport, $token))->getToken();
+        $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($passport, $token))->getToken();
 
         return $this->handleAuthenticationSuccess($token, $request, $authenticator, $passport);
     }
@@ -114,7 +114,7 @@ class Guard implements GuardInterface
         $passport = null;
         try {
             $passport = $authenticator->authenticate($request);
-            $checkPassportEvent = new CheckPassportEvent($this->name, $authenticator, $passport);
+            $checkPassportEvent = new CheckPassportEvent($authenticator, $passport);
             $this->eventDispatcher->dispatch($checkPassportEvent);
 
             foreach ($passport->getBadges() as $badge) {
@@ -124,14 +124,14 @@ class Guard implements GuardInterface
             }
 
             $token = $authenticator->createToken($passport, $this->name);
-            $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($this->name, $passport, $token))->getToken();
+            $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($passport, $token))->getToken();
 
-            $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($this->name, $token));
-
-            return $this->handleAuthenticationSuccess($token, $request, $authenticator, $passport);
+            $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($token));
         } catch (AuthenticationException $exception) {
             return $this->handleAuthenticationFailure($exception, $request, $authenticator, $passport);
         }
+
+        return $this->handleAuthenticationSuccess($token, $request, $authenticator, $passport);
     }
 
     /**
@@ -152,7 +152,6 @@ class Guard implements GuardInterface
         $response = $authenticator->onAuthenticationSuccess($request, $token);
 
         $loginSuccessEvent = new LoginSuccessEvent(
-            $this->name,
             $authenticator,
             $passport,
             $token,

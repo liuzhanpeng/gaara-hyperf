@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard;
 
 use Hyperf\Contract\ContainerInterface;
+use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Contract\ListenerInterface;
+use Hyperf\Event\EventDispatcher;
 use Hyperf\Event\ListenerData;
 use Hyperf\Event\ListenerProvider;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
@@ -79,6 +81,7 @@ class ServiceProvider
         $matcherMap = [];
         $logoutHandlerMap = [];
         $passwordHasherMap = [];
+        $eventDispatcherMap = [];
         foreach ($this->config->guardConfigCollection() as $guardConfig) {
             $guardName = $guardConfig->name();
 
@@ -114,13 +117,6 @@ class ServiceProvider
                 return $this->createTokenStorage($tokenStorageConfig);
             });
 
-            $logoutHandlerId = sprintf('auth.guards.%s.logout_handler', $guardName);
-            $logoutHandlerMap[$guardName] = $logoutHandlerId;
-            $logoutConfig = $guardConfig->logoutConfig();
-            $this->container->set($logoutHandlerId, function () use ($logoutConfig, $tokenStorageId) {
-                return $this->createLogoutHandler($logoutConfig, $tokenStorageId);
-            });
-
             $unauthenticatedHandlerId = sprintf('auth.guards.%s.unauthenticated_handler', $guardName);
             $unauthenticatedHandlerConfig = $guardConfig->unauthenticatedHandlerConfig();
             $this->container->set($unauthenticatedHandlerId, function () use ($unauthenticatedHandlerConfig) {
@@ -139,28 +135,31 @@ class ServiceProvider
                 return $this->createAccessDeniedHandler($accessDeniedHandlerConfig);
             });
 
+            $listenerProvider = new ListenerProvider();
             foreach ($guardConfig->listenerConfigCollection() as $listenerConfig) {
-                $listenerId = sprintf('auth.guards.%s.listeners.%s', $guardName, $listenerConfig->class());
-                $this->container->set($listenerId, function () use ($guardName, $listenerConfig) {
-                    $listener = $this->container->make($listenerConfig->class(), $listenerConfig->params());
-
-                    return new GuardFilteredListener($guardName, $listener);
-                });
-
-                $listenerProvider = $this->container->get(ListenerProviderInterface::class);
-                if (!$listenerProvider instanceof ListenerProvider) {
-                    throw new \LogicException('ListenerProvider not found');
+                $listener = $this->container->make($listenerConfig->class(), $listenerConfig->params());
+                if (!$listener instanceof ListenerInterface) {
+                    throw new \LogicException(sprintf('%s must implement %s', $listenerConfig->class(), ListenerInterface::class));
                 }
 
-                /**
-                 * @var ListenerInterface
-                 */
-                $listenerInstance = $this->container->get($listenerId);
-                $events = $listenerInstance->listen();
-                foreach ($events as $event) {
-                    $listenerProvider->on($event, [$listenerInstance, 'process'], ListenerData::DEFAULT_PRIORITY + 1);
+                foreach ($listener->listen() as $event) {
+                    $listenerProvider->on($event, [$listener, 'handle'], ListenerData::DEFAULT_PRIORITY + 1);
                 }
             }
+
+            $eventDispatcherId = sprintf('auth.guards.%s.event_dispatcher', $guardName);
+            $eventDispatcherMap[$guardName] = $eventDispatcherId;
+            $this->container->set($eventDispatcherId, function () use ($listenerProvider) {
+                $stdoutLogger = $this->container->get(StdoutLoggerInterface::class);
+                return new EventDispatcher($listenerProvider, $stdoutLogger);
+            });
+
+            $logoutHandlerId = sprintf('auth.guards.%s.logout_handler', $guardName);
+            $logoutHandlerMap[$guardName] = $logoutHandlerId;
+            $logoutConfig = $guardConfig->logoutConfig();
+            $this->container->set($logoutHandlerId, function () use ($logoutConfig, $tokenStorageId, $eventDispatcherId) {
+                return $this->createLogoutHandler($logoutConfig, $tokenStorageId, $eventDispatcherId);
+            });
 
             $passwordHasherId = sprintf('auth.guards.%s.password_hasher', $guardName);
             $passwordHasherMap[$guardName] = $passwordHasherId;
@@ -173,20 +172,22 @@ class ServiceProvider
             $guardMap[$guardName] = $guardId;
             $this->container->set($guardId, function () use (
                 $guardName,
-                $tokenStorageId,
                 $authenticatorResolverId,
+                $tokenStorageId,
+                $unauthenticatedHandlerId,
                 $authorizationCheckerId,
-                $accessDeniedHandlerId
+                $accessDeniedHandlerId,
+                $eventDispatcherId,
             ) {
                 return new Guard(
                     name: $guardName,
                     authenticatorResolver: $this->container->get($authenticatorResolverId),
                     tokenContext: $this->container->get(TokenContextInterface::class),
                     tokenStorage: $this->container->get($tokenStorageId),
-                    unauthenticatedHandler: $this->container->get(UnauthenticatedHandlerInterface::class),
+                    unauthenticatedHandler: $this->container->get($unauthenticatedHandlerId),
                     authorizationChecker: $this->container->get($authorizationCheckerId),
                     accessDeniedHandler: $this->container->get($accessDeniedHandlerId),
-                    eventDispatcher: $this->container->get(EventDispatcherInterface::class),
+                    eventDispatcher: $this->container->get($eventDispatcherId),
                 );
             });
         }
@@ -408,16 +409,17 @@ class ServiceProvider
      *
      * @param LogoutConfig $logoutConfig
      * @param string $tokenStorageId
+     * @param string $eventDispatcherId
      * @return LogoutHandlerInterface
      */
-    private function createLogoutHandler(LogoutConfig $logoutConfig, string $tokenStorageId): LogoutHandlerInterface
+    private function createLogoutHandler(LogoutConfig $logoutConfig, string $tokenStorageId, string $eventDispatcherId): LogoutHandlerInterface
     {
         return new LogoutHandler(
             path: $logoutConfig->path(),
             target: $logoutConfig->target(),
             tokenStorage: $this->container->get($tokenStorageId),
             tokenContext: $this->container->get(TokenContextInterface::class),
-            eventDispatcher: $this->container->get(EventDispatcherInterface::class),
+            eventDispatcher: $this->container->get($eventDispatcherId),
             response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
             util: $this->container->get(Util::class),
         );

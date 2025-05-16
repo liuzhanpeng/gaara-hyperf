@@ -13,7 +13,7 @@ use Psr\Http\Message\ResponseInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class LogoutEvent implements EventInterface
+class LogoutEvent
 {
     /**
      * @var ResponseInterface|null
@@ -21,23 +21,13 @@ class LogoutEvent implements EventInterface
     private ?ResponseInterface $response = null;
 
     /**
-     * @param string $guardName
      * @param TokenInterface $token
      * @param RequestInterface $request
      */
     public function __construct(
-        private string $guardName,
         private TokenInterface $token,
         private RequestInterface $request,
     ) {}
-
-    /**
-     * @inheritDoc
-     */
-    public function getGuardName(): string
-    {
-        return $this->guardName;
-    }
 
     /**
      * 返回用户令牌

@@ -12,26 +12,16 @@ use Lzpeng\HyperfAuthGuard\Passport\Passport;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class CheckPassportEvent implements EventInterface
+class CheckPassportEvent
 {
     /**
-     * @param string $guardName
      * @param AuthenticatorInterface $authenticator 不同的认证方法需要不同的验证方式，因此将Authenticator作为参数
      * @param Passport $passport
      */
     public function __construct(
-        private string $guardName,
         private AuthenticatorInterface $authenticator,
         private Passport $passport,
     ) {}
-
-    /**
-     * @inheritDoc
-     */
-    public function getGuardName(): string
-    {
-        return $this->guardName;
-    }
 
     /**
      * 返回认证器

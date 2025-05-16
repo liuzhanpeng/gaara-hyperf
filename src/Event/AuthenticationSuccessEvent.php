@@ -11,24 +11,14 @@ use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class AuthenticationSuccessEvent implements EventInterface
+class AuthenticationSuccessEvent
 {
     /**
-     * @param string $guardName
      * @param TokenInterface $token
      */
     public function __construct(
-        private string $guardName,
         private TokenInterface $token,
     ) {}
-
-    /**
-     * @inheritDoc
-     */
-    public function getGuardName(): string
-    {
-        return $this->guardName;
-    }
 
     /**
      * 返回认证令牌
