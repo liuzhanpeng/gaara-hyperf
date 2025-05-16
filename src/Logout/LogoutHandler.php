@@ -35,7 +35,7 @@ class LogoutHandler implements LogoutHandlerInterface
      */
     public function supports(RequestInterface $request): bool
     {
-        return $request->getUri()->getPath() === $this->path && $request->getMethod() === 'POST';
+        return $request->getPathInfo() === $this->path && $request->isMethod('POST');
     }
 
     /**
@@ -48,7 +48,7 @@ class LogoutHandler implements LogoutHandlerInterface
             throw AuthenticationException::from('未登录或会话已过期');
         }
 
-        $logoutEvent = new LogoutEvent($token->getGuardName(), $token, $request);
+        $logoutEvent = new LogoutEvent($token, $request);
         $this->eventDispatcher->dispatch($logoutEvent);
 
         $this->tokenStorage->delete($token->getGuardName());
