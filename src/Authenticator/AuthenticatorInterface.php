@@ -33,9 +33,10 @@ interface AuthenticatorInterface
      * 对请求进行认证
      *
      * @param RequestInterface $request
+     * @param string $guardName
      * @return Passport
      */
-    public function authenticate(RequestInterface $request): Passport;
+    public function authenticate(RequestInterface $request, string $guardName): Passport;
 
     /**
      * 创建token

@@ -61,7 +61,7 @@ class Guard implements GuardInterface
      */
     public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, RequestInterface $request, array $badges = []): ?ResponseInterface
     {
-        $passport = new Passport($user->getIdentifier(), fn() => $user, $badges);
+        $passport = new Passport($this->name, $user->getIdentifier(), fn() => $user, $badges);
         $token = $authenticator->createToken($passport, $this->name);
         $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($passport, $token))->getToken();
 
@@ -114,8 +114,8 @@ class Guard implements GuardInterface
     {
         $passport = null;
         try {
-            $passport = $authenticator->authenticate($request);
-            $checkPassportEvent = new CheckPassportEvent($this->name, $authenticator, $passport);
+            $passport = $authenticator->authenticate($request, $this->name);
+            $checkPassportEvent = new CheckPassportEvent($authenticator, $passport);
             $this->eventDispatcher->dispatch($checkPassportEvent);
 
             foreach ($passport->getBadges() as $badge) {

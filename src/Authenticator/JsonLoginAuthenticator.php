@@ -45,11 +45,12 @@ class JsonLoginAuthenticator implements AuthenticatorInterface
     /**
      * @inheritDoc
      */
-    public function authenticate(RequestInterface $request): Passport
+    public function authenticate(RequestInterface $request, string $guardName): Passport
     {
         $credientials = $this->getCredentials($request);
 
         $passport = new Passport(
+            $guardName,
             $credientials['username'],
             $this->userProvider->findByIdentifier(...),
             [

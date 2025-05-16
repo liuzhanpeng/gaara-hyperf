@@ -59,7 +59,7 @@ class PasswordBadgeCheckListener implements ListenerInterface
             throw new \LogicException('The user must implement PasswordUserInterface');
         }
 
-        $passwordHasher = $this->passwordHasherResolver->resolve($event->getGuardName());
+        $passwordHasher = $this->passwordHasherResolver->resolve($passport->getGuardName());
         if (!$passwordHasher->verify($badge->getPassword(), $user->getPassword())) {
             throw InvalidPasswordException::from('密码错误', $user);
         }

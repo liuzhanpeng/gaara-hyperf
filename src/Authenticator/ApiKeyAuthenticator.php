@@ -31,11 +31,12 @@ class ApiKeyAuthenticator implements AuthenticatorInterface
         return !empty($request->getHeaderLine($this->apiKeyParam));
     }
 
-    public function authenticate(RequestInterface $request): Passport
+    public function authenticate(RequestInterface $request, string $guardName): Passport
     {
         $apiKey = $request->getHeaderLine($this->apiKeyParam);
 
         return new Passport(
+            $guardName,
             $apiKey,
             $this->userProvider->findByIdentifier(...),
             []

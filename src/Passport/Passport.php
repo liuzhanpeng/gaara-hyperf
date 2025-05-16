@@ -36,11 +36,13 @@ class Passport
     private array $badges;
 
     /**
+     * @param string $guardName
      * @param string $userIdentifier 用户标识
      * @param callable $userLoader 用户加载器
      * @param BadgeInterface[] $badges 认证标识集合
      */
     public function __construct(
+        private string $guardName,
         private string $userIdentifier,
         callable $userLoader,
         array $badges,
@@ -49,6 +51,16 @@ class Passport
         foreach ($badges as $badge) {
             $this->addBadge($badge);
         }
+    }
+
+    /**
+     * 返回守卫名称
+     *
+     * @return string
+     */
+    public function getGuardName(): string
+    {
+        return $this->guardName;
     }
 
     /**
