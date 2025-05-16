@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
+use Hyperf\Contract\SessionInterface;
 use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\Session\Session;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
+use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
+use Lzpeng\HyperfAuthGuard\Token\AuthenticatedToken;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -19,28 +23,92 @@ use Psr\Http\Message\ResponseInterface;
 class FormLogAuthenticator implements AuthenticatorInterface
 {
     public function __construct(
+        private string $checkPath,
+        private string $successPath,
+        private string $failurePath,
+        private string $usernameParam,
+        private string $passwordParam,
+        private ?AuthenticationSuccessHandlerInterface $successHandler,
+        private ?AuthenticationFailureHandlerInterface $failureHandler,
         private UserProviderInterface $userProvider,
-        private array $options
-    ) {
-        $this->options = array_merge([
-            'login_path' => '/login',
-            'check_path' => '/check_login',
-            'username_parameter' => 'username',
-            'password_parameter' => 'password',
-        ], $this->options);
-    }
+        private \Hyperf\HttpServer\Contract\ResponseInterface $response,
+        private SessionInterface $session
+    ) {}
 
+    /**
+     * @inheritDoc
+     */
     public function supports(RequestInterface $request): bool
     {
-        return $request->getUri()->getPath() === $this->checkPath
-            && $request->getMethod() === 'POST';
+        return $request->getPathInfo() === $this->checkPath
+            && $request->isMethod('POST');
     }
 
-    public function authenticate(RequestInterface $request): Passport {}
+    /**
+     * @inheritDoc
+     */
+    public function authenticate(RequestInterface $request): Passport
+    {
+        $credientials = $this->getCredentials($request);
 
-    public function createToken(Passport $passport, string $guardName): TokenInterface {}
+        $passport = new Passport(
+            $credientials['username'],
+            $this->userProvider->findByIdentifier(...),
+            [
+                new PasswordBadge($credientials['password']),
+            ]
+        );
 
-    public function onAuthenticationSuccess(RequestInterface $request, TokenInterface $token): ?ResponseInterface {}
+        return $passport;
+    }
 
-    public function onAuthenticationFailure(RequestInterface $request, AuthenticationException $exception): ?ResponseInterface {}
+    /**
+     * @inheritDoc
+     */
+    public function createToken(Passport $passport, string $guardName): TokenInterface
+    {
+        return new AuthenticatedToken($guardName, $passport->getUser());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function onAuthenticationSuccess(RequestInterface $request, TokenInterface $token): ?ResponseInterface
+    {
+        if (!is_null($this->successHandler)) {
+            return $this->successHandler->handle($request, $token);
+        }
+
+        return $this->response->redirect($this->successPath);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function onAuthenticationFailure(RequestInterface $request, AuthenticationException $exception): ?ResponseInterface
+    {
+        if (!is_null($this->failureHandler)) {
+            return $this->failureHandler->handle($request, $exception);
+        }
+
+        if ($this->session instanceof Session) {
+            $this->session->flash('authentication_error', $exception->getMessage());
+        }
+
+        return $this->response->redirect($this->failurePath);
+    }
+
+    /**
+     * 获取认证凭证
+     *
+     * @param RequestInterface $request
+     * @return array
+     */
+    private function getCredentials(RequestInterface $request): array
+    {
+        return [
+            'username' => $request->post($this->usernameParam),
+            'password' => $request->post($this->passwordParam),
+        ];
+    }
 }

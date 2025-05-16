@@ -39,9 +39,14 @@ return [
             ],
             'authenticators' => [
                 'form_login' => [
-                    'login_path' => '/admin/login',
                     'check_path' => '/admin/check_login',
-                    'redirect' => true,
+                    'success_path' => '/admin/index',
+                    'failure_path' => '/admin/login',
+                    // 'success_handler' => [
+                    //     'class' => CustomSuccessHandler::class,
+                    //     'params' => []
+                    // ],
+                    // 'failure_handler' => CustomFailureHandler::class,
                 ],
                 'json_login' => [
                     'check_path' => '/admin/check_login',
@@ -87,9 +92,9 @@ return [
             //     'params' => []
             // ],
             'listeners' =>  [
-                UserExpireCheckListener::class,
+                CustomListener::class,
                 // [
-                //     'class' => UserExpireCheckListener::class,
+                //     'class' => CustomListener::class,
                 //     'params' => []
                 // ]
             ],

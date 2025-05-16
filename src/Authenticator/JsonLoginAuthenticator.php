@@ -73,11 +73,11 @@ class JsonLoginAuthenticator implements AuthenticatorInterface
      */
     public function onAuthenticationSuccess(RequestInterface $request, TokenInterface $token): ?ResponseInterface
     {
-        if (is_null($this->successHandler)) {
-            return null;
+        if (!is_null($this->successHandler)) {
+            return $this->successHandler->handle($request, $token);
         }
 
-        return $this->successHandler->handle($request, $token);
+        return null;
     }
 
     /**
@@ -85,11 +85,11 @@ class JsonLoginAuthenticator implements AuthenticatorInterface
      */
     public function onAuthenticationFailure(RequestInterface $request, AuthenticationException $exception): ?ResponseInterface
     {
-        if (is_null($this->failureHandler)) {
-            throw $exception;
+        if (!is_null($this->failureHandler)) {
+            return $this->failureHandler->handle($request, $exception);
         }
 
-        return $this->failureHandler->handle($request, $exception);
+        throw $exception;
     }
 
     /**
