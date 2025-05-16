@@ -13,6 +13,7 @@ use Lzpeng\HyperfAuthGuard\Event\AuthenticatedTokenCreatedEvent;
 use Lzpeng\HyperfAuthGuard\Event\AuthenticationFailureEvent;
 use Lzpeng\HyperfAuthGuard\Event\AuthenticationSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
+use Lzpeng\HyperfAuthGuard\Event\LoginFailureEvent;
 use Lzpeng\HyperfAuthGuard\Event\LoginSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Exception\AccessDeniedException;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
@@ -178,8 +179,7 @@ class Guard implements GuardInterface
     {
         $response = $authenticator->onAuthenticationFailure($request, $exception, $passport);
 
-        $authenticationFailureEvent = new AuthenticationFailureEvent(
-            $this->name,
+        $loginFailureEvent = new LoginFailureEvent(
             $authenticator,
             $passport,
             $exception,
@@ -187,8 +187,8 @@ class Guard implements GuardInterface
             $response
         );
 
-        $this->eventDispatcher->dispatch($authenticationFailureEvent);
+        $this->eventDispatcher->dispatch($loginFailureEvent);
 
-        return $authenticationFailureEvent->getResponse();
+        return $loginFailureEvent->getResponse();
     }
 }
