@@ -8,7 +8,6 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
-use Lzpeng\HyperfAuthGuard\Token\AuthenticatedToken;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Lzpeng\HyperfAuthGuard\Util\Util;
@@ -19,7 +18,7 @@ use Psr\Http\Message\ResponseInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class JsonLoginAuthenticator implements AuthenticatorInterface
+class JsonLoginAuthenticator extends AbstractAuthenticator
 {
     public function __construct(
         private string $checkPath,
@@ -59,14 +58,6 @@ class JsonLoginAuthenticator implements AuthenticatorInterface
         );
 
         return $passport;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function createToken(Passport $passport, string $guardName): TokenInterface
-    {
-        return new AuthenticatedToken($guardName, $passport->getUser());
     }
 
     /**

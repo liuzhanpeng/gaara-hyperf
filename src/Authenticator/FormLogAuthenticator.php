@@ -10,7 +10,6 @@ use Hyperf\Session\Session;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
-use Lzpeng\HyperfAuthGuard\Token\AuthenticatedToken;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -20,7 +19,7 @@ use Psr\Http\Message\ResponseInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class FormLogAuthenticator implements AuthenticatorInterface
+class FormLogAuthenticator extends AbstractAuthenticator
 {
     public function __construct(
         private string $checkPath,
@@ -61,14 +60,6 @@ class FormLogAuthenticator implements AuthenticatorInterface
         );
 
         return $passport;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function createToken(Passport $passport, string $guardName): TokenInterface
-    {
-        return new AuthenticatedToken($guardName, $passport->getUser());
     }
 
     /**

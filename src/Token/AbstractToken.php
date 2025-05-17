@@ -69,6 +69,18 @@ abstract class AbstractToken implements TokenInterface, \Serializable
     }
 
     /**
+     * 设置属性
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return void
+     */
+    public function setAttribute(string $name, mixed $value): void
+    {
+        $this->attributes[$name] = $value;
+    }
+
+    /**
      * 序列化
      *
      * @return array

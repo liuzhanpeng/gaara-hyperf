@@ -23,9 +23,9 @@ interface TokenInterface extends \Stringable
     /**
      * 返回用户
      *
-     * @return UserInterface|null
+     * @return UserInterface
      */
-    public function getUser(): ?UserInterface;
+    public function getUser(): UserInterface;
 
     /**
      * 是否有属性
@@ -42,4 +42,13 @@ interface TokenInterface extends \Stringable
      * @return mixed
      */
     public function getAttribute(string $name): mixed;
+
+    /**
+     * 设置属性
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return void
+     */
+    public function setAttribute(string $name, mixed $value): void;
 }

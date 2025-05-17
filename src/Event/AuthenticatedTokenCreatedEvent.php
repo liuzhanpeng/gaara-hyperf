@@ -46,7 +46,7 @@ class AuthenticatedTokenCreatedEvent
     /**
      * 设置Token
      * 
-     * 认证成功前可能对Token进行了修改，添加一些额外信息; 例如添加2fa信息
+     * 认证成功前可能对Token进行了修改，添加一些额外信息
      *
      * @param TokenInterface $token
      * @return void
