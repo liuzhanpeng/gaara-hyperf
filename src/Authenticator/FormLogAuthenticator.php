@@ -48,7 +48,7 @@ class FormLogAuthenticator extends AbstractAuthenticator
             'target_path' => '/',
             'failure_path' => $options['check_path'],
             'use_redirect_path' => true,
-            'redirect_path_param' => '_redirect_to',
+            'redirect_path_param' => 'redirect_to',
             'username_param' => 'username',
             'password_param' => 'password',
         ], $options);
