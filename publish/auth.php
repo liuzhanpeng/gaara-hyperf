@@ -67,7 +67,6 @@ return [
                 'opaque_token' => [
                     'header_param' => 'Authorization',
                     'token_type' => 'Bearer',
-                    'expire_in' => 3600,
                     'issuer' => [
                         'class' => CustomOpaqueTokenIssuer::class,
                         'params' => []

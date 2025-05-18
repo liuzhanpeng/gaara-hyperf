@@ -31,7 +31,6 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
         $this->options = array_merge([
             'header_param' => 'Authorization',
             'token_type' => 'Bearer',
-            'expire_in' => 3600,
         ], $this->options);
     }
 
