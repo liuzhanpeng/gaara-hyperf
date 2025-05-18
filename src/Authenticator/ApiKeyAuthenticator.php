@@ -20,20 +20,28 @@ use Psr\Http\Message\ResponseInterface;
 class ApiKeyAuthenticator implements AuthenticatorInterface
 {
     public function __construct(
-        private string $apiKeyParam,
+        private array $options,
         private UserProviderInterface $userProvider,
         private ?AuthenticationSuccessHandlerInterface $successHandler,
         private ?AuthenticationFailureHandlerInterface $failureHandler,
-    ) {}
+    ) {
+        if (!isset($options['check_path'])) {
+            throw new \InvalidArgumentException('The "check_path" option must be set.');
+        }
+
+        $this->options = array_merge([
+            'api_key_param' => 'X-API-KEY',
+        ], $this->options);
+    }
 
     public function supports(RequestInterface $request): bool
     {
-        return !empty($request->getHeaderLine($this->apiKeyParam));
+        return !empty($request->getHeaderLine($this->options['api_key_param']));
     }
 
     public function authenticate(RequestInterface $request, string $guardName): Passport
     {
-        $apiKey = $request->getHeaderLine($this->apiKeyParam);
+        $apiKey = $request->getHeaderLine($this->options['api_key_param']);
 
         return new Passport(
             $guardName,

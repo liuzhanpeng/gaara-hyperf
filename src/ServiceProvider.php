@@ -52,6 +52,8 @@ use Lzpeng\HyperfAuthGuard\UserProvider\ModelUserProvider;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Lzpeng\HyperfAuthGuard\Util\Util;
 
+use function Hyperf\Support\optional;
+
 /**
  * 认证组件服务提供者
  * 
@@ -419,38 +421,49 @@ class ServiceProvider
         );
     }
 
+    /**
+     * 创建API Key认证器
+     *
+     * @param array $options
+     * @param string $userProviderId
+     * @return AuthenticatorInterface
+     */
     private function createApiKeyAuthenticator(array $options, string $userProviderId): AuthenticatorInterface
     {
         $successHandler = null;
         if (isset($options['success_handler'])) {
-            if (is_string($options['success_handler'])) {
-                $options['success_handler'] = [
+            $successHandlerOption = $options['success_handler'];
+            unset($options['success_handler']);
+            if (is_string($successHandlerOption)) {
+                $successHandlerOption = [
                     'class' => $options['success_handler']
                 ];
             }
 
             $successHandler = $this->container->make(
-                $options['success_handler']['class'],
-                $options['success_handler']['params'] ?? []
+                $successHandlerOption['class'],
+                $successHandlerOption['params'] ?? []
             );
         }
 
         $failureHandler = null;
         if (isset($options['failure_handler'])) {
-            if (is_string($options['failure_handler'])) {
-                $options['failure_handler'] = [
+            $failureHandlerOption = $options['failure_handler'];
+            unset($options['failure_handler']);
+            if (is_string($failureHandlerOption)) {
+                $failureHandlerOption = [
                     'class' => $options['failure_handler']
                 ];
             }
 
             $failureHandler = $this->container->make(
-                $options['failure_handler']['class'],
-                $options['failure_handler']['params'] ?? []
+                $failureHandlerOption['class'],
+                $failureHandlerOption['params'] ?? []
             );
         }
 
         return new ApiKeyAuthenticator(
-            apiKeyParam: $options['api_key_param'] ?? 'X-API-Key',
+            options: $options,
             userProvider: $this->container->get($userProviderId),
             successHandler: $successHandler,
             failureHandler: $failureHandler

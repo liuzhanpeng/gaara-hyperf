@@ -61,6 +61,7 @@ return [
                     'failure_handler' => CustomFailureHandler::class,
                 ],
                 'api_key' => [
+                    'check_path' => '/admin/check_login',
                     'api_key_param' => 'X-API-Key',
                 ],
                 'custom' => [ // 自定义认证器
