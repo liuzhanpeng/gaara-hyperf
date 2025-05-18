@@ -6,6 +6,7 @@ namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
+use Lzpeng\HyperfAuthGuard\Exception\InvalidCredentialsException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
@@ -21,15 +22,22 @@ use Psr\Http\Message\ResponseInterface;
 class JsonLoginAuthenticator extends AbstractAuthenticator
 {
     public function __construct(
-        private string $checkPath,
-        private string $usernameParam,
-        private string $passwordParam,
+        private array $options,
         private ?AuthenticationSuccessHandlerInterface $successHandler,
         private ?AuthenticationFailureHandlerInterface $failureHandler,
         private UserProviderInterface $userProvider,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
         private Util $util,
-    ) {}
+    ) {
+        if (!isset($options['check_path'])) {
+            throw new \InvalidArgumentException('The "check_path" option must be set.');
+        }
+
+        $this->options = array_merge([
+            'username_param' => 'username',
+            'password_param' => 'password',
+        ], $options);
+    }
 
     /**
      * @inheritDoc
@@ -37,7 +45,7 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
     public function supports(RequestInterface $request): bool
     {
         return $this->util->expectJson($request)
-            && $request->getPathInfo() === $this->checkPath
+            && $request->getPathInfo() === $this->options['check_path']
             && $request->isMethod('POST');
     }
 
@@ -92,9 +100,19 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
      */
     private function getCredentials(RequestInterface $request): array
     {
-        return [
-            'username' => $request->input($this->usernameParam),
-            'password' => $request->input($this->passwordParam),
-        ];
+        $credientials = [];
+        $username = $request->post($this->options['username_param'], '');
+        if (!is_string($username) || empty($username)) {
+            throw new InvalidCredentialsException('username must be string.');
+        }
+        $credientials['username'] = trim($username);
+
+        $password = $request->post($this->options['password_param'], '');
+        if (!is_string($password) || empty($password)) {
+            throw new InvalidCredentialsException('password must be string.');
+        }
+        $credientials['password'] = trim($password);
+
+        return $credientials;
     }
 }

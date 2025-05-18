@@ -18,7 +18,7 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * 表单登录认证器
  * 
- * 基于Session
+ * 基于Session的有状态认证
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
