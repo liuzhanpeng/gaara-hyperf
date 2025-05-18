@@ -24,10 +24,6 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
         private ?AuthenticationFailureHandlerInterface $failureHandler,
         private OpaqueTokenIssuerInterface $issuer,
     ) {
-        if (!isset($options['check_path'])) {
-            throw new \InvalidArgumentException('The "check_path" option must be set.');
-        }
-
         $this->options = array_merge([
             'header_param' => 'Authorization',
             'token_type' => 'Bearer',
