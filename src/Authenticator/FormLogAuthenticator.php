@@ -8,6 +8,7 @@ use Hyperf\Contract\SessionInterface;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\Session\Session;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
+use Lzpeng\HyperfAuthGuard\Exception\InvalidCredentialsException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
@@ -17,29 +18,48 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * 表单登录认证器
  * 
+ * 基于Session
+ * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class FormLogAuthenticator extends AbstractAuthenticator
 {
+    /**
+     * @param string $options 配置
+     * @param AuthenticationSuccessHandlerInterface|null $successHandler 登录成功处理器
+     * @param AuthenticationFailureHandlerInterface|null $failureHandler 登录失败处理器
+     * @param UserProviderInterface $userProvider 用户提供者
+     * @param \Hyperf\HttpServer\Contract\ResponseInterface $response
+     * @param SessionInterface $session
+     */
     public function __construct(
-        private string $checkPath,
-        private string $successPath,
-        private string $failurePath,
-        private string $usernameParam,
-        private string $passwordParam,
+        private array $options,
         private ?AuthenticationSuccessHandlerInterface $successHandler,
         private ?AuthenticationFailureHandlerInterface $failureHandler,
         private UserProviderInterface $userProvider,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
         private SessionInterface $session
-    ) {}
+    ) {
+        if (!isset($options['check_path'])) {
+            throw new \InvalidArgumentException('The "check_path" option must be set.');
+        }
+
+        $this->options = array_merge([
+            'target_path' => '/',
+            'failure_path' => $options['check_path'],
+            'use_redirect_path' => true,
+            'redirect_path_param' => '_redirect_to',
+            'username_param' => 'username',
+            'password_param' => 'password',
+        ], $options);
+    }
 
     /**
      * @inheritDoc
      */
     public function supports(RequestInterface $request): bool
     {
-        return $request->getPathInfo() === $this->checkPath
+        return $request->getPathInfo() === $this->options['check_path']
             && $request->isMethod('POST');
     }
 
@@ -71,7 +91,11 @@ class FormLogAuthenticator extends AbstractAuthenticator
             return $this->successHandler->handle($request, $token);
         }
 
-        return $this->response->redirect($this->successPath);
+        if ($this->options['use_redirect_path'] && $request->has($this->options['redirect_path_param'])) {
+            return $this->response->redirect($request->query($this->options['redirect_path_param']));
+        }
+
+        return $this->response->redirect($this->options['target_path']);
     }
 
     /**
@@ -87,7 +111,7 @@ class FormLogAuthenticator extends AbstractAuthenticator
             $this->session->flash('authentication_error', $exception->getMessage());
         }
 
-        return $this->response->redirect($this->failurePath);
+        return $this->response->redirect($this->options['failure_path']);
     }
 
     /**
@@ -98,9 +122,19 @@ class FormLogAuthenticator extends AbstractAuthenticator
      */
     private function getCredentials(RequestInterface $request): array
     {
-        return [
-            'username' => $request->post($this->usernameParam),
-            'password' => $request->post($this->passwordParam),
-        ];
+        $credientials = [];
+        $username = $request->post($this->options['username_param'], '');
+        if (!is_string($username) || empty($username)) {
+            throw new InvalidCredentialsException('username must be string.');
+        }
+        $credientials['username'] = trim($username);
+
+        $password = $request->post($this->options['password_param'], '');
+        if (!is_string($password) || empty($password)) {
+            throw new InvalidCredentialsException('password must be string.');
+        }
+        $credientials['password'] = trim($password);
+
+        return $credientials;
     }
 }

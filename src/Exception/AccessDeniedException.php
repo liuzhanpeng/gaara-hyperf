@@ -38,7 +38,7 @@ class AccessDeniedException extends \RuntimeException
      */
     public static function from(?TokenInterface $token, string|array $attribute, mixed $subject): self
     {
-        $self = new self('Access denied', 403);
+        $self = new self('Forbidden', 403);
         $self->token = $token;
         $self->attribute = $attribute;
         $self->subject = $subject;

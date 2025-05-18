@@ -9,4 +9,4 @@ namespace Lzpeng\HyperfAuthGuard\Exception;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class InvalidPasswordException extends AuthenticationException {}
+class InvalidPasswordException extends InvalidCredentialsException {}

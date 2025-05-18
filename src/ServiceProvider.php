@@ -328,38 +328,38 @@ class ServiceProvider
     {
         $successHandler = null;
         if (isset($options['success_handler'])) {
-            if (is_string($options['success_handler'])) {
-                $options['success_handler'] = [
+            $successHandlerOption = $options['success_handler'];
+            unset($options['success_handler']);
+            if (is_string($successHandlerOption)) {
+                $successHandlerOption = [
                     'class' => $options['success_handler']
                 ];
             }
 
             $successHandler = $this->container->make(
-                $options['success_handler']['class'],
-                $options['success_handler']['params'] ?? []
+                $successHandlerOption['class'],
+                $successHandlerOption['params'] ?? []
             );
         }
 
         $failureHandler = null;
         if (isset($options['failure_handler'])) {
-            if (is_string($options['failure_handler'])) {
-                $options['failure_handler'] = [
+            $failureHandlerOption = $options['failure_handler'];
+            unset($options['failure_handler']);
+            if (is_string($failureHandlerOption)) {
+                $failureHandlerOption = [
                     'class' => $options['failure_handler']
                 ];
             }
 
             $failureHandler = $this->container->make(
-                $options['failure_handler']['class'],
-                $options['failure_handler']['params'] ?? []
+                $failureHandlerOption['class'],
+                $failureHandlerOption['params'] ?? []
             );
         }
 
         return new FormLogAuthenticator(
-            checkPath: $options['check_path'],
-            successPath: $options['success_path'],
-            failurePath: $options['failure_path'],
-            usernameParam: $options['username_param'] ?? 'username',
-            passwordParam: $options['password_param'] ?? 'password',
+            options: $options,
             successHandler: $successHandler,
             failureHandler: $failureHandler,
             userProvider: $this->container->get($userProviderId),

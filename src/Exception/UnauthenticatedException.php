@@ -27,7 +27,7 @@ class UnauthenticatedException extends \RuntimeException
      */
     public static function from(?TokenInterface $token): self
     {
-        $self = new self('未认证', 401);
+        $self = new self('Unauthorized', 401);
         $self->token = $token;
 
         return $self;

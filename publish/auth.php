@@ -40,8 +40,12 @@ return [
             'authenticators' => [
                 'form_login' => [
                     'check_path' => '/admin/check_login',
-                    'success_path' => '/admin/index',
+                    'target_path' => '/admin/index',
                     'failure_path' => '/admin/login',
+                    'use_redirect_path' => false,
+                    'redirect_path_param' => '_redirect_to',
+                    'username_param' => 'username',
+                    'password_param' => 'password',
                     // 'success_handler' => [
                     //     'class' => CustomSuccessHandler::class,
                     //     'params' => []
