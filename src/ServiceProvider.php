@@ -16,6 +16,7 @@ use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorResolver;
 use Lzpeng\HyperfAuthGuard\Authenticator\FormLogAuthenticator;
 use Lzpeng\HyperfAuthGuard\Authenticator\JsonLoginAuthenticator;
+use Lzpeng\HyperfAuthGuard\Authenticator\OpaqueTokenAuthenticator;
 use Lzpeng\HyperfAuthGuard\Authorization\AccessDeniedHandlerInterface;
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerInterface;
 use Lzpeng\HyperfAuthGuard\Config\AccessDeniedHandlerConfig;
@@ -32,6 +33,7 @@ use Lzpeng\HyperfAuthGuard\Logout\LogoutHandler;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerInterface;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolver;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolverInterface;
+use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuer;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasher;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherInterface;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolver;
@@ -309,6 +311,8 @@ class ServiceProvider
                 return $this->createJsonLoginAuthenticator($options, $userProviderId);
             case 'api_key':
                 return $this->createApiKeyAuthenticator($options, $userProviderId);
+            case 'opaque_token':
+                return $this->createOpaqueTokenAuthenticator($options);
             default:
                 $authenticator = $this->container->make($type, $options['params'] ?? []);
                 if (!$authenticator instanceof AuthenticatorInterface) {
@@ -467,6 +471,57 @@ class ServiceProvider
             userProvider: $this->container->get($userProviderId),
             successHandler: $successHandler,
             failureHandler: $failureHandler
+        );
+    }
+
+    private function createOpaqueTokenAuthenticator(array $options): AuthenticatorInterface
+    {
+        $successHandler = null;
+        if (isset($options['success_handler'])) {
+            $successHandlerOption = $options['success_handler'];
+            unset($options['success_handler']);
+            if (is_string($successHandlerOption)) {
+                $successHandlerOption = [
+                    'class' => $options['success_handler']
+                ];
+            }
+
+            $successHandler = $this->container->make(
+                $successHandlerOption['class'],
+                $successHandlerOption['params'] ?? []
+            );
+        }
+
+        $failureHandler = null;
+        if (isset($options['failure_handler'])) {
+            $failureHandlerOption = $options['failure_handler'];
+            unset($options['failure_handler']);
+            if (is_string($failureHandlerOption)) {
+                $failureHandlerOption = [
+                    'class' => $options['failure_handler']
+                ];
+            }
+
+            $failureHandler = $this->container->make(
+                $failureHandlerOption['class'],
+                $failureHandlerOption['params'] ?? []
+            );
+        }
+
+        if (!isset($options['issuer'])) {
+            $options['issuer'] = [
+                'class' => OpaqueTokenIssuer::class,
+                'params' => [
+                    'cachePrefix' => 'auth:opaque_token:'
+                ]
+            ];
+        }
+
+        return new OpaqueTokenAuthenticator(
+            options: $options,
+            successHandler: $successHandler,
+            failureHandler: $failureHandler,
+            issuer: $this->container->make($options['issuer']['class'], $options['issuer']['params']),
         );
     }
 

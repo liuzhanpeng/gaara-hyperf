@@ -11,7 +11,7 @@ use Lzpeng\HyperfAuthGuard\User\UserInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-interface TokenInterface extends \Stringable
+interface TokenInterface extends \Stringable,  \Serializable
 {
     /**
      * 返回认证守卫名称

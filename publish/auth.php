@@ -64,6 +64,15 @@ return [
                     'check_path' => '/admin/check_login',
                     'api_key_param' => 'X-API-Key',
                 ],
+                'opaque_token' => [
+                    'header_param' => 'Authorization',
+                    'token_type' => 'Bearer',
+                    'expire_in' => 3600,
+                    'issuer' => [
+                        'class' => CustomOpaqueTokenIssuer::class,
+                        'params' => []
+                    ],
+                ],
                 'custom' => [ // 自定义认证器
                     [
                         'class' => CustomAuthenticator::class,

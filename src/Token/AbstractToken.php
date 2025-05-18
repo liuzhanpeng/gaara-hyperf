@@ -11,7 +11,7 @@ use Lzpeng\HyperfAuthGuard\User\UserInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-abstract class AbstractToken implements TokenInterface, \Serializable
+abstract class AbstractToken implements TokenInterface
 {
     /**
      * @param string $guardName
