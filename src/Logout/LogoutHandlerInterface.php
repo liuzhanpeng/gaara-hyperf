@@ -26,7 +26,7 @@ interface LogoutHandlerInterface
      * 处理登出请求
      *
      * @param RequestInterface $request
-     * @return ResponseInterface
+     * @return ResponseInterface|null
      */
-    public function handle(RequestInterface $request): ResponseInterface;
+    public function handle(RequestInterface $request): ?ResponseInterface;
 }

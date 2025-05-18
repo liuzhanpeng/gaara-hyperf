@@ -9,7 +9,6 @@ use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
 use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageInterface;
-use Lzpeng\HyperfAuthGuard\Util\Util;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -26,8 +25,6 @@ class LogoutHandler implements LogoutHandlerInterface
         private TokenStorageInterface $tokenStorage,
         private TokenContextInterface $tokenContext,
         private EventDispatcherInterface $eventDispatcher,
-        private \Hyperf\HttpServer\Contract\ResponseInterface $response,
-        private Util $util,
     ) {}
 
     /**
@@ -41,7 +38,7 @@ class LogoutHandler implements LogoutHandlerInterface
     /**
      * @inheritDoc
      */
-    public function handle(RequestInterface $request): ResponseInterface
+    public function handle(RequestInterface $request): ?ResponseInterface
     {
         $token = $this->tokenContext->getToken();
         if (is_null($token)) {
@@ -59,24 +56,6 @@ class LogoutHandler implements LogoutHandlerInterface
             return $response;
         }
 
-        return $this->createDefaultResponse($request);
-    }
-
-    /**
-     * 创建默认的登出响应
-     *
-     * @param RequestInterface $request
-     * @return ResponseInterface
-     */
-    private function createDefaultResponse(RequestInterface $request): ResponseInterface
-    {
-        if ($this->util->expectJson($request)) {
-            return $this->response->json([
-                'code' => 0,
-                'msg' => '登出成功'
-            ]);
-        } else {
-            return $this->response->redirect($this->target ?? '/');
-        }
+        return null;
     }
 }
