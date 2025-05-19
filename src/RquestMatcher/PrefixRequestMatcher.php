@@ -28,11 +28,10 @@ class PrefixRequestMatcher implements RequestMatcherInterface
     public function matches(RequestInterface $request): bool
     {
         foreach ($this->exclusions as $exclusion) {
-            if ($request->is($exclusion)) {
+            if (preg_match('#' . $exclusion . '#', $request->getPathInfo()) === 1) {
                 return false;
             }
         }
-
         return str_starts_with($request->getUri()->getPath(), $this->prefix);
     }
 }
