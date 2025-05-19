@@ -30,11 +30,17 @@ use Lzpeng\HyperfAuthGuard\Config\RequestMatcherConfig;
 use Lzpeng\HyperfAuthGuard\Config\TokenStorageConfig;
 use Lzpeng\HyperfAuthGuard\Config\UnauthenticatedHandlerConfig;
 use Lzpeng\HyperfAuthGuard\Config\UserProviderConfig;
+use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManager;
+use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerInterface;
+use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
+use Lzpeng\HyperfAuthGuard\EventListener\CsrfTokenBadgeCheckListener;
+use Lzpeng\HyperfAuthGuard\EventListener\PasswordBadgeCheckListener;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandler;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerInterface;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolver;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolverInterface;
 use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuer;
+use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasher;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherInterface;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolver;
@@ -137,6 +143,9 @@ class ServiceProvider
             });
 
             $listenerProvider = new ListenerProvider();
+            $listenerProvider->on(CheckPassportEvent::class, [PasswordBadgeCheckListener::class, 'handle'], ListenerData::DEFAULT_PRIORITY + 1);
+            $listenerProvider->on(CheckPassportEvent::class, [CsrfTokenBadgeCheckListener::class, 'handle'], ListenerData::DEFAULT_PRIORITY + 1);
+
             foreach ($guardConfig->listenerConfigCollection() as $listenerConfig) {
                 $listener = $this->container->make($listenerConfig->class(), $listenerConfig->params());
                 if (!$listener instanceof ListenerInterface) {
@@ -197,11 +206,9 @@ class ServiceProvider
             return new TokenContext('auth');
         });
 
-        // $this->container->define(RequestMatcherResolverInteface::class, new RequestMatcherResolver($matcherMap, $this->container));
-
-        // $this->container->define(GuardResolverInterface::class, new GuardResolver($guardMap, $this->container));
-
-        // $this->container->define(LogoutHandlerResolverInterface::class, new LogoutHandlerResolver($logoutHandlerMap, $this->container));
+        $this->container->define(CsrfTokenManagerInterface::class, function () {
+            return $this->container->make(CsrfTokenManager::class);
+        });
 
         $this->container->define(RequestMatcherResolverInteface::class, function () use ($matcherMap) {
             return new RequestMatcherResolver($matcherMap, $this->container);

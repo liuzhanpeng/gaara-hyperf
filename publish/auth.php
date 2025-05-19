@@ -46,6 +46,8 @@ return [
                     // 'redirect_path_param' => 'redirect_to',
                     // 'username_param' => 'username',
                     // 'password_param' => 'password',
+                    // 'csrf_enabled' => true,
+                    // 'csrf_param' => '_csrf_token',
                     // 'success_handler' => [
                     //     'class' => CustomSuccessHandler::class,
                     //     'params' => []

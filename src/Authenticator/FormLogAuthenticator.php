@@ -7,8 +7,10 @@ namespace Lzpeng\HyperfAuthGuard\Authenticator;
 use Hyperf\Contract\SessionInterface;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\Session\Session;
+use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Exception\InvalidCredentialsException;
+use Lzpeng\HyperfAuthGuard\Passport\CsrfTokenBadge;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
@@ -38,7 +40,7 @@ class FormLogAuthenticator extends AbstractAuthenticator
         private ?AuthenticationFailureHandlerInterface $failureHandler,
         private UserProviderInterface $userProvider,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
-        private SessionInterface $session
+        private SessionInterface $session,
     ) {
         if (!isset($options['check_path'])) {
             throw new \InvalidArgumentException('The "check_path" option must be set.');
@@ -51,6 +53,9 @@ class FormLogAuthenticator extends AbstractAuthenticator
             'redirect_path_param' => 'redirect_to',
             'username_param' => 'username',
             'password_param' => 'password',
+            'csrf_enabled' => true,
+            'csrf_id' => '_csrf_id',
+            'csrf_param' => '_csrf_token',
         ], $options);
     }
 
@@ -70,6 +75,7 @@ class FormLogAuthenticator extends AbstractAuthenticator
     {
         $credientials = $this->getCredentials($request);
 
+
         $passport = new Passport(
             $guardName,
             $credientials['username'],
@@ -78,6 +84,13 @@ class FormLogAuthenticator extends AbstractAuthenticator
                 new PasswordBadge($credientials['password']),
             ]
         );
+
+        if ($this->options['csrf_token_enabled']) {
+            $passport->addBadge(new CsrfTokenBadge(
+                $this->options['csrf_id'],
+                $credientials['csrf_token']
+            ));
+        }
 
         return $passport;
     }
@@ -134,6 +147,8 @@ class FormLogAuthenticator extends AbstractAuthenticator
             throw new InvalidCredentialsException('password must be string.');
         }
         $credientials['password'] = trim($password);
+
+        $credientials['csrf_token'] = $request->post($this->options['csrf_token_param'], '');
 
         return $credientials;
     }
