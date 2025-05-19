@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard;
 
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -17,10 +18,11 @@ use Psr\Http\Server\RequestHandlerInterface;
 class AuthMiddleware implements MiddlewareInterface
 {
     /**
-     * @param GuardManagerInterface $guardManager
+     * @param GuardManager $guardManager
      */
     public function __construct(
-        private GuardManagerInterface $guardManager
+        private GuardManager $guardManager,
+        private RequestInterface $request,
     ) {}
 
     /**
@@ -30,7 +32,7 @@ class AuthMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $response = $this->guardManager->process($request);
+        $response = $this->guardManager->process($this->request);
         if (!is_null($response)) {
             return $response;
         }

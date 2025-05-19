@@ -20,22 +20,22 @@ return [
                 // ]
             ],
             'user_provider' => [
-                //     'memory' => [ // 内置用户提供器
-                //         'users' => [
-                //             'admin' => [
-                //                 'password' => 'admin',
-                //                 'enabled' => true,
-                //             ],
-                //         ],
-                //     ],
+                'memory' => [ // 内置用户提供器
+                    'users' => [
+                        'admin' => [
+                            'password' => 'admin',
+                            'enabled' => true,
+                        ],
+                    ],
+                ],
                 // 'model' => [
                 //     'class' => User::class,
                 //     'identifier' => 'username',
                 // ],
-                'custom' => [ // 自定义用户提供器
-                    'class' => CustomUserProvider::class,
-                    'params' => []
-                ]
+                // 'custom' => [ // 自定义用户提供器
+                //     'class' => CustomUserProvider::class,
+                //     'params' => []
+                // ]
             ],
             'authenticators' => [
                 'form_login' => [
@@ -52,32 +52,42 @@ return [
                     // ],
                     // 'failure_handler' => CustomFailureHandler::class,
                 ],
-                'json_login' => [
-                    'check_path' => '/admin/check_login',
-                    'success_handler' => [
-                        'class' => CustomSuccessHandler::class,
-                        'params' => []
-                    ],
-                    'failure_handler' => CustomFailureHandler::class,
-                ],
-                'api_key' => [
-                    'check_path' => '/admin/check_login',
-                    'api_key_param' => 'X-API-Key',
-                ],
-                'opaque_token' => [
-                    'header_param' => 'Authorization',
-                    'token_type' => 'Bearer',
-                    'issuer' => [
-                        'class' => CustomOpaqueTokenIssuer::class,
-                        'params' => []
-                    ],
-                ],
-                'custom' => [ // 自定义认证器
-                    [
-                        'class' => CustomAuthenticator::class,
-                        'params' => [],
-                    ]
-                ]
+                // 'json_login' => [
+                //     'check_path' => '/admin/check_login',
+                //     'success_handler' => [
+                //         'class' => CustomSuccessHandler::class,
+                //         'params' => []
+                //     ],
+                //     'failure_handler' => CustomFailureHandler::class,
+                // ],
+                // 'api_key' => [
+                //     'check_path' => '/admin/check_login',
+                //     'api_key_param' => 'X-API-Key',
+                // ],
+                // 'opaque_token' => [
+                //     'header_param' => 'Authorization',
+                //     'token_type' => 'Bearer',
+                //     'issuer' => [
+                //         'class' => CustomOpaqueTokenIssuer::class,
+                //         'params' => []
+                //     ],
+                // ],
+                // 'jwt' => [
+                //     'algo'  => 'RS256',
+                //     'private_key' => '',
+                //     'public_key' => '',
+                //     'pass_phrase' => '',
+                //     'expire_in' => 3600,
+                //     'blacklist_enabled' => true,
+                //     'header_param' => 'Authorization',
+                //     'token_type' => 'Bearer',
+                // ],
+                // 'custom' => [ // 自定义认证器
+                //     [
+                //         'class' => CustomAuthenticator::class,
+                //         'params' => [],
+                //     ]
+                // ]
             ],
             'logout' => [
                 'path' => '/admin/logout',
@@ -93,22 +103,20 @@ return [
                 // ]
             ],
             // 'token_storage' => null,
-            'unauthenticated_handler' => CustomUnauthenticatedHandler::class,
             // 'unauthenticated_handler' => [
             //     'class' => CustomUnauthenticatedHandler::class,
             //     'params' => []
-            'authorization_checker' => CustomAuthorizationChecker::class,
+            // ],
             // 'authorization_checker' => [
             //     'class' => CustomAuthorizationChecker::class,
             //     'params' => []
             // ],
-            'access_denied_handler' => CustomAccessDeniedHandler::class,
             // 'access_denied_handler' => [
             //     'class' => CustomAccessDeniedHandler::class,
             //     'params' => []
             // ],
             'listeners' =>  [
-                CustomListener::class,
+                // CustomListener::class,
                 // [
                 //     'class' => CustomListener::class,
                 //     'params' => []

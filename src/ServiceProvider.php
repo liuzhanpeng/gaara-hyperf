@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard;
 
+use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Contract\SessionInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
@@ -54,8 +55,6 @@ use Lzpeng\HyperfAuthGuard\UserProvider\ModelUserProvider;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Lzpeng\HyperfAuthGuard\Util\Util;
 
-use function Hyperf\Support\optional;
-
 /**
  * 认证组件服务提供者
  * 
@@ -90,13 +89,13 @@ class ServiceProvider
             $matcherId = sprintf('auth.guards.%s.request_matcher', $guardName);
             $matcherMap[$guardName] = $matcherId;
             $requestMatcherConfig = $guardConfig->requestMatcherConfig();
-            $this->container->set($matcherId, function () use ($requestMatcherConfig) {
+            $this->container->define($matcherId, function () use ($requestMatcherConfig) {
                 return $this->createRequestMatcher($requestMatcherConfig);
             });
 
             $userProviderId = sprintf('auth.guards.%s.user_provider', $guardName);
             $userProviderConfig = $guardConfig->userProviderConfig();
-            $this->container->set($userProviderId, function () use ($userProviderConfig) {
+            $this->container->define($userProviderId, function () use ($userProviderConfig) {
                 return $this->createUserProvider($userProviderConfig);
             });
 
@@ -104,36 +103,36 @@ class ServiceProvider
             foreach ($guardConfig->authenticatorConfigCollection() as $authenticatorConfig) {
                 $authenticatorId = sprintf('auth.guards.%s.authenticators.%s', $guardName, $authenticatorConfig->type());
                 $authenticatorIds[] = $authenticatorId;
-                $this->container->set($authenticatorId, function () use ($authenticatorConfig, $userProviderId) {
+                $this->container->define($authenticatorId, function () use ($authenticatorConfig, $userProviderId) {
                     return $this->createAuthenticator($authenticatorConfig, $userProviderId);
                 });
             }
             $authenticatorResolverId = sprintf('auth.guards.%s.authenticator_resolver', $guardName);
-            $this->container->set($authenticatorResolverId, function () use ($authenticatorIds) {
+            $this->container->define($authenticatorResolverId, function () use ($authenticatorIds) {
                 return new AuthenticatorResolver($authenticatorIds, $this->container);
             });
 
             $tokenStorageId = sprintf('auth.guards.%s.token_storage', $guardName);
             $tokenStorageConfig = $guardConfig->tokenStorageConfig();
-            $this->container->set($tokenStorageId, function () use ($tokenStorageConfig) {
+            $this->container->define($tokenStorageId, function () use ($tokenStorageConfig) {
                 return $this->createTokenStorage($tokenStorageConfig);
             });
 
             $unauthenticatedHandlerId = sprintf('auth.guards.%s.unauthenticated_handler', $guardName);
             $unauthenticatedHandlerConfig = $guardConfig->unauthenticatedHandlerConfig();
-            $this->container->set($unauthenticatedHandlerId, function () use ($unauthenticatedHandlerConfig) {
-                $this->createUnauthenticatedHandler($unauthenticatedHandlerConfig);
+            $this->container->define($unauthenticatedHandlerId, function () use ($unauthenticatedHandlerConfig) {
+                return $this->createUnauthenticatedHandler($unauthenticatedHandlerConfig);
             });
 
             $authorizationCheckerId = sprintf('auth.guards.%s.authorization_checker', $guardName);
             $authorizationCheckerConfig = $guardConfig->authorizationCheckerConfig();
-            $this->container->set($authorizationCheckerId, function () use ($authorizationCheckerConfig) {
+            $this->container->define($authorizationCheckerId, function () use ($authorizationCheckerConfig) {
                 return $this->createAuthorizationChecker($authorizationCheckerConfig);
             });
 
             $accessDeniedHandlerId = sprintf('auth.guards.%s.access_denied_handler', $guardName);
             $accessDeniedHandlerConfig = $guardConfig->accessDeniedHandlerConfig();
-            $this->container->set($accessDeniedHandlerId, function () use ($accessDeniedHandlerConfig) {
+            $this->container->define($accessDeniedHandlerId, function () use ($accessDeniedHandlerConfig) {
                 return $this->createAccessDeniedHandler($accessDeniedHandlerConfig);
             });
 
@@ -151,7 +150,7 @@ class ServiceProvider
 
             $eventDispatcherId = sprintf('auth.guards.%s.event_dispatcher', $guardName);
             $eventDispatcherMap[$guardName] = $eventDispatcherId;
-            $this->container->set($eventDispatcherId, function () use ($listenerProvider) {
+            $this->container->define($eventDispatcherId, function () use ($listenerProvider) {
                 $stdoutLogger = $this->container->get(StdoutLoggerInterface::class);
                 return new EventDispatcher($listenerProvider, $stdoutLogger);
             });
@@ -159,20 +158,20 @@ class ServiceProvider
             $logoutHandlerId = sprintf('auth.guards.%s.logout_handler', $guardName);
             $logoutHandlerMap[$guardName] = $logoutHandlerId;
             $logoutConfig = $guardConfig->logoutConfig();
-            $this->container->set($logoutHandlerId, function () use ($logoutConfig, $tokenStorageId, $eventDispatcherId) {
+            $this->container->define($logoutHandlerId, function () use ($logoutConfig, $tokenStorageId, $eventDispatcherId) {
                 return $this->createLogoutHandler($logoutConfig, $tokenStorageId, $eventDispatcherId);
             });
 
             $passwordHasherId = sprintf('auth.guards.%s.password_hasher', $guardName);
             $passwordHasherMap[$guardName] = $passwordHasherId;
             $passwordHasherConfig = $guardConfig->passwordHasherConfig();
-            $this->container->set($passwordHasherId, function () use ($passwordHasherConfig) {
+            $this->container->define($passwordHasherId, function () use ($passwordHasherConfig) {
                 return $this->createPasswordHasher($passwordHasherConfig);
             });
 
             $guardId = sprintf('auth.guards.%s', $guardName);
             $guardMap[$guardName] = $guardId;
-            $this->container->set($guardId, function () use (
+            $this->container->define($guardId, function () use (
                 $guardName,
                 $authenticatorResolverId,
                 $tokenStorageId,
@@ -194,23 +193,29 @@ class ServiceProvider
             });
         }
 
-        $this->container->set(TokenContextInterface::class, function () {
+        $this->container->define(TokenContextInterface::class, function () {
             return new TokenContext('auth');
         });
 
-        $this->container->set(RequestMatcherResolverInteface::class, function () use ($matcherMap) {
+        // $this->container->define(RequestMatcherResolverInteface::class, new RequestMatcherResolver($matcherMap, $this->container));
+
+        // $this->container->define(GuardResolverInterface::class, new GuardResolver($guardMap, $this->container));
+
+        // $this->container->define(LogoutHandlerResolverInterface::class, new LogoutHandlerResolver($logoutHandlerMap, $this->container));
+
+        $this->container->define(RequestMatcherResolverInteface::class, function () use ($matcherMap) {
             return new RequestMatcherResolver($matcherMap, $this->container);
         });
 
-        $this->container->set(GuardResolverInterface::class, function () use ($guardMap) {
+        $this->container->define(GuardResolverInterface::class, function () use ($guardMap) {
             return new GuardResolver($guardMap, $this->container);
         });
 
-        $this->container->set(LogoutHandlerResolverInterface::class, function () use ($logoutHandlerMap) {
+        $this->container->define(LogoutHandlerResolverInterface::class, function () use ($logoutHandlerMap) {
             return new LogoutHandlerResolver($logoutHandlerMap, $this->container);
         });
 
-        $this->container->set(PasswordHasherResolverInterface::class, function () use ($passwordHasherMap) {
+        $this->container->define(PasswordHasherResolverInterface::class, function () use ($passwordHasherMap) {
             return new PasswordHasherResolver($passwordHasherMap, $this->container);
         });
     }
@@ -575,8 +580,6 @@ class ServiceProvider
             tokenStorage: $this->container->get($tokenStorageId),
             tokenContext: $this->container->get(TokenContextInterface::class),
             eventDispatcher: $this->container->get($eventDispatcherId),
-            response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
-            util: $this->container->get(Util::class),
         );
     }
 

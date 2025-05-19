@@ -21,7 +21,7 @@ class LogoutHandler implements LogoutHandlerInterface
 {
     public function __construct(
         private string $path,
-        private string $target,
+        private ?string $target,
         private TokenStorageInterface $tokenStorage,
         private TokenContextInterface $tokenContext,
         private EventDispatcherInterface $eventDispatcher,

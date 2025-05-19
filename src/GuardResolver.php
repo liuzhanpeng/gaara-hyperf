@@ -35,7 +35,7 @@ class GuardResolver implements GuardResolverInterface
      */
     public function resolve(string $guardName): GuardInterface
     {
-        if (!isset($this->guardIds[$guardName])) {
+        if (!isset($this->guardMap[$guardName])) {
             throw new \InvalidArgumentException("guard id $guardName not found");
         }
 

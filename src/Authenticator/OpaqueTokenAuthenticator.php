@@ -12,7 +12,7 @@ use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * 令牌认证器
+ * 不透明令牌认证器
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
