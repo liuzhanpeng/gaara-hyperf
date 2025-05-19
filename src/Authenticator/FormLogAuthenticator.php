@@ -85,7 +85,11 @@ class FormLogAuthenticator extends AbstractAuthenticator
             ]
         );
 
-        if ($this->options['csrf_token_enabled']) {
+        if ($this->options['csrf_enabled'] && empty($credientials['csrf_token'])) {
+            throw AuthenticationException::from('CSRF token is missing.');
+        }
+
+        if ($this->options['csrf_enabled']) {
             $passport->addBadge(new CsrfTokenBadge(
                 $this->options['csrf_id'],
                 $credientials['csrf_token']
@@ -148,7 +152,7 @@ class FormLogAuthenticator extends AbstractAuthenticator
         }
         $credientials['password'] = trim($password);
 
-        $credientials['csrf_token'] = $request->post($this->options['csrf_token_param'], '');
+        $credientials['csrf_token'] = $request->post($this->options['csrf_param'], '');
 
         return $credientials;
     }

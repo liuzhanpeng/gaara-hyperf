@@ -39,7 +39,7 @@ class CsrfTokenBadgeCheckListener implements ListenerInterface
 
         $csrfToken = new CsrfToken($badge->getId(), $badge->getToken());
 
-        if (!$this->csrfTokenManager->isTokenValid($csrfToken)) {
+        if (!$this->csrfTokenManager->verify($csrfToken)) {
             throw new \LogicException('Invalid CSRF token.');
         }
 
