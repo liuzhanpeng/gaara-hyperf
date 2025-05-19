@@ -27,12 +27,13 @@ class PatternRequestMatcher implements RequestMatcherInterface
      */
     public function matches(RequestInterface $request): bool
     {
+        $path = $request->getPathInfo();
         foreach ($this->exclusions as $exclusion) {
-            if (preg_match('#' . $exclusion . '#', $request->getPathInfo()) === 1) {
+            if (preg_match('#' . $exclusion . '#', $path) === 1) {
                 return false;
             }
         }
 
-        return preg_match('#' . $this->pattern . '#', $request->getUri()->getPath()) === 1;
+        return preg_match('#' . $this->pattern . '#', $path) === 1;
     }
 }
