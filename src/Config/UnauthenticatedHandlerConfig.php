@@ -24,7 +24,7 @@ class UnauthenticatedHandlerConfig
      * @param array|string $config
      * @return self
      */
-    public static function from(array $config): self
+    public static function from(array|string $config): self
     {
         if (is_string($config)) {
             return new self($config, []);
