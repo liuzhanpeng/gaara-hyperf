@@ -16,21 +16,8 @@ class Util
      */
     public function expectJson(RequestInterface $request): bool
     {
-        $acceptHeader = $request->getHeaderLine('Accept');
-        if (empty($acceptHeader) || $acceptHeader === '*/*') {
-            return false;
-        }
+        $contentType = strtolower($request->getHeaderLine('Content-Type'));
 
-        $parts = explode(',', $acceptHeader);
-        foreach ($parts as $part) {
-            $part = trim($part);
-            $part = explode(';', $part, 2)[0];
-            $part = trim($part);
-            if (stripos($part, 'application/json') === 0) {
-                return true;
-            }
-        }
-
-        return false;
+        return str_starts_with($contentType, 'application/json');
     }
 }

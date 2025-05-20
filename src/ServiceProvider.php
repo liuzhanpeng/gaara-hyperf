@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard;
 
-use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Contract\SessionInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
@@ -20,6 +19,8 @@ use Lzpeng\HyperfAuthGuard\Authenticator\JsonLoginAuthenticator;
 use Lzpeng\HyperfAuthGuard\Authenticator\OpaqueTokenAuthenticator;
 use Lzpeng\HyperfAuthGuard\Authorization\AccessDeniedHandlerInterface;
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerInterface;
+use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerResolver;
+use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerResolverInterface;
 use Lzpeng\HyperfAuthGuard\Config\AccessDeniedHandlerConfig;
 use Lzpeng\HyperfAuthGuard\Config\AuthenticatorConfig;
 use Lzpeng\HyperfAuthGuard\Config\AuthorizationCheckerConfig;
@@ -40,7 +41,7 @@ use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerInterface;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolver;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolverInterface;
 use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuer;
-use Lzpeng\HyperfAuthGuard\Passport\Passport;
+use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerInterface;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasher;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherInterface;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolver;
@@ -87,6 +88,7 @@ class ServiceProvider
         $guardMap = [];
         $matcherMap = [];
         $logoutHandlerMap = [];
+        $authorizationCheckerMap = [];
         $passwordHasherMap = [];
         $eventDispatcherMap = [];
         foreach ($this->config->guardConfigCollection() as $guardConfig) {
@@ -131,6 +133,7 @@ class ServiceProvider
             });
 
             $authorizationCheckerId = sprintf('auth.guards.%s.authorization_checker', $guardName);
+            $authorizationCheckerMap[$guardName] = $authorizationCheckerId;
             $authorizationCheckerConfig = $guardConfig->authorizationCheckerConfig();
             $this->container->define($authorizationCheckerId, function () use ($authorizationCheckerConfig) {
                 return $this->createAuthorizationChecker($authorizationCheckerConfig);
@@ -219,12 +222,22 @@ class ServiceProvider
             return new RequestMatcherResolver($matcherMap, $this->container);
         });
 
+        $this->container->define(AuthorizationCheckerResolverInterface::class, function () use ($authorizationCheckerMap) {
+            return new AuthorizationCheckerResolver($authorizationCheckerMap, $this->container);
+        });
+
         $this->container->define(GuardResolverInterface::class, function () use ($guardMap) {
             return new GuardResolver($guardMap, $this->container);
         });
 
         $this->container->define(LogoutHandlerResolverInterface::class, function () use ($logoutHandlerMap) {
             return new LogoutHandlerResolver($logoutHandlerMap, $this->container);
+        });
+
+        $this->container->define(OpaqueTokenIssuerInterface::class, function () {
+            return $this->container->make(OpaqueTokenIssuer::class, [
+                'cachePrefix' => 'auth:opaque_token:'
+            ]);
         });
     }
 
@@ -534,7 +547,7 @@ class ServiceProvider
             options: $options,
             successHandler: $successHandler,
             failureHandler: $failureHandler,
-            issuer: $this->container->make($options['issuer']['class'], $options['issuer']['params']),
+            issuer: $this->container->get(OpaqueTokenIssuerInterface::class)
         );
     }
 
@@ -601,7 +614,7 @@ class ServiceProvider
     {
         return $this->container->make(
             $unauthenticatedHandlerConfig->class(),
-            $unauthenticatedHandlerConfig->params()
+            $this->paramsCamelCase($unauthenticatedHandlerConfig->params())
         );
     }
 
@@ -660,5 +673,36 @@ class ServiceProvider
             default:
                 throw new \InvalidArgumentException(sprintf('Invalid password hasher type: %s', $type));
         }
+    }
+
+    /**
+     * @param array $params
+     * @return array
+     */
+    private function paramsCamelCase(array $params): array
+    {
+        $result = [];
+        foreach ($params as $key => $value) {
+            $result[$this->toCamelCase($key)] = $value;
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $str
+     * @return string
+     */
+    private function toCamelCase(string $str): string
+    {
+        $parts = explode('_', $str);
+        if (count($parts) <= 1) {
+            return $str;
+        }
+
+        $camelParts = array_map(function ($part) {
+            return ucfirst($part);
+        }, array_slice($parts, 1));
+
+        return $parts[0] . implode('', $camelParts);
     }
 }

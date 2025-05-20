@@ -12,9 +12,9 @@ use Psr\Http\Message\ResponseInterface;
 class OpaqueTokenResponseHandler implements AuthenticationSuccessHandlerInterface
 {
     public function __construct(
-        private array $options,
         private OpaqueTokenIssuerInterface $opaqueTokenIssuer,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
+        private array $options = [],
     ) {
         $this->options = array_merge([
             'token_name' => 'token',

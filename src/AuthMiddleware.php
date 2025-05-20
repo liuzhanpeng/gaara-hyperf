@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard;
 
+use Hyperf\HttpMessage\Exception\NotFoundHttpException;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;

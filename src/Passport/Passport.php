@@ -33,7 +33,7 @@ class Passport
      *
      * @var array<string, BadgeInterface>
      */
-    private array $badges;
+    private array $badges = [];
 
     /**
      * @param string $guardName

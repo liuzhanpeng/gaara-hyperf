@@ -16,13 +16,13 @@ use Psr\SimpleCache\CacheInterface;
 class OpaqueTokenIssuer implements OpaqueTokenIssuerInterface
 {
     public function __construct(
-        private string $cachePrefix = 'auth:opaque_token:',
+        private string $cachePrefix,
         private CacheInterface $cache,
     ) {}
 
     public function issue(TokenInterface $token, ?DateTimeInterface $expiresAt = null): OpaqueToken
     {
-        $accessToken = base64_encode(random_bytes(32));
+        $accessToken = bin2hex(random_bytes(32));
         $this->cache->set($this->getAccessTokenKey($accessToken), $token, $expiresAt);
 
         return new OpaqueToken($accessToken, $expiresAt);
@@ -46,6 +46,6 @@ class OpaqueTokenIssuer implements OpaqueTokenIssuerInterface
      */
     private function getAccessTokenKey(string $accessToken): string
     {
-        return sprintf('%s:%s', $this->cachePrefix);
+        return sprintf('%s:%s', $this->cachePrefix, $accessToken);
     }
 }

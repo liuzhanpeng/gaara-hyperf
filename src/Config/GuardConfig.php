@@ -39,9 +39,7 @@ class GuardConfig
         $userProviderConfig = UserProviderConfig::from($config['user_provider'] ?? throw new \InvalidArgumentException('user_provider config is required'));
         $authenticatorConfigCollection = AuthenticatorConfigCollection::from($config['authenticators'] ?? throw new \InvalidArgumentException('authenticators config is required'));
         $tokenStorageConfig = TokenStorageConfig::from($config['token_storage'] ?? [
-            'session' => [
-                'prefix' => 'auth.token'
-            ]
+            'null' => []
         ]);
         $logoutConfig = LogoutConfig::from($config['logout'] ?? throw new \InvalidArgumentException('logout config is required'));
         $unauthenticatedHandlerConfig = UnauthenticatedHandlerConfig::from($config['unauthenticated_handler'] ?? [

@@ -6,6 +6,7 @@ namespace Lzpeng\HyperfAuthGuard;
 
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerInterface;
+use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerResolverInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AccessDeniedException;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolverInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
@@ -24,7 +25,7 @@ class AuthContext
         private RequestInterface $request,
         private TokenContextInterface $tokenContext,
         private LogoutHandlerResolverInterface $logoutHandlerResolver,
-        private AuthorizationCheckerInterface $authorizationChecker,
+        private AuthorizationCheckerResolverInterface $authorizationCheckerResolver,
     ) {}
 
     /**
@@ -85,6 +86,10 @@ class AuthContext
             return false;
         }
 
-        return $this->authorizationChecker->check($this->getToken(), $attribute, $subject);
+        $token = $this->getToken();
+
+        $authorizationChecker = $this->authorizationCheckerResolver->resolve($token->getGuardName());
+
+        return $authorizationChecker->check($token, $attribute, $subject);
     }
 }
