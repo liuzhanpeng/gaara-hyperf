@@ -17,7 +17,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
 {
     public function __construct(private SessionInterface $session) {}
 
-    public function generate(string $tokenId): CsrfToken
+    public function generate(string $tokenId = 'authenticate'): CsrfToken
     {
         $csrfToken = new CsrfToken($tokenId, $this->generateToken());
 

@@ -49,12 +49,12 @@ class FormLogAuthenticator extends AbstractAuthenticator
         $this->options = array_merge([
             'target_path' => '/',
             'failure_path' => $options['check_path'],
-            'use_redirect_path' => true,
-            'redirect_path_param' => 'redirect_to',
+            'redirect_enabled' => true,
+            'redirect_param' => 'redirect_to',
             'username_param' => 'username',
             'password_param' => 'password',
             'csrf_enabled' => true,
-            'csrf_id' => '_csrf_id',
+            'csrf_id' => 'authenticate',
             'csrf_param' => '_csrf_token',
         ], $options);
     }
@@ -108,8 +108,9 @@ class FormLogAuthenticator extends AbstractAuthenticator
             return $this->successHandler->handle($request, $token);
         }
 
-        if ($this->options['use_redirect_path'] && $request->has($this->options['redirect_path_param'])) {
-            return $this->response->redirect($request->query($this->options['redirect_path_param']));
+        $redirectTo = $request->post($this->options['redirect_param'], null);
+        if ($this->options['redirect_enabled'] && !is_null($redirectTo)) {
+            return $this->response->redirect(urldecode($redirectTo));
         }
 
         return $this->response->redirect($this->options['target_path']);

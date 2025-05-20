@@ -37,14 +37,18 @@ class GuardManager implements GuardManagerInterface
                 continue;
             }
 
-            $logoutHandler = $this->logoutHandlerResolver->resolve($guardName);
-            if ($logoutHandler->supports($request)) {
-                return $logoutHandler->handle($request);
-            }
-
             $guard = $this->guardResolver->resolve($guardName);
 
-            return $guard->authenticate($request);
+            $response = $guard->authenticate($request);
+
+            if (is_null($response)) {
+                $logoutHandler = $this->logoutHandlerResolver->resolve($guardName);
+                if ($logoutHandler->supports($request)) {
+                    return $logoutHandler->handle($request);
+                }
+            }
+
+            return $response;
         }
 
         return null;

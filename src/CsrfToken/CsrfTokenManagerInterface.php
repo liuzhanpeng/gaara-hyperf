@@ -17,7 +17,7 @@ interface CsrfTokenManagerInterface
      * @param string $tokenId
      * @return CsrfToken
      */
-    public function generate(string $tokenId): CsrfToken;
+    public function generate(string $tokenId = 'authenticate'): CsrfToken;
 
     /**
      * 验证CsrfToken

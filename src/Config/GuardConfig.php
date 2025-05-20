@@ -53,7 +53,7 @@ class GuardConfig
         $accessDeniedHandlerConfig = AccessDeniedHandlerConfig::from($config['access_denied_handler'] ?? [
             'class' => AccessDeniedHandler::class,
         ]);
-        $listenerConfigCollection = new ListenerConfigCollection($config['listeners'] ?? []);
+        $listenerConfigCollection = ListenerConfigCollection::from($config['listeners'] ?? []);
         $passwordHasherConfig = PasswordHasherConfig::from($config['password_hasher'] ?? [
             'default' => [
                 'algo' => PASSWORD_BCRYPT,

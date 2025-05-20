@@ -19,14 +19,14 @@ class LoginFailureEvent
 {
     /**
      * @param AuthenticatorInterface $authenticator
-     * @param Passport $passport
+     * @param Passport|null $passport
      * @param AuthenticationException $exception
      * @param RequestInterface $request
      * @param ResponseInterface|null $response
      */
     public function __construct(
         private AuthenticatorInterface $authenticator,
-        private Passport $passport,
+        private ?Passport $passport,
         private AuthenticationException $exception,
         private RequestInterface $request,
         private ?ResponseInterface $response

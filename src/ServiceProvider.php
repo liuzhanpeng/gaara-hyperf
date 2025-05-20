@@ -142,9 +142,29 @@ class ServiceProvider
                 return $this->createAccessDeniedHandler($accessDeniedHandlerConfig);
             });
 
+
+            $this->container->define(TokenContextInterface::class, function () {
+                return new TokenContext('auth');
+            });
+
+            $passwordHasherId = sprintf('auth.guards.%s.password_hasher', $guardName);
+            $passwordHasherMap[$guardName] = $passwordHasherId;
+            $passwordHasherConfig = $guardConfig->passwordHasherConfig();
+            $this->container->define($passwordHasherId, function () use ($passwordHasherConfig) {
+                return $this->createPasswordHasher($passwordHasherConfig);
+            });
+
+            $this->container->define(PasswordHasherResolverInterface::class, function () use ($passwordHasherMap) {
+                return new PasswordHasherResolver($passwordHasherMap, $this->container);
+            });
+
+            $this->container->define(CsrfTokenManagerInterface::class, function () {
+                return $this->container->make(CsrfTokenManager::class);
+            });
+
             $listenerProvider = new ListenerProvider();
-            $listenerProvider->on(CheckPassportEvent::class, [PasswordBadgeCheckListener::class, 'handle'], ListenerData::DEFAULT_PRIORITY + 1);
-            $listenerProvider->on(CheckPassportEvent::class, [CsrfTokenBadgeCheckListener::class, 'handle'], ListenerData::DEFAULT_PRIORITY + 1);
+            $listenerProvider->on(CheckPassportEvent::class, [$this->container->make(PasswordBadgeCheckListener::class), 'process'], ListenerData::DEFAULT_PRIORITY + 1);
+            $listenerProvider->on(CheckPassportEvent::class, [$this->container->make(CsrfTokenBadgeCheckListener::class), 'process'], ListenerData::DEFAULT_PRIORITY + 1);
 
             foreach ($guardConfig->listenerConfigCollection() as $listenerConfig) {
                 $listener = $this->container->make($listenerConfig->class(), $listenerConfig->params());
@@ -153,7 +173,7 @@ class ServiceProvider
                 }
 
                 foreach ($listener->listen() as $event) {
-                    $listenerProvider->on($event, [$listener, 'handle'], ListenerData::DEFAULT_PRIORITY + 1);
+                    $listenerProvider->on($event, [$listener, 'process'], ListenerData::DEFAULT_PRIORITY + 1);
                 }
             }
 
@@ -169,13 +189,6 @@ class ServiceProvider
             $logoutConfig = $guardConfig->logoutConfig();
             $this->container->define($logoutHandlerId, function () use ($logoutConfig, $tokenStorageId, $eventDispatcherId) {
                 return $this->createLogoutHandler($logoutConfig, $tokenStorageId, $eventDispatcherId);
-            });
-
-            $passwordHasherId = sprintf('auth.guards.%s.password_hasher', $guardName);
-            $passwordHasherMap[$guardName] = $passwordHasherId;
-            $passwordHasherConfig = $guardConfig->passwordHasherConfig();
-            $this->container->define($passwordHasherId, function () use ($passwordHasherConfig) {
-                return $this->createPasswordHasher($passwordHasherConfig);
             });
 
             $guardId = sprintf('auth.guards.%s', $guardName);
@@ -202,14 +215,6 @@ class ServiceProvider
             });
         }
 
-        $this->container->define(TokenContextInterface::class, function () {
-            return new TokenContext('auth');
-        });
-
-        $this->container->define(CsrfTokenManagerInterface::class, function () {
-            return $this->container->make(CsrfTokenManager::class);
-        });
-
         $this->container->define(RequestMatcherResolverInteface::class, function () use ($matcherMap) {
             return new RequestMatcherResolver($matcherMap, $this->container);
         });
@@ -220,10 +225,6 @@ class ServiceProvider
 
         $this->container->define(LogoutHandlerResolverInterface::class, function () use ($logoutHandlerMap) {
             return new LogoutHandlerResolver($logoutHandlerMap, $this->container);
-        });
-
-        $this->container->define(PasswordHasherResolverInterface::class, function () use ($passwordHasherMap) {
-            return new PasswordHasherResolver($passwordHasherMap, $this->container);
         });
     }
 

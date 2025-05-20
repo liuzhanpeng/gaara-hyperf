@@ -12,6 +12,6 @@ abstract class AbstractAuthenticator implements AuthenticatorInterface
 {
     public function createToken(Passport $passport, string $guardName): TokenInterface
     {
-        return new AuthenticatedToken($passport, $guardName);
+        return new AuthenticatedToken($guardName, $passport->getUser());
     }
 }
