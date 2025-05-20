@@ -34,7 +34,9 @@ use Lzpeng\HyperfAuthGuard\Config\UserProviderConfig;
 use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManager;
 use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerInterface;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
+use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
 use Lzpeng\HyperfAuthGuard\EventListener\CsrfTokenBadgeCheckListener;
+use Lzpeng\HyperfAuthGuard\EventListener\OpaqueTokenLogoutListener;
 use Lzpeng\HyperfAuthGuard\EventListener\PasswordBadgeCheckListener;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandler;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerInterface;
@@ -94,6 +96,18 @@ class ServiceProvider
         foreach ($this->config->guardConfigCollection() as $guardConfig) {
             $guardName = $guardConfig->name();
 
+            $this->container->define(PasswordHasherResolverInterface::class, function () use ($passwordHasherMap) {
+                return new PasswordHasherResolver($passwordHasherMap, $this->container);
+            });
+
+            $this->container->define(CsrfTokenManagerInterface::class, function () {
+                return $this->container->make(CsrfTokenManager::class);
+            });
+
+            $listenerProvider = new ListenerProvider();
+            $listenerProvider->on(CheckPassportEvent::class, [$this->container->make(PasswordBadgeCheckListener::class), 'process'], ListenerData::DEFAULT_PRIORITY + 1);
+            $listenerProvider->on(CheckPassportEvent::class, [$this->container->make(CsrfTokenBadgeCheckListener::class), 'process'], ListenerData::DEFAULT_PRIORITY + 1);
+
             $matcherId = sprintf('auth.guards.%s.request_matcher', $guardName);
             $matcherMap[$guardName] = $matcherId;
             $requestMatcherConfig = $guardConfig->requestMatcherConfig();
@@ -111,8 +125,8 @@ class ServiceProvider
             foreach ($guardConfig->authenticatorConfigCollection() as $authenticatorConfig) {
                 $authenticatorId = sprintf('auth.guards.%s.authenticators.%s', $guardName, $authenticatorConfig->type());
                 $authenticatorIds[] = $authenticatorId;
-                $this->container->define($authenticatorId, function () use ($authenticatorConfig, $userProviderId) {
-                    return $this->createAuthenticator($authenticatorConfig, $userProviderId);
+                $this->container->define($authenticatorId, function () use ($authenticatorConfig, $userProviderId, $listenerProvider) {
+                    return $this->createAuthenticator($authenticatorConfig, $userProviderId, $listenerProvider);
                 });
             }
             $authenticatorResolverId = sprintf('auth.guards.%s.authenticator_resolver', $guardName);
@@ -156,18 +170,6 @@ class ServiceProvider
             $this->container->define($passwordHasherId, function () use ($passwordHasherConfig) {
                 return $this->createPasswordHasher($passwordHasherConfig);
             });
-
-            $this->container->define(PasswordHasherResolverInterface::class, function () use ($passwordHasherMap) {
-                return new PasswordHasherResolver($passwordHasherMap, $this->container);
-            });
-
-            $this->container->define(CsrfTokenManagerInterface::class, function () {
-                return $this->container->make(CsrfTokenManager::class);
-            });
-
-            $listenerProvider = new ListenerProvider();
-            $listenerProvider->on(CheckPassportEvent::class, [$this->container->make(PasswordBadgeCheckListener::class), 'process'], ListenerData::DEFAULT_PRIORITY + 1);
-            $listenerProvider->on(CheckPassportEvent::class, [$this->container->make(CsrfTokenBadgeCheckListener::class), 'process'], ListenerData::DEFAULT_PRIORITY + 1);
 
             foreach ($guardConfig->listenerConfigCollection() as $listenerConfig) {
                 $listener = $this->container->make($listenerConfig->class(), $listenerConfig->params());
@@ -323,9 +325,10 @@ class ServiceProvider
      *
      * @param AuthenticatorConfig $authenticatorConfig
      * @param string $userProviderId
+     * @param ListenerProvider $listenerProvider
      * @return AuthenticatorInterface
      */
-    private function createAuthenticator(AuthenticatorConfig $authenticatorConfig, string $userProviderId): AuthenticatorInterface
+    private function createAuthenticator(AuthenticatorConfig $authenticatorConfig, string $userProviderId, ListenerProvider $listenerProvider): AuthenticatorInterface
     {
         $type = $authenticatorConfig->type();
         $options = $authenticatorConfig->options();
@@ -338,7 +341,7 @@ class ServiceProvider
             case 'api_key':
                 return $this->createApiKeyAuthenticator($options, $userProviderId);
             case 'opaque_token':
-                return $this->createOpaqueTokenAuthenticator($options);
+                return $this->createOpaqueTokenAuthenticator($options, $listenerProvider);
             default:
                 $authenticator = $this->container->make($type, $options['params'] ?? []);
                 if (!$authenticator instanceof AuthenticatorInterface) {
@@ -500,7 +503,7 @@ class ServiceProvider
         );
     }
 
-    private function createOpaqueTokenAuthenticator(array $options): AuthenticatorInterface
+    private function createOpaqueTokenAuthenticator(array $options, ListenerProvider $listenerProvider): AuthenticatorInterface
     {
         $successHandler = null;
         if (isset($options['success_handler'])) {
@@ -542,6 +545,15 @@ class ServiceProvider
                 ]
             ];
         }
+
+        $listener = $this->container->make(OpaqueTokenLogoutListener::class, [
+            'options' => [
+                'header_param' => $options['header_param'],
+                'token_type' => $options['token_type'],
+            ]
+        ]);
+
+        $listenerProvider->on(LogoutEvent::class, [$listener, 'process'], ListenerData::DEFAULT_PRIORITY + 1);
 
         return new OpaqueTokenAuthenticator(
             options: $options,

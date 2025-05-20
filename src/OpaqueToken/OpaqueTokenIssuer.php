@@ -30,7 +30,7 @@ class OpaqueTokenIssuer implements OpaqueTokenIssuerInterface
 
     public function revoke(string $accessToken): void
     {
-        $this->cache->delete($this->$accessToken($accessToken));
+        $this->cache->delete($this->getAccessTokenKey($accessToken));
     }
 
     public function resolve(string $tokenStr): ?TokenInterface

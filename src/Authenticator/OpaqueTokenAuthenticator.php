@@ -6,6 +6,7 @@ namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
+use Lzpeng\HyperfAuthGuard\Exception\UnauthenticatedException;
 use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerInterface;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
@@ -47,7 +48,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
 
         $token = $this->issuer->resolve($accessToken);
         if (is_null($token)) {
-            throw new AuthenticationException('Token is invalid.');
+            throw new UnauthenticatedException('Token is invalid.');
         }
 
         return new Passport(
