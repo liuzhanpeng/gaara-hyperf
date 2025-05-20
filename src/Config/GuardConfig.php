@@ -15,6 +15,19 @@ use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandler;
  */
 class GuardConfig
 {
+    /**
+     * @param string $name
+     * @param RequestMatcherConfig $requestMatcherConfig
+     * @param UserProviderConfig $userProviderConfig
+     * @param AuthenticatorConfigCollection $authenticatorConfigCollection
+     * @param TokenStorageConfig $tokenStorageConfig
+     * @param LogoutConfig $logoutConfig
+     * @param UnauthenticatedHandlerConfig $unauthenticatedHandlerConfig
+     * @param AuthorizationCheckerConfig $authorizationCheckerConfig
+     * @param AccessDeniedHandlerConfig $accessDeniedHandlerConfig
+     * @param ListenerConfigCollection $listenerConfigCollection
+     * @param PasswordHasherConfig $passwordHasherConfig
+     */
     public function __construct(
         private string $name,
         private RequestMatcherConfig $requestMatcherConfig,

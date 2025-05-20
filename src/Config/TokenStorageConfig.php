@@ -20,7 +20,11 @@ class TokenStorageConfig
         private array $options = []
     ) {}
 
-    public static function from(array $config): self
+    /**
+     * @param array|null $config
+     * @return self
+     */
+    public static function from(?array $config): self
     {
         if (is_null($config)) {
             $config = [

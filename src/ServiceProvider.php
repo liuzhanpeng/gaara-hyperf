@@ -26,11 +26,7 @@ use Lzpeng\HyperfAuthGuard\Config\AuthenticatorConfig;
 use Lzpeng\HyperfAuthGuard\Config\AuthorizationCheckerConfig;
 use Lzpeng\HyperfAuthGuard\Config\Config;
 use Lzpeng\HyperfAuthGuard\Config\LogoutConfig;
-use Lzpeng\HyperfAuthGuard\Config\PasswordHasherConfig;
-use Lzpeng\HyperfAuthGuard\Config\RequestMatcherConfig;
-use Lzpeng\HyperfAuthGuard\Config\TokenStorageConfig;
 use Lzpeng\HyperfAuthGuard\Config\UnauthenticatedHandlerConfig;
-use Lzpeng\HyperfAuthGuard\Config\UserProviderConfig;
 use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManager;
 use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerInterface;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
@@ -44,24 +40,17 @@ use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolver;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolverInterface;
 use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuer;
 use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerInterface;
-use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasher;
-use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherInterface;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolver;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolverInterface;
-use Lzpeng\HyperfAuthGuard\RquestMatcher\PatternRequestMatcher;
-use Lzpeng\HyperfAuthGuard\RquestMatcher\PrefixRequestMatcher;
-use Lzpeng\HyperfAuthGuard\RquestMatcher\RequestMatcherInterface;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\RequestMatcherResolver;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\RequestMatcherResolverInteface;
-use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageInterface;
-use Lzpeng\HyperfAuthGuard\TokenStorage\NullTokenStorage;
-use Lzpeng\HyperfAuthGuard\TokenStorage\SessionTokenStorage;
+use Lzpeng\HyperfAuthGuard\ServiceFactory\PasswordHasherFactory;
+use Lzpeng\HyperfAuthGuard\ServiceFactory\RequestMatcherFactory;
+use Lzpeng\HyperfAuthGuard\ServiceFactory\TokenStorageFactory;
+use Lzpeng\HyperfAuthGuard\ServiceFactory\UserProviderFactory;
 use Lzpeng\HyperfAuthGuard\Token\TokenContext;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandlerInterface;
-use Lzpeng\HyperfAuthGuard\UserProvider\MemoryUserProvider;
-use Lzpeng\HyperfAuthGuard\UserProvider\ModelUserProvider;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Lzpeng\HyperfAuthGuard\Util\Util;
 
 /**
@@ -96,6 +85,13 @@ class ServiceProvider
         foreach ($this->config->guardConfigCollection() as $guardConfig) {
             $guardName = $guardConfig->name();
 
+            $passwordHasherId = sprintf('auth.guards.%s.password_hasher', $guardName);
+            $passwordHasherMap[$guardName] = $passwordHasherId;
+            $passwordHasherConfig = $guardConfig->passwordHasherConfig();
+            $this->container->define($passwordHasherId, function () use ($passwordHasherConfig) {
+                return $this->container->get(PasswordHasherFactory::class)->create($passwordHasherConfig);
+            });
+
             $this->container->define(PasswordHasherResolverInterface::class, function () use ($passwordHasherMap) {
                 return new PasswordHasherResolver($passwordHasherMap, $this->container);
             });
@@ -112,13 +108,13 @@ class ServiceProvider
             $matcherMap[$guardName] = $matcherId;
             $requestMatcherConfig = $guardConfig->requestMatcherConfig();
             $this->container->define($matcherId, function () use ($requestMatcherConfig) {
-                return $this->createRequestMatcher($requestMatcherConfig);
+                return $this->container->get(RequestMatcherFactory::class)->create($requestMatcherConfig);
             });
 
             $userProviderId = sprintf('auth.guards.%s.user_provider', $guardName);
             $userProviderConfig = $guardConfig->userProviderConfig();
             $this->container->define($userProviderId, function () use ($userProviderConfig) {
-                return $this->createUserProvider($userProviderConfig);
+                return $this->container->get(UserProviderFactory::class)->create($userProviderConfig);
             });
 
             $authenticatorIds = [];
@@ -137,7 +133,7 @@ class ServiceProvider
             $tokenStorageId = sprintf('auth.guards.%s.token_storage', $guardName);
             $tokenStorageConfig = $guardConfig->tokenStorageConfig();
             $this->container->define($tokenStorageId, function () use ($tokenStorageConfig) {
-                return $this->createTokenStorage($tokenStorageConfig);
+                return $this->container->get(TokenStorageFactory::class)->create($tokenStorageConfig);
             });
 
             $unauthenticatedHandlerId = sprintf('auth.guards.%s.unauthenticated_handler', $guardName);
@@ -164,12 +160,7 @@ class ServiceProvider
                 return new TokenContext('auth');
             });
 
-            $passwordHasherId = sprintf('auth.guards.%s.password_hasher', $guardName);
-            $passwordHasherMap[$guardName] = $passwordHasherId;
-            $passwordHasherConfig = $guardConfig->passwordHasherConfig();
-            $this->container->define($passwordHasherId, function () use ($passwordHasherConfig) {
-                return $this->createPasswordHasher($passwordHasherConfig);
-            });
+
 
             foreach ($guardConfig->listenerConfigCollection() as $listenerConfig) {
                 $listener = $this->container->make($listenerConfig->class(), $listenerConfig->params());
@@ -241,83 +232,6 @@ class ServiceProvider
                 'cachePrefix' => 'auth:opaque_token:'
             ]);
         });
-    }
-
-
-    /**
-     * 创建请求匹配器
-     *
-     * @param RequestMatcherConfig $requestMatcherConfig
-     * @return RequestMatcherInterface
-     */
-    private function createRequestMatcher(RequestMatcherConfig $requestMatcherConfig): RequestMatcherInterface
-    {
-        $type = $requestMatcherConfig->type();
-        $options = $requestMatcherConfig->options();
-
-        switch ($type) {
-            case 'pattern':
-                return new PatternRequestMatcher($options['expr'], $options['exclusion'] ?? []);
-            case 'prefix':
-                return new PrefixRequestMatcher($options['expr'], $options['exclusion'] ?? []);
-            case 'custom':
-                if (!isset($options['class'])) {
-                    throw new \InvalidArgumentException("自定定义匹配器必须指定class选项");
-                }
-
-                $requestMatcher = $this->container->make($options['class'], $options['params'] ?? []);
-                if (!$requestMatcher instanceof RequestMatcherInterface) {
-                    throw new \LogicException("自定义匹配器必须实现RequestMatcherInterface接口");
-                }
-
-                return $requestMatcher;
-            default:
-                throw new \InvalidArgumentException("不支持的匹配类型: {$type}");
-        }
-    }
-
-    /**
-     * 创建用户提供者
-     *
-     * @param UserProviderConfig $userProviderConfig
-     * @return UserProviderInterface
-     */
-    private function createUserProvider(UserProviderConfig $userProviderConfig): UserProviderInterface
-    {
-        $type = $userProviderConfig->type();
-        $options = $userProviderConfig->options();
-
-        switch ($type) {
-            case 'memory':
-                if (!isset($options['users'])) {
-                    throw new \InvalidArgumentException("memory类型的用户提供器必须配置users选项");
-                }
-
-                return new MemoryUserProvider($options['users']);
-            case 'model':
-                if (!isset($options['class'])) {
-                    throw new \InvalidArgumentException("model类型的用户提供器必须配置class选项");
-                }
-
-                if (!isset($options['identifier'])) {
-                    throw new \InvalidArgumentException("model类型的用户提供器必须配置identifier选项");
-                }
-
-                return new ModelUserProvider($options['class'], $options['identifier']);
-            case 'custom':
-                if (!isset($options['class'])) {
-                    throw new \InvalidArgumentException("自定义类型的用户提供器必须配置class选项");
-                }
-
-                $userProvider = $this->container->make($options['class'], $options['params'] ?? []);
-                if (!$userProvider instanceof UserProviderInterface) {
-                    throw new \LogicException("自定义类型的用户提供器必须实现UserProviderInterface接口");
-                }
-
-                return $userProvider;
-            default:
-                throw new \InvalidArgumentException("未支持的用户提供者类型: {$type}");
-        }
     }
 
     /**
@@ -564,40 +478,6 @@ class ServiceProvider
     }
 
     /**
-     * 创建Token存储器
-     *
-     * @param TokenStorageConfig $tokenStorageConfig
-     * @return TokenStorageInterface
-     */
-    private function createTokenStorage(TokenStorageConfig $tokenStorageConfig): TokenStorageInterface
-    {
-        $type = $tokenStorageConfig->type();
-        $options = $tokenStorageConfig->options();
-
-        switch ($type) {
-            case 'session':
-                return $this->container->make(SessionTokenStorage::class, [
-                    'prefix' => $options['prefix'] ?? 'auth.token',
-                ]);
-            case 'null':
-                return new NullTokenStorage();
-            case 'custom':
-                if (!isset($tokenStorageConfig['class'])) {
-                    throw new \InvalidArgumentException("自定义Token存储器必须配置class选项");
-                }
-
-                $tokenStorage = $this->container->make($options['class'], $options['params'] ?? []);
-                if (!$tokenStorage instanceof TokenStorageInterface) {
-                    throw new \LogicException("自定义Token存储器必须实现TokenStorageInterface接口");
-                }
-
-                return $tokenStorage;
-            default:
-                throw new \InvalidArgumentException(sprintf('Invalid token storage type: %s', $type));
-        }
-    }
-
-    /**
      * 创建登出处理器
      *
      * @param LogoutConfig $logoutConfig
@@ -656,35 +536,6 @@ class ServiceProvider
             $accessDeniedHandlerConfig->class(),
             $accessDeniedHandlerConfig->params()
         );
-    }
-
-    /**
-     * 创建密码哈希器
-     *
-     * @return PasswordHasherInterface
-     */
-    private function createPasswordHasher(PasswordHasherConfig $passwordHasherConfig): PasswordHasherInterface
-    {
-        $type = $passwordHasherConfig->type();
-        $options = $passwordHasherConfig->options();
-
-        switch ($type) {
-            case 'default':
-                return new PasswordHasher($options['algo'] ?? PASSWORD_BCRYPT);
-            case 'custom':
-                if (!isset($options['class'])) {
-                    throw new \InvalidArgumentException();
-                }
-
-                $passwordHasher = $this->container->make($options['class'], $options['params'] ?? []);
-                if (!$passwordHasher instanceof PasswordHasherInterface) {
-                    throw new \LogicException('Custom PasswordHasher class must be an instance of PasswordHasherInterface');
-                }
-
-                return $passwordHasher;
-            default:
-                throw new \InvalidArgumentException(sprintf('Invalid password hasher type: %s', $type));
-        }
     }
 
     /**

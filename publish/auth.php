@@ -16,7 +16,7 @@ return [
                 // ],
                 // 'custom' => [ // 自定义匹配
                 //     'class' => CustomRequestMatcher::class,
-                //     'params' => []
+                //     'args' => []
                 // ]
             ],
             'user_provider' => [
@@ -34,7 +34,7 @@ return [
                 // ],
                 // 'custom' => [ // 自定义用户提供器
                 //     'class' => CustomUserProvider::class,
-                //     'params' => []
+                //     'args' => []
                 // ]
             ],
             'authenticators' => [
@@ -50,7 +50,7 @@ return [
                     // 'csrf_param' => '_csrf_token',
                     // 'success_handler' => [
                     //     'class' => CustomSuccessHandler::class,
-                    //     'params' => []
+                    //     'args' => []
                     // ],
                     // 'failure_handler' => CustomFailureHandler::class,
                 ],
@@ -58,7 +58,7 @@ return [
                 //     'check_path' => '/admin/check_login',
                 //     'success_handler' => [
                 //         'class' => CustomSuccessHandler::class,
-                //         'params' => []
+                //         'args' => []
                 //     ],
                 //     'failure_handler' => CustomFailureHandler::class,
                 // ],
@@ -71,7 +71,7 @@ return [
                 //     'token_type' => 'Bearer',
                 //     'issuer' => [
                 //         'class' => CustomOpaqueTokenIssuer::class,
-                //         'params' => []
+                //         'args' => []
                 //     ],
                 // ],
                 // 'jwt' => [
@@ -87,7 +87,7 @@ return [
                 // 'custom' => [ // 自定义认证器
                 //     [
                 //         'class' => CustomAuthenticator::class,
-                //         'params' => [],
+                //         'args' => [],
                 //     ]
                 // ]
             ],
@@ -101,27 +101,27 @@ return [
                 ],
                 // 'custom' => [ // 自定义存储器
                 //     'class' => CustomTokenStorage::class,
-                //     'params' => []
+                //     'args' => []
                 // ]
             ],
             // 'token_storage' => null,
             // 'unauthenticated_handler' => [
             //     'class' => CustomUnauthenticatedHandler::class,
-            //     'params' => []
+            //     'args' => []
             // ],
             // 'authorization_checker' => [
             //     'class' => CustomAuthorizationChecker::class,
-            //     'params' => []
+            //     'args' => []
             // ],
             // 'access_denied_handler' => [
             //     'class' => CustomAccessDeniedHandler::class,
-            //     'params' => []
+            //     'args' => []
             // ],
             'listeners' =>  [
                 // CustomListener::class,
                 // [
                 //     'class' => CustomListener::class,
-                //     'params' => []
+                //     'args' => []
                 // ]
             ],
             // 'password_hasher' => [
@@ -130,7 +130,7 @@ return [
             //     ],
             //     'custom' => [
             //         'class' => PasswordHasher::class,
-            //         'params' => []
+            //         'args' => []
             //     ]
             // ]
         ],
