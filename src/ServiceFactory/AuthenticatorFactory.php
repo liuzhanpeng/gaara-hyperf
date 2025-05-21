@@ -46,7 +46,7 @@ class AuthenticatorFactory
             case 'api_key':
                 return $this->createApiKeyAuthenticator($options, $userProviderId);
             case 'opaque_token':
-                return $this->createOpaqueTokenAuthenticator($options, $userProviderId);
+                return $this->createOpaqueTokenAuthenticator($options, $userProviderId, $eventDispatcherId);
             default:
                 $authenticator = $this->container->make($type, $options);
                 if (!$authenticator instanceof AuthenticatorInterface) {

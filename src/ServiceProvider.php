@@ -209,35 +209,4 @@ class ServiceProvider
             return new LogoutHandlerResolver($this->container, $logoutHandlerMap);
         });
     }
-
-    // /**
-    //  * @param array $params
-    //  * @return array
-    //  */
-    // private function paramsCamelCase(array $params): array
-    // {
-    //     $result = [];
-    //     foreach ($params as $key => $value) {
-    //         $result[$this->toCamelCase($key)] = $value;
-    //     }
-    //     return $result;
-    // }
-
-    // /**
-    //  * @param string $str
-    //  * @return string
-    //  */
-    // private function toCamelCase(string $str): string
-    // {
-    //     $parts = explode('_', $str);
-    //     if (count($parts) <= 1) {
-    //         return $str;
-    //     }
-
-    //     $camelParts = array_map(function ($part) {
-    //         return ucfirst($part);
-    //     }, array_slice($parts, 1));
-
-    //     return $parts[0] . implode('', $camelParts);
-    // }
 }
