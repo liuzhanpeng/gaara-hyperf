@@ -35,7 +35,7 @@ class AuthenticatorFactory
 
         if ($authenticatorRegistry->hasFactory($type)) {
             return $authenticatorRegistry->getFacotry($type)->create($options, $userProviderId, $eventDispatcherId);
-        } else {
+        } elseif ($type === 'custom') {
             $authenticator = $this->container->make($type, $options);
             if (!$authenticator instanceof AuthenticatorInterface) {
                 throw new \LogicException(sprintf('Authenticator "%s" must implement AuthenticatorInterface', $type));
@@ -43,5 +43,7 @@ class AuthenticatorFactory
 
             return $authenticator;
         }
+
+        throw new \InvalidArgumentException("未支持的认证器类型: {$type}");
     }
 }

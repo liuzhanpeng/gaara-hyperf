@@ -138,13 +138,13 @@ return [
             //     'class' => CustomAccessDeniedHandler::class,
             //     'args' => []
             // ],
-            'listeners' =>  [
-                // CustomListener::class,
-                // [
-                //     'class' => CustomListener::class,
-                //     'args' => []
-                // ]
-            ],
+            // 'listeners' =>  [
+            // CustomListener::class,
+            // [
+            //     'class' => CustomListener::class,
+            //     'args' => []
+            // ]
+            // ],
             // 'password_hasher' => [
             //     'default' => [
             //         'algo' => PASSWORD_BCRYPT,

@@ -27,9 +27,12 @@ use Lzpeng\HyperfAuthGuard\ServiceFactory\PasswordHasherFactory;
 use Lzpeng\HyperfAuthGuard\ServiceFactory\RequestMatcherFactory;
 use Lzpeng\HyperfAuthGuard\ServiceFactory\TokenStorageFactory;
 use Lzpeng\HyperfAuthGuard\ServiceFactory\UnauthenticatedHandlerFactory;
-use Lzpeng\HyperfAuthGuard\ServiceFactory\UserProviderFactory;
 use Lzpeng\HyperfAuthGuard\Token\TokenContext;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
+use Lzpeng\HyperfAuthGuard\UserProvider\Factory\MemoryUserProviderFactory;
+use Lzpeng\HyperfAuthGuard\UserProvider\Factory\ModelUserProviderFactory;
+use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderFactory;
+use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -48,6 +51,10 @@ class ServiceProvider
         private Config $config,
         private ContainerInterface $container,
     ) {
+        $userProviderRegistry = $this->container->get(UserProviderRegistry::class);
+        $userProviderRegistry->register('memory', MemoryUserProviderFactory::class);
+        $userProviderRegistry->register('model', ModelUserProviderFactory::class);
+
         $authenticatorRegistry = $this->container->get(AuthenticatorRegistry::class);
         $authenticatorRegistry->register('from_login', FormLoginAuthenticatorFactory::class);
         $authenticatorRegistry->register('json_login', JsonLoginAuthenticatorFactory::class);
