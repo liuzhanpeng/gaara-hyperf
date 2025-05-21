@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\ServiceFactory;
+namespace Lzpeng\HyperfAuthGuard\RquestMatcher;
 
 use Hyperf\Contract\ContainerInterface;
 use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
