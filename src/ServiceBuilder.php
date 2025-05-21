@@ -37,11 +37,11 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * 认证组件服务提供者
+ * 认证组件服务构建器
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class ServiceProvider
+class ServiceBuilder
 {
     /**
      * @param Config $config
@@ -50,24 +50,9 @@ class ServiceProvider
     public function __construct(
         private Config $config,
         private ContainerInterface $container,
-    ) {
-        $userProviderRegistry = $this->container->get(UserProviderRegistry::class);
-        $userProviderRegistry->register('memory', MemoryUserProviderFactory::class);
-        $userProviderRegistry->register('model', ModelUserProviderFactory::class);
+    ) {}
 
-        $authenticatorRegistry = $this->container->get(AuthenticatorRegistry::class);
-        $authenticatorRegistry->register('from_login', FormLoginAuthenticatorFactory::class);
-        $authenticatorRegistry->register('json_login', JsonLoginAuthenticatorFactory::class);
-        $authenticatorRegistry->register('api_key', ApiKeyAuthenticatorFactory::class);
-        $authenticatorRegistry->register('opaque_token', OpaqueTokenAuthenticatorFactory::class);
-    }
-
-    /**
-     * 注册
-     *
-     * @return void
-     */
-    public function register()
+    public function build(): void
     {
         $guardMap = [];
         $matcherMap = [];
@@ -110,8 +95,6 @@ class ServiceProvider
             $eventDispatcherId = sprintf('auth.guards.%s.event_dispatcher', $guardName);
             $this->container->define($eventDispatcherId, function () use ($passwordHasherId) {
                 $eventDispatcher = new EventDispatcher();
-
-                // 密码检查基本都要用到，默认都注册
                 $eventDispatcher->addSubscriber(new PasswordBadgeCheckListener(
                     $this->container->get($passwordHasherId)
                 ));
@@ -226,5 +209,15 @@ class ServiceProvider
         $this->container->define(LogoutHandlerResolverInterface::class, function () use ($logoutHandlerMap) {
             return new LogoutHandlerResolver($this->container, $logoutHandlerMap);
         });
+
+        $userProviderRegistry = $this->container->get(UserProviderRegistry::class);
+        $userProviderRegistry->register('memory', MemoryUserProviderFactory::class);
+        $userProviderRegistry->register('model', ModelUserProviderFactory::class);
+
+        $authenticatorRegistry = $this->container->get(AuthenticatorRegistry::class);
+        $authenticatorRegistry->register('from_login', FormLoginAuthenticatorFactory::class);
+        $authenticatorRegistry->register('json_login', JsonLoginAuthenticatorFactory::class);
+        $authenticatorRegistry->register('api_key', ApiKeyAuthenticatorFactory::class);
+        $authenticatorRegistry->register('opaque_token', OpaqueTokenAuthenticatorFactory::class);
     }
 }

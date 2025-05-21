@@ -9,7 +9,6 @@ use Hyperf\Contract\ContainerInterface;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\BeforeMainServerStart;
 use Lzpeng\HyperfAuthGuard\Config\Config;
-use Lzpeng\HyperfAuthGuard\RquestMatcher\RequestMatcherResolverInteface;
 
 /**
  * 认证监听器
@@ -39,10 +38,10 @@ class AuthListener implements ListenerInterface
      */
     public function process(object $event): void
     {
-        $serviceProvider = $this->container->make(ServiceProvider::class, [
+        $serviceBuilder = $this->container->make(ServiceBuilder::class, [
             'config' =>  Config::from($this->container->get(ConfigInterface::class)->get('auth')),
         ]);
 
-        $serviceProvider->register();
+        $serviceBuilder->build();
     }
 }
