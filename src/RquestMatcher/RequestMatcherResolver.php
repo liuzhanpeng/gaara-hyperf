@@ -18,8 +18,8 @@ class RequestMatcherResolver implements RequestMatcherResolverInteface
      * @param ContainerInterface $container
      */
     public function __construct(
+        private ContainerInterface $container,
         private array $matcherMap,
-        private ContainerInterface $container
     ) {}
 
     /**

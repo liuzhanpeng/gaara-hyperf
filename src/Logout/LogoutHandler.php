@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\Logout;
 
 use Hyperf\HttpServer\Contract\RequestInterface;
+use Lzpeng\HyperfAuthGuard\Config\LogoutConfig;
 use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
 use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageInterface;
+use Lzpeng\HyperfAuthGuard\Util\Util;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -20,11 +22,11 @@ use Psr\Http\Message\ResponseInterface;
 class LogoutHandler implements LogoutHandlerInterface
 {
     public function __construct(
-        private string $path,
-        private ?string $target,
+        private LogoutConfig $config,
         private TokenStorageInterface $tokenStorage,
         private TokenContextInterface $tokenContext,
         private EventDispatcherInterface $eventDispatcher,
+        private \Hyperf\HttpServer\Contract\ResponseInterface $response,
     ) {}
 
     /**
@@ -32,7 +34,7 @@ class LogoutHandler implements LogoutHandlerInterface
      */
     public function supports(RequestInterface $request): bool
     {
-        return $request->getPathInfo() === $this->path && $request->isMethod('POST');
+        return $request->getPathInfo() === $this->config->path() && $request->isMethod('POST');
     }
 
     /**
@@ -54,6 +56,10 @@ class LogoutHandler implements LogoutHandlerInterface
         $response = $logoutEvent->getResponse();
         if (!is_null($response)) {
             return $response;
+        }
+
+        if (!is_null($this->config->targetPath())) {
+            return $this->response->redirect($this->config->targetPath());
         }
 
         return null;

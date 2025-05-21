@@ -35,12 +35,12 @@ class FormLogAuthenticator extends AbstractAuthenticator
      * @param SessionInterface $session
      */
     public function __construct(
-        private array $options,
         private ?AuthenticationSuccessHandlerInterface $successHandler,
         private ?AuthenticationFailureHandlerInterface $failureHandler,
         private UserProviderInterface $userProvider,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
         private SessionInterface $session,
+        private array $options,
     ) {
         if (!isset($options['check_path'])) {
             throw new \InvalidArgumentException('The "check_path" option must be set.');

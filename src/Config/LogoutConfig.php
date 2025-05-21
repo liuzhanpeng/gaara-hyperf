@@ -15,11 +15,11 @@ class LogoutConfig
 {
     /**
      * @param string $path 登出路径
-     * @param string|null $target 登出成功后跳转的页面 
+     * @param string|null $targetPath 登出成功后跳转的页面 
      */
     public function __construct(
         private string $path,
-        private ?string $target,
+        private ?string $targetPath,
     ) {}
 
     /**
@@ -34,7 +34,7 @@ class LogoutConfig
 
         return new self(
             $config['path'],
-            $config['target'] ?? null,
+            $config['target_path'] ?? null,
         );
     }
 
@@ -53,8 +53,8 @@ class LogoutConfig
      *
      * @return string|null
      */
-    public function target(): string|null
+    public function targetPath(): string|null
     {
-        return $this->target;
+        return $this->targetPath;
     }
 }

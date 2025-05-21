@@ -16,8 +16,8 @@ use Psr\SimpleCache\CacheInterface;
 class OpaqueTokenIssuer implements OpaqueTokenIssuerInterface
 {
     public function __construct(
-        private string $cachePrefix,
         private CacheInterface $cache,
+        private string $cachePrefix,
     ) {}
 
     public function issue(TokenInterface $token, ?DateTimeInterface $expiresAt = null): OpaqueToken

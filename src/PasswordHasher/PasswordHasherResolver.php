@@ -14,8 +14,8 @@ use Hyperf\Contract\ContainerInterface;
 class PasswordHasherResolver implements PasswordHasherResolverInterface
 {
     public function __construct(
+        private ContainerInterface $container,
         private array $passwordHasherMap,
-        private ContainerInterface $container
     ) {}
 
     /**

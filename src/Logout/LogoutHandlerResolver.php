@@ -14,8 +14,8 @@ use Hyperf\Contract\ContainerInterface;
 class LogoutHandlerResolver implements LogoutHandlerResolverInterface
 {
     public function __construct(
+        private ContainerInterface $container,
         private array $logoutHandlerMap,
-        private ContainerInterface $container
     ) {}
 
     /**

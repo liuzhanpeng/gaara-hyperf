@@ -56,7 +56,7 @@ class GuardConfig
         ]);
         $logoutConfig = LogoutConfig::from($config['logout'] ?? throw new \InvalidArgumentException('logout config is required'));
         $unauthenticatedHandlerConfig = UnauthenticatedHandlerConfig::from($config['unauthenticated_handler'] ?? [
-            'class' => UnauthenticatedHandler::class,
+            'default' => []
         ]);
         $authorizationCheckerConfig = AuthorizationCheckerConfig::from($config['authorization_checker'] ?? [
             'class' => NullAuthorizationChecker::class,

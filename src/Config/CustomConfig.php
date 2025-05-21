@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\Config;
 
 /**
- * 授权检查器配置
+ * 自定义扩展配置
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class AuthorizationCheckerConfig
+class CustomConfig
 {
     /**
-     * @param string $class 授权检查器类名
-     * @param array $args 授权检查器构造参数
+     * @param string $class 扩展类名
+     * @param array $args 参数
      */
     public function __construct(
         private string $class,
-        private array $args,
+        private array $args
     ) {}
 
     /**
@@ -31,18 +31,15 @@ class AuthorizationCheckerConfig
         }
 
         if (!isset($config['class'])) {
-            throw new \InvalidArgumentException('AuthorizationCheckerConfig class is required');
+            throw new \InvalidArgumentException('class is required');
         }
 
-        return new self(
-            $config['class'],
-            $config['args'] ?? []
-        );
+        return new self($config['class'], $config['args'] ?? []);
     }
 
     /**
-     * 返回授权检查器类名
-     * 
+     * 返回类名
+     *
      * @return string
      */
     public function class(): string
@@ -51,7 +48,7 @@ class AuthorizationCheckerConfig
     }
 
     /**
-     * 返回授权检查器构造参数
+     * 返回参数
      *
      * @return array
      */

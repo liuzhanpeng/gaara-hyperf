@@ -20,10 +20,10 @@ use Psr\Http\Message\ResponseInterface;
 class OpaqueTokenAuthenticator extends AbstractAuthenticator
 {
     public function __construct(
-        private array $options,
         private ?AuthenticationSuccessHandlerInterface $successHandler,
         private ?AuthenticationFailureHandlerInterface $failureHandler,
-        private OpaqueTokenIssuerInterface $issuer,
+        private OpaqueTokenIssuerInterface $tokenIssuer,
+        private array $options,
     ) {
         $this->options = array_merge([
             'header_param' => 'Authorization',
@@ -46,7 +46,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
     {
         $accessToken = $this->extractAccessToken($request);
 
-        $token = $this->issuer->resolve($accessToken);
+        $token = $this->tokenIssuer->resolve($accessToken);
         if (is_null($token)) {
             throw new UnauthenticatedException('Token is invalid.');
         }

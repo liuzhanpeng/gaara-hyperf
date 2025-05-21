@@ -18,8 +18,8 @@ class GuardResolver implements GuardResolverInterface
      * @param ContainerInterface $container
      */
     public function __construct(
+        private ContainerInterface $container,
         private array $guardMap,
-        private ContainerInterface $container
     ) {}
 
     /**

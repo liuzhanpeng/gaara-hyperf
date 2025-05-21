@@ -13,11 +13,11 @@ class AccessDeniedHandlerConfig
 {
     /**
      * @param string $class 权拒绝访问处理器类名
-     * @param array $params 权拒绝访问处理器构造参数
+     * @param array $args 权拒绝访问处理器构造参数
      */
     public function __construct(
         private string $class,
-        private array $params,
+        private array $args,
     ) {}
 
     /**
@@ -36,7 +36,7 @@ class AccessDeniedHandlerConfig
 
         return new self(
             $config['class'],
-            $config['params'] ?? []
+            $config['args'] ?? []
         );
     }
 
@@ -55,8 +55,8 @@ class AccessDeniedHandlerConfig
      *
      * @return array
      */
-    public function params(): array
+    public function args(): array
     {
-        return $this->params;
+        return $this->args;
     }
 }

@@ -20,10 +20,10 @@ use Psr\Http\Message\ResponseInterface;
 class ApiKeyAuthenticator implements AuthenticatorInterface
 {
     public function __construct(
-        private array $options,
         private UserProviderInterface $userProvider,
         private ?AuthenticationSuccessHandlerInterface $successHandler,
         private ?AuthenticationFailureHandlerInterface $failureHandler,
+        private array $options,
     ) {
         if (!isset($options['check_path'])) {
             throw new \InvalidArgumentException('The "check_path" option must be set.');

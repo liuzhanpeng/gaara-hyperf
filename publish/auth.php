@@ -48,6 +48,13 @@ return [
                     // 'password_param' => 'password',
                     // 'csrf_enabled' => true,
                     // 'csrf_param' => '_csrf_token',
+                    // 'csrf_token_manager' => [
+                    //     'default' => [],
+                    //     'custom' => [
+                    //         'class' => CsrfTokenManager::class,
+                    //         'args' => []
+                    //     ]
+                    // ],
                     // 'success_handler' => [
                     //     'class' => CustomSuccessHandler::class,
                     //     'args' => []
@@ -69,9 +76,15 @@ return [
                 // 'opaque_token' => [
                 //     'header_param' => 'Authorization',
                 //     'token_type' => 'Bearer',
-                //     'issuer' => [
-                //         'class' => CustomOpaqueTokenIssuer::class,
-                //         'args' => []
+                //     'expires_in' => 3600,
+                //     'token_issuer' => [
+                //         'default' => [
+                //             'cache_prefix' => 'auth:opaque_token:',
+                //         ],
+                //         'custom' => [
+                //             'class' => CustomOpaqueTokenIssuer::class,
+                //             'args' => []
+                //         ]
                 //     ],
                 // ],
                 // 'jwt' => [
@@ -106,8 +119,16 @@ return [
             ],
             // 'token_storage' => null,
             // 'unauthenticated_handler' => [
-            //     'class' => CustomUnauthenticatedHandler::class,
-            //     'args' => []
+            //     'default' => [],
+            //     'redirect' => [
+            //         'target_path' => '/login',
+            //         'redirect_enabled' => true,
+            //         'redirect_param' => 'redirect_to'
+            //     ],
+            //     'custom' => [
+            //         'class' => CustomUnauthenticatedHandler::class,
+            //         'args' => []
+            //     ]
             // ],
             // 'authorization_checker' => [
             //     'class' => CustomAuthorizationChecker::class,

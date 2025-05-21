@@ -12,51 +12,47 @@ namespace Lzpeng\HyperfAuthGuard\Config;
 class UnauthenticatedHandlerConfig
 {
     /**
-     * @param string $class
-     * @param array $params
+     * @param string $type
+     * @param array $options
      */
     public function __construct(
-        private string $class,
-        private array $params,
+        private string $type,
+        private array $options,
     ) {}
 
     /**
-     * @param array|string $config
+     * @param array $config
      * @return self
      */
-    public static function from(array|string $config): self
+    public static function from(array $config): self
     {
-        if (is_string($config)) {
-            return new self($config, []);
+        if (count($config) !== 1) {
+            throw new \InvalidArgumentException('munauthenticated_handler配置必须是单个数组');
         }
 
-        if (!isset($config['class'])) {
-            throw new \InvalidArgumentException('unauthenticated_handler配置中缺少class属性');
-        }
+        $type = array_key_first($config);
+        $options = $config[$type];
 
-        return new self(
-            $config['class'],
-            $config['params'] ?? []
-        );
+        return new self($type, $options);
     }
 
     /**
-     * 返回类名
+     * 返回匹配类型
      * 
      * @return string
      */
-    public function class(): string
+    public function type(): string
     {
-        return $this->class;
+        return $this->type;
     }
 
     /**
-     * 返回构造参数
+     * 返回选项
      *
      * @return array
      */
-    public function params(): array
+    public function options(): array
     {
-        return $this->params;
+        return $this->options;
     }
 }

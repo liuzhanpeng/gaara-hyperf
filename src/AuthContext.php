@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard;
 
 use Hyperf\HttpServer\Contract\RequestInterface;
-use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerInterface;
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerResolverInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AccessDeniedException;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolverInterface;

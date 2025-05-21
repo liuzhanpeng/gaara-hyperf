@@ -18,8 +18,8 @@ class AuthenticatorResolver implements AuthenticatorResolverInterface
      * @param ContainerInterface $container
      */
     public function __construct(
+        private ContainerInterface $container,
         private array $authenticatorIds,
-        private ContainerInterface $container
     ) {}
 
     /**

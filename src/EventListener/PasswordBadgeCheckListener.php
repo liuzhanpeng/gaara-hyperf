@@ -4,46 +4,39 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\EventListener;
 
-use Hyperf\Event\Contract\ListenerInterface;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
 use Lzpeng\HyperfAuthGuard\Exception\InvalidPasswordException;
 use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
-use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolverInterface;
+use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherInterface;
 use Lzpeng\HyperfAuthGuard\User\PasswordUserInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * 检查密码凭证监听器
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class PasswordBadgeCheckListener implements ListenerInterface
+class PasswordBadgeCheckListener implements EventSubscriberInterface
 {
     /**
-     * @param PasswordHasherResolverInterface $passwordHasherResolver
+     * @param PasswordHasherInterface $passwordHasher
      */
     public function __construct(
-        private PasswordHasherResolverInterface $passwordHasherResolver
+        private PasswordHasherInterface $passwordHasher,
     ) {}
 
-    /**
-     * @inheritDoc
-     */
-    public function listen(): array
+    public static function getSubscribedEvents()
     {
         return [
-            CheckPassportEvent::class,
+            CheckPassportEvent::class => 'checkPassport'
         ];
     }
 
     /**
      * @inheritDoc
      */
-    public function process(object $event): void
+    public function checkPassport(CheckPassportEvent $event): void
     {
-        if (!$event instanceof CheckPassportEvent) {
-            return;
-        }
-
         $passport = $event->getPassport();
 
         /**
@@ -59,8 +52,7 @@ class PasswordBadgeCheckListener implements ListenerInterface
             throw new \LogicException('The user must implement PasswordUserInterface');
         }
 
-        $passwordHasher = $this->passwordHasherResolver->resolve($passport->getGuardName());
-        if (!$passwordHasher->verify($badge->getPassword(), $user->getPassword())) {
+        if (!$this->passwordHasher->verify($badge->getPassword(), $user->getPassword())) {
             throw InvalidPasswordException::from('密码错误', $user);
         }
 

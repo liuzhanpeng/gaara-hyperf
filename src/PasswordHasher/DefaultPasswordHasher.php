@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\PasswordHasher;
 
 /**
- * 内置的密码哈希器
+ * 默认的密码哈希器
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class PasswordHasher implements PasswordHasherInterface
+class DefaultPasswordHasher implements PasswordHasherInterface
 {
     /**
      * @param string $algo

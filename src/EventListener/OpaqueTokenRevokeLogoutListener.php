@@ -4,31 +4,32 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\EventListener;
 
-use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
 use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class OpaqueTokenLogoutListener implements ListenerInterface
+/**
+ * 撤消OpaqueToken登出监听器
+ * 
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
+class OpaqueTokenRevokeLogoutListener implements EventSubscriberInterface
 {
     public function __construct(
         private OpaqueTokenIssuerInterface $opaqueTokenIssuer,
         private array $options,
     ) {}
 
-    public function listen(): array
+    public static function getSubscribedEvents()
     {
         return [
-            LogoutEvent::class,
+            LogoutEvent::class => 'onLogout',
         ];
     }
 
-    public function process(object $event): void
+    public function onLogout(LogoutEvent $event): void
     {
-        if (!$event instanceof LogoutEvent) {
-            return;
-        }
-
         if (!$event->getRequest()->isMethod('POST')) {
             return;
         }

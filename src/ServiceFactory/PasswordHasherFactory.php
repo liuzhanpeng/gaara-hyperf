@@ -7,7 +7,7 @@ namespace Lzpeng\HyperfAuthGuard\ServiceFactory;
 use Hyperf\Contract\ContainerInterface;
 use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
 use Lzpeng\HyperfAuthGuard\Config\PasswordHasherConfig;
-use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasher;
+use Lzpeng\HyperfAuthGuard\PasswordHasher\DefaultPasswordHasher;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherInterface;
 
 /**
@@ -28,7 +28,7 @@ class PasswordHasherFactory
 
         switch ($type) {
             case 'default':
-                return new PasswordHasher($options['algo'] ?? PASSWORD_BCRYPT);
+                return new DefaultPasswordHasher($options['algo'] ?? PASSWORD_BCRYPT);
             case 'custom':
                 $customConfig = CustomConfig::from($options);
 

@@ -13,7 +13,7 @@ class ListenerConfig
 {
     public function __construct(
         private string $class,
-        private array $params,
+        private array $args,
     ) {}
 
     /**
@@ -26,7 +26,7 @@ class ListenerConfig
             return new self($config, []);
         }
 
-        return new self($config['class'], $config['params'] ?? []);
+        return new self($config['class'], $config['args'] ?? []);
     }
 
     /**
@@ -44,8 +44,8 @@ class ListenerConfig
      *
      * @return array
      */
-    public function params(): array
+    public function args(): array
     {
-        return $this->params;
+        return $this->args;
     }
 }

@@ -4,31 +4,32 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\EventListener;
 
-use Hyperf\Event\Contract\ListenerInterface;
 use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfToken;
 use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerInterface;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
 use Lzpeng\HyperfAuthGuard\Passport\CsrfTokenBadge;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CsrfTokenBadgeCheckListener implements ListenerInterface
+/**
+ * CSRF令牌检查监听器
+ * 
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
+class CsrfTokenBadgeCheckListener implements EventSubscriberInterface
 {
     public function __construct(
         private CsrfTokenManagerInterface $csrfTokenManager,
     ) {}
 
-    public function listen(): array
+    public static function getSubscribedEvents()
     {
         return [
-            CheckPassportEvent::class,
+            CheckPassportEvent::class => 'checkPassport',
         ];
     }
 
-    public function process(object $event): void
+    public function checkPassport(CheckPassportEvent $event): void
     {
-        if (!$event instanceof CheckPassportEvent) {
-            return;
-        }
-
         /**
          * @var CsrfTokenBadge|null $badge
          */

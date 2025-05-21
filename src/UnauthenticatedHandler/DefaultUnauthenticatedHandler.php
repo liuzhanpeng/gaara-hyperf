@@ -9,11 +9,11 @@ use Lzpeng\HyperfAuthGuard\Exception\UnauthenticatedException;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * 内置的未认证处理器
+ * 默认的未认证处理器
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class UnauthenticatedHandler implements UnauthenticatedHandlerInterface
+class DefaultUnauthenticatedHandler implements UnauthenticatedHandlerInterface
 {
     public function __construct() {}
 

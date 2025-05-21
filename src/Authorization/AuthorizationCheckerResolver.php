@@ -14,8 +14,8 @@ use Hyperf\Contract\ContainerInterface;
 class AuthorizationCheckerResolver implements AuthorizationCheckerResolverInterface
 {
     public function __construct(
+        private ContainerInterface $container,
         private array $authorizationCheckerMap,
-        private ContainerInterface $container
     ) {}
 
     /**
