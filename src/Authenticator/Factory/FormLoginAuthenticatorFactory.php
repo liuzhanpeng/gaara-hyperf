@@ -7,8 +7,8 @@ namespace Lzpeng\HyperfAuthGuard\Authenticator\Factory;
 use Hyperf\Contract\SessionInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\FormLogAuthenticator;
+use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerFactory;
 use Lzpeng\HyperfAuthGuard\EventListener\CsrfTokenBadgeCheckListener;
-use Lzpeng\HyperfAuthGuard\ServiceFactory\CsrfTokenManagerFactory;
 
 class FormLoginAuthenticatorFactory extends AbstractAuthenticatorFactory
 {

@@ -7,7 +7,7 @@ namespace Lzpeng\HyperfAuthGuard\Authenticator\Factory;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\OpaqueTokenAuthenticator;
 use Lzpeng\HyperfAuthGuard\EventListener\OpaqueTokenRevokeLogoutListener;
-use Lzpeng\HyperfAuthGuard\ServiceFactory\OpaqueTokenIssuerFactory;
+use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerFactory;
 
 class OpaqueTokenAuthenticatorFactory extends AbstractAuthenticatorFactory
 {

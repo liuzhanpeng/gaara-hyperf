@@ -7,7 +7,6 @@ namespace Lzpeng\HyperfAuthGuard\Authenticator;
 use Hyperf\Contract\SessionInterface;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\Session\Session;
-use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Exception\InvalidCredentialsException;
 use Lzpeng\HyperfAuthGuard\Passport\CsrfTokenBadge;
