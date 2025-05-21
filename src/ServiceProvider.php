@@ -5,7 +5,13 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard;
 
 use Hyperf\Contract\ContainerInterface;
+use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorFactory;
+use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorRegistry;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorResolver;
+use Lzpeng\HyperfAuthGuard\Authenticator\Factory\ApiKeyAuthenticatorFactory;
+use Lzpeng\HyperfAuthGuard\Authenticator\Factory\FormLoginAuthenticatorFactory;
+use Lzpeng\HyperfAuthGuard\Authenticator\Factory\JsonLoginAuthenticatorFactory;
+use Lzpeng\HyperfAuthGuard\Authenticator\Factory\OpaqueTokenAuthenticatorFactory;
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerResolver;
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerResolverInterface;
 use Lzpeng\HyperfAuthGuard\Config\Config;
@@ -17,7 +23,6 @@ use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolver;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolverInterface;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\RequestMatcherResolver;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\RequestMatcherResolverInteface;
-use Lzpeng\HyperfAuthGuard\ServiceFactory\AuthenticatorFactory;
 use Lzpeng\HyperfAuthGuard\ServiceFactory\PasswordHasherFactory;
 use Lzpeng\HyperfAuthGuard\ServiceFactory\RequestMatcherFactory;
 use Lzpeng\HyperfAuthGuard\ServiceFactory\TokenStorageFactory;
@@ -42,7 +47,13 @@ class ServiceProvider
     public function __construct(
         private Config $config,
         private ContainerInterface $container,
-    ) {}
+    ) {
+        $authenticatorRegistry = $this->container->get(AuthenticatorRegistry::class);
+        $authenticatorRegistry->register('from_login', FormLoginAuthenticatorFactory::class);
+        $authenticatorRegistry->register('json_login', JsonLoginAuthenticatorFactory::class);
+        $authenticatorRegistry->register('api_key', ApiKeyAuthenticatorFactory::class);
+        $authenticatorRegistry->register('opaque_token', OpaqueTokenAuthenticatorFactory::class);
+    }
 
     /**
      * 注册
