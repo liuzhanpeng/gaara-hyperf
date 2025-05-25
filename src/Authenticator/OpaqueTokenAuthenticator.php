@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Exception\UnauthenticatedException;
 use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerInterface;
@@ -34,7 +34,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
     /**
      * @inheritDoc
      */
-    public function supports(RequestInterface $request): bool
+    public function supports(ServerRequestInterface $request): bool
     {
         return $this->extractAccessToken($request) !== null;
     }
@@ -42,7 +42,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
     /**
      * @inheritDoc
      */
-    public function authenticate(RequestInterface $request, string $guardName): Passport
+    public function authenticate(ServerRequestInterface $request, string $guardName): Passport
     {
         $accessToken = $this->extractAccessToken($request);
 
@@ -62,7 +62,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
     /**
      * @inheritDoc
      */
-    public function onAuthenticationSuccess(RequestInterface $request, TokenInterface $token): ?ResponseInterface
+    public function onAuthenticationSuccess(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
     {
         if (!is_null($this->successHandler)) {
             return $this->successHandler->handle($request, $token);
@@ -74,7 +74,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
     /**
      * @inheritDoc
      */
-    public function onAuthenticationFailure(RequestInterface $request, AuthenticationException $exception): ?ResponseInterface
+    public function onAuthenticationFailure(ServerRequestInterface $request, AuthenticationException $exception): ?ResponseInterface
     {
         if (!is_null($this->failureHandler)) {
             return $this->failureHandler->handle($request, $exception);
@@ -86,10 +86,10 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
     /**
      * 提取AccessToken
      *
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @return string|null
      */
-    public function extractAccessToken(RequestInterface $request): ?string
+    public function extractAccessToken(ServerRequestInterface $request): ?string
     {
         if (!$request->hasHeader($this->options['header_param']) || !\is_string($header = $request->getHeaderLine($this->options['header_param']))) {
             return null;

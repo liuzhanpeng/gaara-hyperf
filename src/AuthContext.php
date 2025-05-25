@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerResolverInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AccessDeniedException;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolverInterface;
@@ -21,7 +21,7 @@ use Psr\Http\Message\ResponseInterface;
 class AuthContext
 {
     public function __construct(
-        private RequestInterface $request,
+        private ServerRequestInterface $request,
         private TokenContextInterface $tokenContext,
         private LogoutHandlerResolverInterface $logoutHandlerResolver,
         private AuthorizationCheckerResolverInterface $authorizationCheckerResolver,

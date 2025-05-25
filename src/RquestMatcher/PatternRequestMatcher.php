@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\RquestMatcher;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * 正则模式请求匹配器
@@ -25,9 +25,9 @@ class PatternRequestMatcher implements RequestMatcherInterface
     /**
      * @inheritDoc
      */
-    public function matches(RequestInterface $request): bool
+    public function matches(ServerRequestInterface $request): bool
     {
-        $path = $request->getPathInfo();
+        $path = $request->getUri()->getPath();
         foreach ($this->exclusions as $exclusion) {
             if (preg_match('#' . $exclusion . '#', $path) === 1) {
                 return false;

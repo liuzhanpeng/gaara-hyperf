@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authorization;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AccessDeniedException;
 use Psr\Http\Message\ResponseInterface;
 
@@ -18,9 +18,9 @@ interface AccessDeniedHandlerInterface
     /**
      * 处理访问控制拒绝
      *
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @param AccessDeniedException $accessDeniedException
      * @return ResponseInterface|null
      */
-    public function handle(RequestInterface $request, AccessDeniedException $accessDeniedException): ?ResponseInterface;
+    public function handle(ServerRequestInterface $request, AccessDeniedException $accessDeniedException): ?ResponseInterface;
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Event;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
@@ -21,7 +21,7 @@ class LoginSuccessEvent
      * @param AuthenticatorInterface $authenticator
      * @param Passport $passport
      * @param TokenInterface $token
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @param ResponseInterface|null $response
      * @param TokenInterface|null $previousToken
      */
@@ -29,7 +29,7 @@ class LoginSuccessEvent
         private AuthenticatorInterface $authenticator,
         private Passport $passport,
         private TokenInterface $token,
-        private RequestInterface $request,
+        private ServerRequestInterface $request,
         private ?ResponseInterface $response,
         private ?TokenInterface $previousToken
     ) {}
@@ -67,9 +67,9 @@ class LoginSuccessEvent
     /**
      * 返回请求
      *
-     * @return RequestInterface
+     * @return ServerRequestInterface
      */
-    public function getRequest(): RequestInterface
+    public function getRequest(): ServerRequestInterface
     {
         return $this->request;
     }

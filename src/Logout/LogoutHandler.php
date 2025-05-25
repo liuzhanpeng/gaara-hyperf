@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Logout;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Config\LogoutConfig;
 use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
@@ -32,15 +32,16 @@ class LogoutHandler implements LogoutHandlerInterface
     /**
      * @inheritDoc
      */
-    public function supports(RequestInterface $request): bool
+    public function supports(ServerRequestInterface $request): bool
     {
-        return $request->getPathInfo() === $this->config->path() && $request->isMethod('POST');
+        return $request->getUri()->getPath() === $this->config->path()
+            && $request->getMethod() === 'POST';
     }
 
     /**
      * @inheritDoc
      */
-    public function handle(RequestInterface $request): ?ResponseInterface
+    public function handle(ServerRequestInterface $request): ?ResponseInterface
     {
         $token = $this->tokenContext->getToken();
         if (is_null($token)) {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Passport\BadgeInterface;
 use Lzpeng\HyperfAuthGuard\User\UserInterface;
@@ -22,17 +22,17 @@ interface GuardInterface
      *
      * @param UserInterface $user
      * @param AuthenticatorInterface $authenticator
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @param BadgeInterface[] $badges
      * @return ResponseInterface|null
      */
-    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, RequestInterface $request, array $badges = []): ?ResponseInterface;
+    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, ServerRequestInterface $request, array $badges = []): ?ResponseInterface;
 
     /**
      * 处理认证请求
      *
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @return ResponseInterface|null
      */
-    public function authenticate(RequestInterface $request): ?ResponseInterface;
+    public function authenticate(ServerRequestInterface $request): ?ResponseInterface;
 }

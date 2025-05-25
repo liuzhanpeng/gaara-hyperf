@@ -15,6 +15,8 @@ use Lzpeng\HyperfAuthGuard\Authenticator\Factory\OpaqueTokenAuthenticatorFactory
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerResolver;
 use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerResolverInterface;
 use Lzpeng\HyperfAuthGuard\Config\Config;
+use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManager;
+use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerInterface;
 use Lzpeng\HyperfAuthGuard\EventListener\PasswordBadgeCheckListener;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandler;
 use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolver;
@@ -215,7 +217,7 @@ class ServiceBuilder
         $userProviderRegistry->register('model', ModelUserProviderFactory::class);
 
         $authenticatorRegistry = $this->container->get(AuthenticatorRegistry::class);
-        $authenticatorRegistry->register('from_login', FormLoginAuthenticatorFactory::class);
+        $authenticatorRegistry->register('form_login', FormLoginAuthenticatorFactory::class);
         $authenticatorRegistry->register('json_login', JsonLoginAuthenticatorFactory::class);
         $authenticatorRegistry->register('api_key', ApiKeyAuthenticatorFactory::class);
         $authenticatorRegistry->register('opaque_token', OpaqueTokenAuthenticatorFactory::class);

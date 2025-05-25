@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\UnauthenticatedHandler;
 
 use Hyperf\Contract\SessionInterface;
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Hyperf\Session\Session;
 use Lzpeng\HyperfAuthGuard\Exception\UnauthenticatedException;
 use Psr\Http\Message\ResponseInterface;
@@ -32,7 +32,7 @@ class RedirectUnauthenticatedHandler implements UnauthenticatedHandlerInterface
         ], $this->options);
     }
 
-    public function handle(RequestInterface $request, UnauthenticatedException $unauthenticatedException): ResponseInterface
+    public function handle(ServerRequestInterface $request, UnauthenticatedException $unauthenticatedException): ResponseInterface
     {
         if ($this->session instanceof Session) {
             $this->session->flash('authentication_error', '未认证或已登出，请重新登录！');

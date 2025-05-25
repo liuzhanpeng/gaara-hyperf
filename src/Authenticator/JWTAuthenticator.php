@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * JSON Web Token 认证器
@@ -15,11 +15,11 @@ class JWTAuthenticator extends OpaqueTokenAuthenticator
 {
     public function __construct() {}
 
-    public function supports(RequestInterface $request): bool {}
+    public function supports(ServerRequestInterface $request): bool {}
 
-    public function authenticate(RequestInterface $request, string $guardName): Passport {}
+    public function authenticate(ServerRequestInterface $request, string $guardName): Passport {}
 
-    public function onAuthenticationSuccess(RequestInterface $request, TokenInterface $token): ?ResponseInterface {}
+    public function onAuthenticationSuccess(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface {}
 
-    public function onAuthenticationFailure(RequestInterface $request, AuthenticationException $exception): ?ResponseInterface {}
+    public function onAuthenticationFailure(ServerRequestInterface $request, AuthenticationException $exception): ?ResponseInterface {}
 }

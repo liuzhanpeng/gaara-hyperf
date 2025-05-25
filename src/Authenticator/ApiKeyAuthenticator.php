@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Token\AuthenticatedToken;
@@ -34,12 +34,12 @@ class ApiKeyAuthenticator implements AuthenticatorInterface
         ], $this->options);
     }
 
-    public function supports(RequestInterface $request): bool
+    public function supports(ServerRequestInterface $request): bool
     {
         return !empty($request->getHeaderLine($this->options['api_key_param']));
     }
 
-    public function authenticate(RequestInterface $request, string $guardName): Passport
+    public function authenticate(ServerRequestInterface $request, string $guardName): Passport
     {
         $apiKey = $request->getHeaderLine($this->options['api_key_param']);
 
@@ -56,7 +56,7 @@ class ApiKeyAuthenticator implements AuthenticatorInterface
         return new AuthenticatedToken($guardName, $passport->getUser());
     }
 
-    public function onAuthenticationSuccess(RequestInterface $request, TokenInterface $token): ?ResponseInterface
+    public function onAuthenticationSuccess(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
     {
         if (!is_null($this->successHandler)) {
             return $this->successHandler->handle($request, $token);
@@ -65,7 +65,7 @@ class ApiKeyAuthenticator implements AuthenticatorInterface
         return null;
     }
 
-    public function onAuthenticationFailure(RequestInterface $request, AuthenticationException $exception): ?ResponseInterface
+    public function onAuthenticationFailure(ServerRequestInterface $request, AuthenticationException $exception): ?ResponseInterface
     {
         if (!is_null($this->failureHandler)) {
             return $this->failureHandler->handle($request, $exception);

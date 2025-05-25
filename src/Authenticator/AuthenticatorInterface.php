@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
@@ -24,19 +24,19 @@ interface AuthenticatorInterface
      * 
      * 返回ture时会调用 authenticate 方法进行认证，否则不进行认证
      *
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @return boolean
      */
-    public function supports(RequestInterface $request): bool;
+    public function supports(ServerRequestInterface $request): bool;
 
     /**
      * 对请求进行认证
      *
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @param string $guardName
      * @return Passport
      */
-    public function authenticate(RequestInterface $request, string $guardName): Passport;
+    public function authenticate(ServerRequestInterface $request, string $guardName): Passport;
 
     /**
      * 创建token
@@ -50,18 +50,18 @@ interface AuthenticatorInterface
     /**
      * 认证成功处理函数
      *
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @param TokenInterface $token
      * @return ResponseInterface|null
      */
-    public function onAuthenticationSuccess(RequestInterface $request, TokenInterface $token): ?ResponseInterface;
+    public function onAuthenticationSuccess(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface;
 
     /**
      * 认证失败处理函数
      *
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @param AuthenticationException $exception
      * @return ResponseInterface|null
      */
-    public function onAuthenticationFailure(RequestInterface $request, AuthenticationException $exception): ?ResponseInterface;
+    public function onAuthenticationFailure(ServerRequestInterface $request, AuthenticationException $exception): ?ResponseInterface;
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -22,7 +22,7 @@ class OpaqueTokenResponseHandler implements AuthenticationSuccessHandlerInterfac
         ], $this->options);
     }
 
-    public function handle(RequestInterface $request, TokenInterface $token): ?ResponseInterface
+    public function handle(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
     {
         $opaqueToken = $this->opaqueTokenIssuer->issue(
             $token,

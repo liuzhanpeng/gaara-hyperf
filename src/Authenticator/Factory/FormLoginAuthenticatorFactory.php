@@ -17,6 +17,18 @@ class FormLoginAuthenticatorFactory extends AbstractAuthenticatorFactory
         $successHandler = $this->createSuccessHandler($options);
         $failureHandler = $this->createFailureHandler($options);
 
+        $options = array_merge([
+            'target_path' => '/',
+            'failure_path' => $options['check_path'],
+            'redirect_enabled' => true,
+            'redirect_param' => 'redirect_to',
+            'username_param' => 'username',
+            'password_param' => 'password',
+            'csrf_enabled' => true,
+            'csrf_id' => 'authenticate',
+            'csrf_param' => '_csrf_token',
+        ], $options);
+
         if ($options['csrf_enabled']) {
             if (!isset($options['csrf_token_manager'])) {
                 $csrfTokenManagerConfig  = [
@@ -26,13 +38,13 @@ class FormLoginAuthenticatorFactory extends AbstractAuthenticatorFactory
                 $csrfTokenManagerConfig = $options['csrf_token_manager'];
             }
 
+            $csrfTokenManager = $this->container->get(CsrfTokenManagerFactory::class)->create($csrfTokenManagerConfig);
+
             /**
              * @var EventDispatcher $eventDispatcher
              */
             $eventDispatcher = $this->container->get($eventDispatcherId);
-            $eventDispatcher->addSubscriber(new CsrfTokenBadgeCheckListener(
-                $this->container->get(CsrfTokenManagerFactory::class)->create($csrfTokenManagerConfig)
-            ));
+            $eventDispatcher->addSubscriber(new CsrfTokenBadgeCheckListener($csrfTokenManager));
         }
 
         return new FormLogAuthenticator(

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\EventListener;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
 use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -42,10 +42,10 @@ class OpaqueTokenRevokeLogoutListener implements EventSubscriberInterface
     /**
      * 提取AccessToken
      *
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @return string|null
      */
-    public function extractAccessToken(RequestInterface $request): ?string
+    public function extractAccessToken(ServerRequestInterface $request): ?string
     {
         if (!$request->hasHeader($this->options['header_param']) || !\is_string($header = $request->getHeaderLine($this->options['header_param']))) {
             return null;

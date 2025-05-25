@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -16,9 +16,9 @@ use Psr\Http\Message\ResponseInterface;
 interface AuthenticationSuccessHandlerInterface
 {
     /**
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @param TokenInterface $token
      * @return ResponseInterface|null
      */
-    public function handle(RequestInterface $request, TokenInterface  $token): ?ResponseInterface;
+    public function handle(ServerRequestInterface $request, TokenInterface  $token): ?ResponseInterface;
 }

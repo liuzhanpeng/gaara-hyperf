@@ -29,9 +29,13 @@ class UnauthenticatedHandlerFactory
 
         switch ($type) {
             case 'default':
-                return $this->container->make(DefaultUnauthenticatedHandler::class, $options);
+                return $this->container->make(DefaultUnauthenticatedHandler::class, [
+                    'options' => $options
+                ]);
             case 'redirect':
-                return $this->container->make(RedirectUnauthenticatedHandler::class, $options);
+                return $this->container->make(RedirectUnauthenticatedHandler::class, [
+                    'options' => $options
+                ]);
             case 'custom':
                 $customConfig = CustomConfig::from($options);
 

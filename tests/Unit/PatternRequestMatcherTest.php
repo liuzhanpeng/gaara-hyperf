@@ -2,20 +2,25 @@
 
 declare(strict_types=1);
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\RquestMatcher\PatternRequestMatcher;
+use Psr\Http\Message\UriInterface;
 
 test('PatternRequestMatcherTest', function () {
-    $request = Mockery::mock(RequestInterface::class);
-    $request->shouldReceive('getPathInfo')->andReturn(
-        '/admin/',
-        '/admin/users',
-        '/admin/users/1',
-        '/admin/users/1/edit',
-        '/admin2/',
-        '/admin2/users',
-        '/admin/logout'
-    );
+    $uri = Mockery::mock(UriInterface::class);
+    $uri->shouldReceive('getPath')
+        ->andReturn(
+            '/admin/',
+            '/admin/users',
+            '/admin/users/1',
+            '/admin/users/1/edit',
+            '/admin2/',
+            '/admin2/users',
+            '/admin/logout'
+        );
+    $request = Mockery::mock(ServerRequestInterface::class);
+    $request->shouldReceive('getUri')
+        ->andReturn($uri);
 
     $requestMatcher = new PatternRequestMatcher('^/admin/', [
         '/admin/logout',

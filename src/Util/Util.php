@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Util;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Util
 {
     /**
      * 判断是JSON请求
      *
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @return boolean
      */
-    public function expectJson(RequestInterface $request): bool
+    public function expectJson(ServerRequestInterface $request): bool
     {
         $contentType = strtolower($request->getHeaderLine('Content-Type'));
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\UnauthenticatedHandler;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Exception\UnauthenticatedException;
 use Psr\Http\Message\ResponseInterface;
 
@@ -20,7 +20,7 @@ class DefaultUnauthenticatedHandler implements UnauthenticatedHandlerInterface
     /**
      * @inheritDoc
      */
-    public function handle(RequestInterface $request, UnauthenticatedException $unauthenticatedException): ResponseInterface
+    public function handle(ServerRequestInterface $request, UnauthenticatedException $unauthenticatedException): ResponseInterface
     {
         throw $unauthenticatedException;
     }

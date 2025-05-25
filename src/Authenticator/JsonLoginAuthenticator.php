@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Exception\InvalidCredentialsException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
@@ -42,17 +42,17 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
     /**
      * @inheritDoc
      */
-    public function supports(RequestInterface $request): bool
+    public function supports(ServerRequestInterface $request): bool
     {
         return $this->util->expectJson($request)
-            && $request->getPathInfo() === $this->options['check_path']
-            && $request->isMethod('POST');
+            && $request->getUri()->getPath() === $this->options['check_path']
+            && $request->getMethod() === 'POST';
     }
 
     /**
      * @inheritDoc
      */
-    public function authenticate(RequestInterface $request, string $guardName): Passport
+    public function authenticate(ServerRequestInterface $request, string $guardName): Passport
     {
         $credientials = $this->getCredentials($request);
 
@@ -71,7 +71,7 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
     /**
      * @inheritDoc
      */
-    public function onAuthenticationSuccess(RequestInterface $request, TokenInterface $token): ?ResponseInterface
+    public function onAuthenticationSuccess(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
     {
         if (!is_null($this->successHandler)) {
             return $this->successHandler->handle($request, $token);
@@ -83,7 +83,7 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
     /**
      * @inheritDoc
      */
-    public function onAuthenticationFailure(RequestInterface $request, AuthenticationException $exception): ?ResponseInterface
+    public function onAuthenticationFailure(ServerRequestInterface $request, AuthenticationException $exception): ?ResponseInterface
     {
         if (!is_null($this->failureHandler)) {
             return $this->failureHandler->handle($request, $exception);
@@ -95,10 +95,10 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
     /**
      * 获取认证凭证
      *
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @return array
      */
-    private function getCredentials(RequestInterface $request): array
+    private function getCredentials(ServerRequestInterface $request): array
     {
         $credientials = [];
         $username = $request->post($this->options['username_param'], '');

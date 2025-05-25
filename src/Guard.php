@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorResolverInterface;
 use Lzpeng\HyperfAuthGuard\Authorization\AccessDeniedHandlerInterface;
@@ -58,7 +58,7 @@ class Guard implements GuardInterface
     /**
      * @inheritDoc
      */
-    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, RequestInterface $request, array $badges = []): ?ResponseInterface
+    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, ServerRequestInterface $request, array $badges = []): ?ResponseInterface
     {
         $passport = new Passport($this->name, $user->getIdentifier(), fn() => $user, $badges);
         $token = $authenticator->createToken($passport, $this->name);
@@ -70,7 +70,7 @@ class Guard implements GuardInterface
     /**
      * @inheritDoc
      */
-    public function authenticate(RequestInterface $request): ?ResponseInterface
+    public function authenticate(ServerRequestInterface $request): ?ResponseInterface
     {
         $token = $this->tokenStorage->get($this->name);
         $this->tokenContext->setToken($token);
@@ -106,10 +106,10 @@ class Guard implements GuardInterface
      * 执行指定的认证器认证逻辑
      *
      * @param AuthenticatorInterface $authenticator
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @return ResponseInterface|null
      */
-    private function executeAuthenticator(AuthenticatorInterface $authenticator, RequestInterface $request): ?ResponseInterface
+    private function executeAuthenticator(AuthenticatorInterface $authenticator, ServerRequestInterface $request): ?ResponseInterface
     {
         $passport = null;
         try {
@@ -138,12 +138,12 @@ class Guard implements GuardInterface
      * 处理认证成功
      *
      * @param TokenInterface $token
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @param AuthenticatorInterface $authenticator
      * @param Passport $passport
      * @return ResponseInterface|null
      */
-    public function handleAuthenticationSuccess(TokenInterface $token, RequestInterface $request, AuthenticatorInterface $authenticator, Passport $passport): ?ResponseInterface
+    public function handleAuthenticationSuccess(TokenInterface $token, ServerRequestInterface $request, AuthenticatorInterface $authenticator, Passport $passport): ?ResponseInterface
     {
         $previousToken = $this->tokenContext->getToken();
         $this->tokenContext->setToken($token);
@@ -169,12 +169,12 @@ class Guard implements GuardInterface
      * 处理认证失败
      *
      * @param AuthenticationException $exception
-     * @param RequestInterface $request
+     * @param ServerRequestInterface $request
      * @param AuthenticatorInterface $authenticator
      * @param Passport|null $passport
      * @return ResponseInterface
      */
-    private function handleAuthenticationFailure(AuthenticationException $exception, RequestInterface $request, AuthenticatorInterface $authenticator, ?Passport $passport): ?ResponseInterface
+    private function handleAuthenticationFailure(AuthenticationException $exception, ServerRequestInterface $request, AuthenticatorInterface $authenticator, ?Passport $passport): ?ResponseInterface
     {
         $response = $authenticator->onAuthenticationFailure($request, $exception, $passport);
 
