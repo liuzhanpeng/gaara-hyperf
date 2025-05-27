@@ -20,12 +20,15 @@ class OpaqueTokenIssuer implements OpaqueTokenIssuerInterface
         private string $cachePrefix,
     ) {}
 
-    public function issue(TokenInterface $token, ?DateTimeInterface $expiresAt = null): OpaqueToken
+    public function issue(TokenInterface $token, ?int $ttl = null): OpaqueToken
     {
         $accessToken = bin2hex(random_bytes(32));
-        $this->cache->set($this->getAccessTokenKey($accessToken), $token, $expiresAt);
+        $this->cache->set($this->getAccessTokenKey($accessToken), $token, $ttl);
 
-        return new OpaqueToken($accessToken, $expiresAt);
+        return new OpaqueToken(
+            $accessToken,
+            (new \DateTimeImmutable())->add(new \DateInterval('PT' . $ttl . 'S'))
+        );
     }
 
     public function revoke(string $accessToken): void

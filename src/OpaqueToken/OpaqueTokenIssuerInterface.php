@@ -17,10 +17,10 @@ interface OpaqueTokenIssuerInterface
      * 发布一个opaque token
      *
      * @param TokenInterface $token
-     * @param \DateTimeInterface|null $expiresAt
+     * @param \DateTimeInterface|null $ttl
      * @return OpaqueToken
      */
-    public function issue(TokenInterface $token, ?\DateTimeInterface $expiresAt = null): OpaqueToken;
+    public function issue(TokenInterface $token, ?int $ttl = null): OpaqueToken;
 
     /**
      * 撤销一个opaque token

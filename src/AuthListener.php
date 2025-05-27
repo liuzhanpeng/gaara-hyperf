@@ -38,6 +38,7 @@ class AuthListener implements ListenerInterface
      */
     public function process(object $event): void
     {
+        echo 'auth listener start' . PHP_EOL;
         $serviceBuilder = $this->container->make(ServiceBuilder::class, [
             'config' =>  Config::from($this->container->get(ConfigInterface::class)->get('auth')),
         ]);

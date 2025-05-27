@@ -26,7 +26,7 @@ class OpaqueTokenResponseHandler implements AuthenticationSuccessHandlerInterfac
     {
         $opaqueToken = $this->opaqueTokenIssuer->issue(
             $token,
-            (new \DateTimeImmutable())->add(new \DateInterval('PT' . $this->options['expires_in'] . 'S'))
+            $this->options['expires_in'],
         );
 
         return $this->response->json([

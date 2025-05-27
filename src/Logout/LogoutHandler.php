@@ -10,7 +10,6 @@ use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
 use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageInterface;
-use Lzpeng\HyperfAuthGuard\Util\Util;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 
