@@ -17,9 +17,9 @@ class Passport
     /**
      * 用户
      *
-     * @var UserInterface
+     * @var UserInterface|null
      */
-    private UserInterface $user;
+    private ?UserInterface $user = null;
 
     /**
      * 用户加载器
@@ -70,14 +70,17 @@ class Passport
      */
     public function getUser(): UserInterface
     {
-        if (!isset($this->user)) {
+        if (!is_null($this->user)) {
             $user = ($this->userLoader)($this->userIdentifier);
             if (is_null($user)) {
                 throw UserNotFoundException::fromUserIdentifier($this->userIdentifier);
             }
 
             if (!$user instanceof UserInterface) {
-                throw new \LogicException('The user provider must return a UserInterface object');
+                throw new \LogicException(sprintf(
+                    'The user provider must return a UserInterface object, %s given',
+                    get_debug_type($user)
+                ));
             }
 
             $this->user = $user;

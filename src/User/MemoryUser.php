@@ -9,7 +9,6 @@ class MemoryUser implements UserInterface, PasswordUserInterface
     public function __construct(
         private string $username,
         private string $password,
-        private bool $enabled = true,
     ) {}
 
     /**
@@ -20,16 +19,6 @@ class MemoryUser implements UserInterface, PasswordUserInterface
     public function username(): string
     {
         return $this->username;
-    }
-
-    /**
-     * 是否启用
-     *
-     * @return boolean
-     */
-    public function enabled(): bool
-    {
-        return $this->enabled;
     }
 
     /**

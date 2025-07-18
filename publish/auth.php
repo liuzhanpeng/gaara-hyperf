@@ -4,23 +4,12 @@ return [
     'guards' => [
         'admin' => [
             'matcher' => [
-                'pattern' => [ // 正则匹配
-                    'expr' => '^/admin/',
-                    // 'exclusion' => [
-                    //     'admin/a',
-                    //     'admin/b'
-                    // ]
-                ],
-                // 'prefix' => [ // 前缀匹配
-                //     'expr' => '/admin/',
-                // ],
-                // 'custom' => [ // 自定义匹配
-                //     'class' => CustomRequestMatcher::class,
-                //     'args' => []
-                // ]
+                'pattern' => '^/admin/',
+                'logout_path' => '/admin/logout',
+                'exclusions' => []
             ],
             'user_provider' => [
-                'memory' => [ // 内置用户提供器
+                'memory' => [
                     'users' => [
                         'admin' => [
                             'password' => 'admin',
@@ -28,133 +17,99 @@ return [
                         ],
                     ],
                 ],
-                // 'model' => [
-                //     'class' => User::class,
-                //     'identifier' => 'username',
-                // ],
-                // 'custom' => [ // 自定义用户提供器
-                //     'class' => CustomUserProvider::class,
-                //     'args' => []
-                // ]
             ],
             'authenticators' => [
                 'form_login' => [
-                    'check_path' => '/admin/check_login',
-                    // 'target_path' => '/',
-                    // 'failure_path' => '/login',
-                    // 'use_redirect_path' => false,
-                    // 'redirect_path_param' => 'redirect_to',
-                    // 'username_param' => 'username',
-                    // 'password_param' => 'password',
-                    // 'csrf_enabled' => true,
-                    // 'csrf_param' => '_csrf_token',
-                    // 'csrf_token_manager' => [
-                    //     'default' => [],
-                    //     'custom' => [
-                    //         'class' => CsrfTokenManager::class,
-                    //         'args' => []
-                    //     ]
-                    // ],
-                    // 'success_handler' => [
-                    //     'class' => CustomSuccessHandler::class,
-                    //     'args' => []
-                    // ],
-                    // 'failure_handler' => CustomFailureHandler::class,
+                    'check_path' => '/admin/login',
+                    'enable_csrf' => true,
                 ],
-                // 'json_login' => [
-                //     'check_path' => '/admin/check_login',
-                //     'success_handler' => [
-                //         'class' => CustomSuccessHandler::class,
-                //         'args' => []
-                //     ],
-                //     'failure_handler' => CustomFailureHandler::class,
-                // ],
-                // 'api_key' => [
-                //     'check_path' => '/admin/check_login',
-                //     'api_key_param' => 'X-API-Key',
-                // ],
-                // 'opaque_token' => [
-                //     'header_param' => 'Authorization',
-                //     'token_type' => 'Bearer',
-                //     'expires_in' => 3600,
-                //     'token_issuer' => [
-                //         'default' => [
-                //             'cache_prefix' => 'auth:opaque_token:',
-                //         ],
-                //         'custom' => [
-                //             'class' => CustomOpaqueTokenIssuer::class,
-                //             'args' => []
-                //         ]
-                //     ],
-                // ],
-                // 'jwt' => [
-                //     'algo'  => 'RS256',
-                //     'private_key' => '',
-                //     'public_key' => '',
-                //     'pass_phrase' => '',
-                //     'expire_in' => 3600,
-                //     'blacklist_enabled' => true,
-                //     'header_param' => 'Authorization',
-                //     'token_type' => 'Bearer',
-                // ],
-                // 'custom' => [ // 自定义认证器
+                'json_login' => [
+                    'check_path' => '/admin/check_login',
+                    'success_handler' => [
+                        'class' => OpaqueTokenResponseHandler::class,
+                        'args' => [
+                            // 'tokenIssuer' => 'admin_opaque_token_issuer',
+                            // 'responseTemplate' => '{ "code": 0, "msg": "success", "data": { "access_token": "#TOKEN#", "expires_at": #EXPIRES_AT# } }',
+                        ],
+                    ],
+                    'failure_handler' => CustomFailureHandler::class,
+                ],
+                'opaque_token' => [
+                    'header_param' => 'Authorization',
+                    'token_type' => 'Bearer',
+                    // 'token_issuer' => 'admin_opaque_token_issuer',
+                    'token_refresh' => true,
+                ],
+                // 'custom' => [
                 //     [
                 //         'class' => CustomAuthenticator::class,
-                //         'args' => [],
+                //         'args' => []
                 //     ]
                 // ]
             ],
-            'logout' => [
-                'path' => '/admin/logout',
-                // 'target' => '/admin/login',
-            ],
-            'token_storage' => [
-                'session' => [
-                    'prefix' => 'auth.token',
+            'token_storage' => 'session', // null 或 session
+            'unauthenticated_handler' => [
+                'redirect' => [
+                    'target_path' => '/login',
+                    'redirect_enabled' => true,
+                    'redirect_param' => 'redirect_to'
                 ],
-                // 'custom' => [ // 自定义存储器
-                //     'class' => CustomTokenStorage::class,
-                //     'args' => []
+                // 'custom' => [
+                //    'class' => CustomUnauthenticatedHandler::class,
+                //    'args' => []
                 // ]
             ],
-            // 'token_storage' => null,
-            // 'unauthenticated_handler' => [
-            //     'default' => [],
-            //     'redirect' => [
-            //         'target_path' => '/login',
-            //         'redirect_enabled' => true,
-            //         'redirect_param' => 'redirect_to'
-            //     ],
-            //     'custom' => [
-            //         'class' => CustomUnauthenticatedHandler::class,
+            'listeners' =>  [
+                // CustomListener::class,
+            ],
+            // 'authorization' => [
+            //     'checker' => [
+            //         'class' => AuthorizationChecker::class,
             //         'args' => []
-            //     ]
-            // ],
-            // 'authorization_checker' => [
-            //     'class' => CustomAuthorizationChecker::class,
-            //     'args' => []
-            // ],
-            // 'access_denied_handler' => [
-            //     'class' => CustomAccessDeniedHandler::class,
-            //     'args' => []
-            // ],
-            // 'listeners' =>  [
-            // CustomListener::class,
-            // [
-            //     'class' => CustomListener::class,
-            //     'args' => []
-            // ]
-            // ],
-            // 'password_hasher' => [
-            //     'default' => [
-            //         'algo' => PASSWORD_BCRYPT,
             //     ],
-            //     'custom' => [
-            //         'class' => PasswordHasher::class,
+            //     'access_denied_handler' => [
+            //         'class' => AccessDeniedHandler::class,
             //         'args' => []
-            //     ]
-            // ]
+            //     ],
+            // ],
+            // 'password_hasher' => 'default'
         ],
     ],
 
+    'services' => [
+        'password_hashers' => [
+            'admin' => [
+                'default' => [
+                    'algo' => PASSWORD_BCRYPT,
+                ],
+                // 'custom' => [
+                //     'class' => PasswordHasher::class,
+                //     'args' => []
+                // ]
+            ]
+        ],
+        'csrf_token_managers' => [
+            'default' => [
+                'session' => [
+                    'prefix' => 'auth.csrf_token'
+                ],
+            ],
+            // 'custom' => [
+            //     'class' => CustomCsrfTokenManager::class,
+            //     'args' => []
+            // ]
+        ],
+        'opaque_token_issuers' => [
+            'admin_opaque_token_issuer' => [
+                'cache' => [
+                    'cache_prefix' => 'auth:opaque_token',
+                    'expires_in' => 60 * 20,
+                ],
+                // 'custom' => [
+                //     'class' => CustomOpaqueTokenIssuer::class,
+                //     'args' => []
+                // ]
+            ]
+        ],
+    ],
 ];

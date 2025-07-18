@@ -9,7 +9,6 @@ namespace Lzpeng\HyperfAuthGuard\Passport;
  * 
  * 认证过程中产生的信息，用于认证过程中传递信息
  *
- *
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
 interface BadgeInterface

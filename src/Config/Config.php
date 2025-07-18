@@ -12,10 +12,12 @@ namespace Lzpeng\HyperfAuthGuard\Config;
 class Config
 {
     /**
-     * @param GuardConfig[] $guardConfigCollection
+     * @param array<string, GuardConfig> $guardConfigCollection
+     * @param array $servicesConfig
      */
     public function __construct(
         private array $guardConfigCollection,
+        private array $servicesConfigCollection,
     ) {}
 
     /**
@@ -30,19 +32,29 @@ class Config
 
         $guardConfigCollection = [];
         foreach ($config['guards'] as $guardName => $guardConfig) {
-            $guardConfigCollection[] = GuardConfig::from($guardName, $guardConfig);
+            $guardConfigCollection[$guardName] = GuardConfig::from($guardConfig);
         }
 
-        return new self($guardConfigCollection);
+        return new self($guardConfigCollection, $config['services'] ?? []);
     }
 
     /**
      * 返回所有guard的配置
      * 
-     * @return GuardConfig[]
+     * @return array<string, GuardConfig>
      */
     public function guardConfigCollection(): array
     {
         return $this->guardConfigCollection;
+    }
+
+    /**
+     * 返回指定服务的配置
+     *
+     * @return array<string, array>
+     */
+    public function serviceConfig(string $name): array
+    {
+        return $this->servicesConfigCollection[$name] ?? [];
     }
 }

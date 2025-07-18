@@ -11,17 +11,17 @@ use Lzpeng\HyperfAuthGuard\User\UserInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-interface TokenInterface extends \Stringable,  \Serializable
+interface TokenInterface
 {
     /**
-     * 返回认证守卫名称
+     * 返回发行令牌的认证守卫名称
      *
      * @return string
      */
     public function getGuardName(): string;
 
     /**
-     * 返回用户
+     * 返回所属用户
      *
      * @return UserInterface
      */

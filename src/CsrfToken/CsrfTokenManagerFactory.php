@@ -5,10 +5,15 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\CsrfToken;
 
 use Hyperf\Contract\ContainerInterface;
+use Hyperf\Contract\SessionInterface;
 use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
-use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManager;
 use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerInterface;
 
+/**
+ * CSRF令牌管理器工厂
+ * 
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
 class CsrfTokenManagerFactory
 {
     public function __construct(
@@ -18,15 +23,18 @@ class CsrfTokenManagerFactory
     public function create(array $config): CsrfTokenManagerInterface
     {
         if (count($config) !== 1) {
-            throw new \InvalidArgumentException('csrf_token_manager配置必须是单个数组');
+            throw new \InvalidArgumentException('csrf_token_manager config must be an associative array with a single key-value pair');
         }
 
         $type = array_key_first($config);
         $options = $config[$type];
 
         switch ($type) {
-            case 'default':
-                return $this->container->get(CsrfTokenManager::class);
+            case 'session':
+                return $this->container->make(SessionCsrfTokenManager::class, [
+                    'prefix' => $options['prefix'] ?? 'auth.csrf_token',
+                    'session' => $this->container->get(SessionInterface::class),
+                ]);
             case 'custom':
                 $customConfig = CustomConfig::from($options);
 

@@ -35,7 +35,6 @@ class MemoryUserProvider implements UserProviderInterface
                 return new MemoryUser(
                     $username,
                     $info['password'],
-                    $info['enabled'] ?? true,
                 );
             }
         }

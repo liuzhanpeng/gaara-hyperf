@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\Authorization;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Lzpeng\HyperfAuthGuard\Exception\AccessDeniedException;
+use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -19,8 +19,10 @@ interface AccessDeniedHandlerInterface
      * 处理访问控制拒绝
      *
      * @param ServerRequestInterface $request
-     * @param AccessDeniedException $accessDeniedException
-     * @return ResponseInterface|null
+     * @param TokenInterface|null $token
+     * @param string|array $attribute
+     * @param mixed $subject
+     * @return ResponseInterface
      */
-    public function handle(ServerRequestInterface $request, AccessDeniedException $accessDeniedException): ?ResponseInterface;
+    public function handle(ServerRequestInterface $request, ?TokenInterface $token, string|array $attribute, mixed $subject = null): ResponseInterface;
 }

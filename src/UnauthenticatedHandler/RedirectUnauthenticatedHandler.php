@@ -7,7 +7,7 @@ namespace Lzpeng\HyperfAuthGuard\UnauthenticatedHandler;
 use Hyperf\Contract\SessionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Hyperf\Session\Session;
-use Lzpeng\HyperfAuthGuard\Exception\UnauthenticatedException;
+use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -28,11 +28,11 @@ class RedirectUnauthenticatedHandler implements UnauthenticatedHandlerInterface
 
         $this->options = array_merge([
             'redirect_enabled' => true,
-            'redirect_param' => 'redirect_to'
+            'redirect_to' => 'redirect_to'
         ], $this->options);
     }
 
-    public function handle(ServerRequestInterface $request, UnauthenticatedException $unauthenticatedException): ResponseInterface
+    public function handle(ServerRequestInterface $request, ?TokenInterface $token): ResponseInterface
     {
         if ($this->session instanceof Session) {
             $this->session->flash('authentication_error', '未认证或已登出，请重新登录！');
@@ -40,7 +40,7 @@ class RedirectUnauthenticatedHandler implements UnauthenticatedHandlerInterface
 
         $targetPath = $this->options['target_path'];
         if ($this->options['redirect_enabled']) {
-            $targetPath .= sprintf('?%s=%s', $this->options['redirect_param'], urlencode($request->getUri()->getPath()));
+            $targetPath .= sprintf('?%s=%s', $this->options['redirect_to'], urlencode($request->getUri()->getPath()));
         }
 
         return $this->response->redirect($targetPath);

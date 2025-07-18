@@ -7,7 +7,7 @@ namespace Lzpeng\HyperfAuthGuard\CsrfToken;
 /**
  * CSRF令牌
  * 
- * @author lzpeng <<EMAIL>>
+ * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class CsrfToken implements \Stringable
 {

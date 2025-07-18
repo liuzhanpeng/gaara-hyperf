@@ -5,37 +5,34 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerInterface;
+use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerResolverInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * 不透明令牌响应处理器
+ *
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
 class OpaqueTokenResponseHandler implements AuthenticationSuccessHandlerInterface
 {
     public function __construct(
-        private OpaqueTokenIssuerInterface $opaqueTokenIssuer,
+        private OpaqueTokenIssuerResolverInterface $opaqueTokenIssuerResolver,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
-        private array $options = [],
-    ) {
-        $this->options = array_merge([
-            'token_name' => 'token',
-            'expires_in' => 3600,
-        ], $this->options);
-    }
+        private string $tokenIssuer = 'default',
+        private string $responseTemplate = '{ "code": 0, "msg": "success", "data": { "access_token": "#TOKEN#", "expires_at": #EXPIRES_AT# } }',
+    ) {}
 
     public function handle(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
     {
-        $opaqueToken = $this->opaqueTokenIssuer->issue(
-            $token,
-            $this->options['expires_in'],
+        $opaqueToken = $this->opaqueTokenIssuerResolver->resolve($this->tokenIssuer)->issue($token);
+
+        $result = str_replace(
+            ['#TOKEN#', '#EXPIRES_AT#'],
+            [$opaqueToken->getTokenStr(), $opaqueToken->getExpiresAt()->getTimestamp()],
+            $this->responseTemplate
         );
 
-        return $this->response->json([
-            'code' => 0,
-            'msg' => 'success',
-            'data' => [
-                'access_token' => $opaqueToken->getTokenStr(),
-                'expires_at' => $opaqueToken->getExpiresAt()->getTimestamp(),
-            ],
-        ]);
+        return $this->response->json($result);
     }
 }

@@ -64,4 +64,11 @@ interface AuthenticatorInterface
      * @return ResponseInterface|null
      */
     public function onAuthenticationFailure(ServerRequestInterface $request, AuthenticationException $exception): ?ResponseInterface;
+
+    /**
+     * 是否交互式认证
+     *
+     * @return boolean
+     */
+    public function isInteractive(): bool;
 }

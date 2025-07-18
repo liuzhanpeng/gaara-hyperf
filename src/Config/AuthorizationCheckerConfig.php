@@ -31,7 +31,7 @@ class AuthorizationCheckerConfig
         }
 
         if (!isset($config['class'])) {
-            throw new \InvalidArgumentException('AuthorizationCheckerConfig class is required');
+            throw new \InvalidArgumentException('authorization.checker config must have a "class" key');
         }
 
         return new self(

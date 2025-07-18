@@ -73,4 +73,9 @@ class ApiKeyAuthenticator implements AuthenticatorInterface
 
         throw $exception;
     }
+
+    public function isInteractive(): bool
+    {
+        return false;
+    }
 }

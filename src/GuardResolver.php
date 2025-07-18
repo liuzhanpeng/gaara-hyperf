@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard;
 
-use Hyperf\Contract\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * 认证守卫解析器
@@ -14,7 +14,7 @@ use Hyperf\Contract\ContainerInterface;
 class GuardResolver implements GuardResolverInterface
 {
     /**
-     * @param array<string,string> $guardMap 结构[[guardName => guardId]]
+     * @param array<string,string> $guardMap 结构[guardName => guardId, ...]
      * @param ContainerInterface $container
      */
     public function __construct(

@@ -18,7 +18,7 @@ class NullAuthorizationChecker implements AuthorizationCheckerInterface
     /**
      * @inheritDoc
      */
-    public function check(?TokenInterface $token, string|array $attribute, mixed $subject): bool
+    public function check(TokenInterface $token, string|array $attribute, mixed $subject = null): bool
     {
         if (is_null($token)) {
             return false;

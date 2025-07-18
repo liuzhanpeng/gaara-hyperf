@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\PasswordHasher;
 
-use Hyperf\Contract\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
- * 内置的密码哈希器解析器
+ * 密码哈希器解析器
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
@@ -21,16 +21,16 @@ class PasswordHasherResolver implements PasswordHasherResolverInterface
     /**
      * @@inheritDoc
      */
-    public function resolve(string $guardName): PasswordHasherInterface
+    public function resolve(string $name = 'default'): PasswordHasherInterface
     {
-        if (!isset($this->passwordHasherMap[$guardName])) {
-            throw new \InvalidArgumentException("密码哈希器不存在: $guardName");
+        if (!isset($this->passwordHasherMap[$name])) {
+            throw new \InvalidArgumentException("密码哈希器不存在: $name");
         }
 
-        $passwordHasherId = $this->passwordHasherMap[$guardName];
+        $passwordHasherId = $this->passwordHasherMap[$name];
         $passwordHasher = $this->container->get($passwordHasherId);
         if (!$passwordHasher instanceof PasswordHasherInterface) {
-            throw new \LogicException(sprintf('Guard %s password hasher must be an instance of %s', $guardName, PasswordHasherInterface::class));
+            throw new \LogicException(sprintf('Password hasher "%s" must implement PasswordHasherInterface', $passwordHasherId));
         }
 
         return $passwordHasher;

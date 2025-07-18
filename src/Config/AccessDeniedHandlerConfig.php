@@ -31,7 +31,7 @@ class AccessDeniedHandlerConfig
         }
 
         if (!isset($config['class'])) {
-            throw new \InvalidArgumentException('AccessDeniedHandlerConfig class is required');
+            throw new \InvalidArgumentException('authorization.denied_handler config must have a "class" key');
         }
 
         return new self(

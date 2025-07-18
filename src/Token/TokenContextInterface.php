@@ -21,7 +21,7 @@ interface TokenContextInterface
     /**
      * 设置令牌
      *
-     * @param TokenInterface $token|null
+     * @param TokenInterface|null $token
      * @return void
      */
     public function setToken(?TokenInterface $token): void;

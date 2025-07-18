@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerResolverInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AccessDeniedException;
-use Lzpeng\HyperfAuthGuard\Logout\LogoutHandlerResolverInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\User\UserInterface;
@@ -23,9 +21,29 @@ class AuthContext
     public function __construct(
         private ServerRequestInterface $request,
         private TokenContextInterface $tokenContext,
-        private LogoutHandlerResolverInterface $logoutHandlerResolver,
-        private AuthorizationCheckerResolverInterface $authorizationCheckerResolver,
+        private GuardResolverInterface $guardResolver,
     ) {}
+
+    /**
+     * 登录
+     *
+     * @param UserInterface $user
+     * @param string $guard
+     * @param string|null $authenticator
+     * @param array $badges
+     * @return ResponseInterface
+     */
+    public function login(UserInterface $user, string $guard, ?string $authenticator = null, array $badges = []): ResponseInterface
+    {
+        $guard = $this->guardResolver->resolve($guard);
+
+        return $guard->authenticateUser(
+            $user,
+            $this->request,
+            $authenticator,
+            $badges
+        );
+    }
 
     /**
      * 登出
@@ -38,8 +56,9 @@ class AuthContext
             throw new AccessDeniedException('未登录或会话已过期');
         }
 
-        $logoutHandler = $this->logoutHandlerResolver->resolve($this->getToken()->getGuardName());
-        return $logoutHandler->handle($this->request);
+        $guard = $this->guardResolver->resolve($this->getToken()->getGuardName());
+
+        return $guard->logout($this->getToken());
     }
 
     /**
@@ -86,9 +105,8 @@ class AuthContext
         }
 
         $token = $this->getToken();
+        $guard = $this->guardResolver->resolve($token->getGuardName());
 
-        $authorizationChecker = $this->authorizationCheckerResolver->resolve($token->getGuardName());
-
-        return $authorizationChecker->check($token, $attribute, $subject);
+        return $guard->isGranted($token, $attribute, $subject);
     }
 }

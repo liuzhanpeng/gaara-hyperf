@@ -30,7 +30,7 @@ class OpaqueTokenRevokeLogoutListener implements EventSubscriberInterface
 
     public function onLogout(LogoutEvent $event): void
     {
-        if (!$event->getRequest()->isMethod('POST')) {
+        if ($event->getRequest()->getMethod() !== 'POST') {
             return;
         }
 

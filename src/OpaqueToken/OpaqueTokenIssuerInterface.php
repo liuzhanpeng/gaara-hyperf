@@ -17,10 +17,9 @@ interface OpaqueTokenIssuerInterface
      * 发布一个opaque token
      *
      * @param TokenInterface $token
-     * @param \DateTimeInterface|null $ttl
      * @return OpaqueToken
      */
-    public function issue(TokenInterface $token, ?int $ttl = null): OpaqueToken;
+    public function issue(TokenInterface $token): OpaqueToken;
 
     /**
      * 撤销一个opaque token
@@ -34,7 +33,8 @@ interface OpaqueTokenIssuerInterface
      * 解析一个opaque token 返回一个用户令牌
      *
      * @param string $tokenStr
+     * @param boolean $refresh
      * @return TokenInterface|null
      */
-    public function resolve(string $tokenStr): ?TokenInterface;
+    public function resolve(string $tokenStr, bool $refresh = true): ?TokenInterface;
 }

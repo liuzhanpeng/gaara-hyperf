@@ -20,10 +20,10 @@ class UserProviderConfig
         private array $options
     ) {}
 
-    public static function from(array $config): self
+    public static function from(array|string $config): self
     {
         if (count($config) !== 1) {
-            throw new \InvalidArgumentException('user_provider配置必须是单数组');
+            throw new \InvalidArgumentException('user_provider config must be an associative array with a single key-value pair');
         }
 
         $type = array_key_first($config);

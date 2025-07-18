@@ -21,19 +21,26 @@ class TokenStorageConfig
     ) {}
 
     /**
-     * @param array|null $config
+     * @param array $config
      * @return self
      */
-    public static function from(?array $config): self
+    public static function from(array|string $config): self
     {
-        if (is_null($config)) {
-            $config = [
-                'null' => [],
-            ];
+        if (is_string($config)) {
+            switch ($config) {
+                case 'session':
+                    $config = ['session' => ['prefix' => 'auth.token']];
+                    break;
+                case 'null':
+                    $config = ['null' => []];
+                    break;
+                default:
+                    $config = ['custom' => ['class' => $config]];
+            }
         }
 
         if (count($config) !== 1) {
-            throw new \InvalidArgumentException('token_storage配置必须是单个数组');
+            throw new \InvalidArgumentException('token_storage config must be an associative array with a single key-value pair');
         }
 
         $type = array_key_first($config);

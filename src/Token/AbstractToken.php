@@ -50,7 +50,7 @@ abstract class AbstractToken implements TokenInterface
      */
     public function hasAttribute(string $name): bool
     {
-        return \array_key_exists($name, $this->attributes);
+        return array_key_exists($name, $this->attributes);
     }
 
     /**
@@ -61,8 +61,8 @@ abstract class AbstractToken implements TokenInterface
      */
     public function getAttribute(string $name): mixed
     {
-        if (!\array_key_exists($name, $this->attributes)) {
-            throw new \InvalidArgumentException(\sprintf('This token has no "%s" attribute.', $name));
+        if (!array_key_exists($name, $this->attributes)) {
+            throw new \InvalidArgumentException(sprintf('This token has no "%s" attribute.', $name));
         }
 
         return $this->attributes[$name];

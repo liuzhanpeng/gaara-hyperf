@@ -12,10 +12,10 @@ namespace Lzpeng\HyperfAuthGuard\PasswordHasher;
 interface PasswordHasherResolverInterface
 {
     /**
-     * 获取密码哈希器
+     * 通过名称解析密码哈希器
      *
-     * @param string $guardName
+     * @param string $name
      * @return PasswordHasherInterface
      */
-    public function resolve(string $guardName): PasswordHasherInterface;
+    public function resolve(string $name = 'default'): PasswordHasherInterface;
 }

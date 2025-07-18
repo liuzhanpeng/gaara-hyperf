@@ -27,7 +27,7 @@ class UnauthenticatedHandlerConfig
     public static function from(array $config): self
     {
         if (count($config) !== 1) {
-            throw new \InvalidArgumentException('unauthenticated_handler配置必须是单个数组');
+            throw new \InvalidArgumentException('unauthenticated_handler config must be an associative array with a single key-value pair');
         }
 
         $type = array_key_first($config);

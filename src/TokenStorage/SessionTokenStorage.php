@@ -20,7 +20,7 @@ class SessionTokenStorage implements TokenStorageInterface
      */
     public function __construct(
         private SessionInterface $session,
-        private string $prefix,
+        private string $prefix = 'auth.token',
     ) {}
 
     /**

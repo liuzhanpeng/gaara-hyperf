@@ -40,23 +40,7 @@ class FormLogAuthenticator extends AbstractAuthenticator
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
         private SessionInterface $session,
         private array $options,
-    ) {
-        if (!isset($options['check_path'])) {
-            throw new \InvalidArgumentException('The "check_path" option must be set.');
-        }
-
-        $this->options = array_merge([
-            'target_path' => '/',
-            'failure_path' => $options['check_path'],
-            'redirect_enabled' => true,
-            'redirect_param' => 'redirect_to',
-            'username_param' => 'username',
-            'password_param' => 'password',
-            'csrf_enabled' => true,
-            'csrf_id' => 'authenticate',
-            'csrf_param' => '_csrf_token',
-        ], $options);
-    }
+    ) {}
 
     /**
      * @inheritDoc
@@ -73,7 +57,6 @@ class FormLogAuthenticator extends AbstractAuthenticator
     public function authenticate(ServerRequestInterface $request, string $guardName): Passport
     {
         $credientials = $this->getCredentials($request);
-
 
         $passport = new Passport(
             $guardName,
@@ -107,7 +90,7 @@ class FormLogAuthenticator extends AbstractAuthenticator
             return $this->successHandler->handle($request, $token);
         }
 
-        $redirectTo = $request->post($this->options['redirect_param'], null);
+        $redirectTo = $request->getParsedBody()[$this->options['redirect_param']] ?? null;
         if ($this->options['redirect_enabled'] && !is_null($redirectTo)) {
             return $this->response->redirect(urldecode($redirectTo));
         }
@@ -132,6 +115,14 @@ class FormLogAuthenticator extends AbstractAuthenticator
     }
 
     /**
+     * @inheritDoc
+     */
+    public function isInteractive(): bool
+    {
+        return true;
+    }
+
+    /**
      * 获取认证凭证
      *
      * @param ServerRequestInterface $request
@@ -140,19 +131,19 @@ class FormLogAuthenticator extends AbstractAuthenticator
     private function getCredentials(ServerRequestInterface $request): array
     {
         $credientials = [];
-        $username = $request->post($this->options['username_param'], '');
+        $username = $request->getParsedBody()[$this->options['username_param']] ?? '';
         if (!is_string($username) || empty($username)) {
             throw new InvalidCredentialsException('username must be string.');
         }
         $credientials['username'] = trim($username);
 
-        $password = $request->post($this->options['password_param'], '');
+        $password = $request->getParsedBody()[$this->options['password_param']] ?? '';
         if (!is_string($password) || empty($password)) {
             throw new InvalidCredentialsException('password must be string.');
         }
         $credientials['password'] = trim($password);
 
-        $credientials['csrf_token'] = $request->post($this->options['csrf_param'], '');
+        $credientials['csrf_token'] = $request->getParsedBody()[$this->options['csrf_param']] ?? '';
 
         return $credientials;
     }

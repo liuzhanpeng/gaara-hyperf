@@ -24,12 +24,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
         private ?AuthenticationFailureHandlerInterface $failureHandler,
         private OpaqueTokenIssuerInterface $tokenIssuer,
         private array $options,
-    ) {
-        $this->options = array_merge([
-            'header_param' => 'Authorization',
-            'token_type' => 'Bearer',
-        ], $this->options);
-    }
+    ) {}
 
     /**
      * @inheritDoc
@@ -46,7 +41,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
     {
         $accessToken = $this->extractAccessToken($request);
 
-        $token = $this->tokenIssuer->resolve($accessToken);
+        $token = $this->tokenIssuer->resolve($accessToken, $this->options['refresh']);
         if (is_null($token)) {
             throw new UnauthenticatedException('Token is invalid.');
         }
@@ -83,13 +78,18 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
         throw $exception;
     }
 
+    public function isInteractive(): bool
+    {
+        return false;
+    }
+
     /**
      * 提取AccessToken
      *
      * @param ServerRequestInterface $request
      * @return string|null
      */
-    public function extractAccessToken(ServerRequestInterface $request): ?string
+    private function extractAccessToken(ServerRequestInterface $request): ?string
     {
         if (!$request->hasHeader($this->options['header_param']) || !\is_string($header = $request->getHeaderLine($this->options['header_param']))) {
             return null;

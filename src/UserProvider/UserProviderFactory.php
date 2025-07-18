@@ -16,6 +16,13 @@ use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
  */
 class UserProviderFactory
 {
+    /**
+     * 用户提供者构建器
+     *
+     * @var array<string, string> 用户提供者类型 => 用户提供者构建器类名
+     */
+    private array $builders = [];
+
     public function __construct(
         private ContainerInterface $container
     ) {}
@@ -29,13 +36,9 @@ class UserProviderFactory
         $type = $userProviderConfig->type();
         $options = $userProviderConfig->options();
 
-        /**
-         * @var UserProviderRegistry $userProviderRegistry
-         */
-        $userProviderRegistry = $this->container->get(UserProviderRegistry::class);
-
-        if ($userProviderRegistry->hasFactory($type)) {
-            return $userProviderRegistry->getFactory($type)->create($options);
+        if (isset($this->builders[$type])) {
+            $builder = $this->container->get($this->builders[$type]);
+            return $builder->create($options);
         } elseif ($type === 'custom') {
             $customConfig = CustomConfig::from($options);
 
@@ -47,6 +50,15 @@ class UserProviderFactory
             return $userProvider;
         }
 
-        throw new \InvalidArgumentException("未支持的用户提供者类型: {$type}");
+        throw new \InvalidArgumentException("未支持的用户提供器类型: {$type}");
+    }
+
+    public function registerBuilder(string $type, string $builderClass): void
+    {
+        if (!is_subclass_of($builderClass, UserProviderBuilderInterface::class)) {
+            throw new \InvalidArgumentException(sprintf('The builder class "%s" must implement %s.', $builderClass, UserProviderBuilderInterface::class));
+        }
+
+        $this->builders[$type] = $builderClass;
     }
 }

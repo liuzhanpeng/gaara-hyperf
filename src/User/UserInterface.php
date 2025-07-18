@@ -12,7 +12,7 @@ namespace Lzpeng\HyperfAuthGuard\User;
 interface UserInterface
 {
     /**
-     * 返回用户标识
+     * 返回用户标识符
      *
      * @return string
      */

@@ -8,6 +8,11 @@ use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Token\AuthenticatedToken;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 
+/**
+ * 抽象认证器
+ * 
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
 abstract class AbstractAuthenticator implements AuthenticatorInterface
 {
     public function createToken(Passport $passport, string $guardName): TokenInterface

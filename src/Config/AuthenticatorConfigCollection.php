@@ -27,7 +27,7 @@ class AuthenticatorConfigCollection implements \IteratorAggregate
     public static function from(array $config): self
     {
         if (count($config) === 0) {
-            throw new \InvalidArgumentException('Authenticator config can not be empty');
+            throw new \InvalidArgumentException('authenticators配置不能为空');
         }
 
         $authenticatorConfigCollection = [];

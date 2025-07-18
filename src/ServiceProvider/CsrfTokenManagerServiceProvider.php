@@ -1,0 +1,45 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Lzpeng\HyperfAuthGuard\ServiceProvider;
+
+use Hyperf\Contract\ContainerInterface;
+use Lzpeng\HyperfAuthGuard\Config\ConfigLoaderInterface;
+use Lzpeng\HyperfAuthGuard\Constants;
+use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerFactory;
+use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerResolver;
+use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerResolverInterface;
+
+/**
+ * CSRF令牌管理器服务提供者
+ *
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
+class CsrfTokenManagerServiceProvider implements ServiceProviderInterface
+{
+    public function register(ContainerInterface $container): void
+    {
+        $config = $container->get(ConfigLoaderInterface::class)->load();
+
+        $csrfTokenManagerConfig = array_merge([
+            'default' => [
+                'session' => [
+                    'prefix' => 'auth.csrf_token',
+                ],
+            ],
+        ], $config->serviceConfig('csrf_token_managers'));
+
+        $csrfTokenManagerMap = [];
+        foreach ($csrfTokenManagerConfig as $name => $config) {
+            $csrfTokenManagerMap[$name] = sprintf('%s.%s', Constants::CSRF_TOKEN_MANAGER_PREFIX, $name);
+            $container->define($csrfTokenManagerMap[$name], function () use ($container, $config) {
+                return $container->get(CsrfTokenManagerFactory::class)->create($config);
+            });
+        }
+
+        $container->define(CsrfTokenManagerResolverInterface::class, function () use ($container, $csrfTokenManagerMap) {
+            return new CsrfTokenManagerResolver($csrfTokenManagerMap, $container);
+        });
+    }
+}

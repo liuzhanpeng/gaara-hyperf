@@ -6,9 +6,6 @@ namespace Lzpeng\HyperfAuthGuard\PasswordHasher;
 
 use Hyperf\Contract\ContainerInterface;
 use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
-use Lzpeng\HyperfAuthGuard\Config\PasswordHasherConfig;
-use Lzpeng\HyperfAuthGuard\PasswordHasher\DefaultPasswordHasher;
-use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherInterface;
 
 /**
  * 密码哈希器服务工厂
@@ -21,10 +18,14 @@ class PasswordHasherFactory
         private ContainerInterface $container,
     ) {}
 
-    public function create(PasswordHasherConfig $passwordHasherConfig): PasswordHasherInterface
+    public function create(array $passwordHasherConfig): PasswordHasherInterface
     {
-        $type = $passwordHasherConfig->type();
-        $options = $passwordHasherConfig->options();
+        if (count($passwordHasherConfig) !== 1) {
+            throw new \InvalidArgumentException('password_hasher config must be an associative array with a single key-value pair');
+        }
+
+        $type = array_key_first($passwordHasherConfig);
+        $options = $passwordHasherConfig[$type];
 
         switch ($type) {
             case 'default':
