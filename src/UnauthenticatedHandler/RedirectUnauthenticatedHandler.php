@@ -28,7 +28,7 @@ class RedirectUnauthenticatedHandler implements UnauthenticatedHandlerInterface
 
         $this->options = array_merge([
             'redirect_enabled' => true,
-            'redirect_to' => 'redirect_to'
+            'redirect_param' => 'redirect_to'
         ], $this->options);
     }
 
@@ -40,7 +40,7 @@ class RedirectUnauthenticatedHandler implements UnauthenticatedHandlerInterface
 
         $targetPath = $this->options['target_path'];
         if ($this->options['redirect_enabled']) {
-            $targetPath .= sprintf('?%s=%s', $this->options['redirect_to'], urlencode($request->getUri()->getPath()));
+            $targetPath .= sprintf('?%s=%s', $this->options['redirect_param'], urlencode($request->getUri()->getPath()));
         }
 
         return $this->response->redirect($targetPath);

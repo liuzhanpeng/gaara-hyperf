@@ -59,12 +59,6 @@ class RequestMatcher implements RequestMatcherInterface
      */
     private function matches(string $path, string $pattern): bool
     {
-        if (str_starts_with($path, '/')) {
-            if (str_starts_with($path, $pattern)) {
-                return true;
-            }
-        }
-
         return preg_match('#' . $pattern . '#', $path) === 1;
     }
 }

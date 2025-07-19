@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\Exception;
 
 /**
- * 无效凭证异常
- * 
+ * 无效的CSRF令牌异常
+ *
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class InvalidCredentialsException extends AuthenticationException
+class InvalidCsrfTokenException extends AuthenticationException
 {
     public function getDisplayMessage(): string
     {
-        return '用户名或密码错误';
+        return '无效的CSRF令牌';
     }
 }

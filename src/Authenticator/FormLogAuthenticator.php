@@ -14,6 +14,7 @@ use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
+use PHPUnit\Event\Runtime\PHP;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -68,7 +69,7 @@ class FormLogAuthenticator extends AbstractAuthenticator
         );
 
         if ($this->options['csrf_enabled'] && empty($credientials['csrf_token'])) {
-            throw AuthenticationException::from('CSRF token is missing.');
+            throw AuthenticationException::from('CSRF token is missing.', $passport->getUser()->getIdentifier());
         }
 
         if ($this->options['csrf_enabled']) {
@@ -108,7 +109,7 @@ class FormLogAuthenticator extends AbstractAuthenticator
         }
 
         if ($this->session instanceof Session) {
-            $this->session->flash('authentication_error', $exception->getMessage());
+            $this->session->flash('authentication_error', $exception->getDisplayMessage());
         }
 
         return $this->response->redirect($this->options['failure_path']);

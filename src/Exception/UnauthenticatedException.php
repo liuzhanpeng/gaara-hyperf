@@ -13,7 +13,6 @@ use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
  */
 class UnauthenticatedException extends \RuntimeException
 {
-
     /**
      * 用户令牌
      *

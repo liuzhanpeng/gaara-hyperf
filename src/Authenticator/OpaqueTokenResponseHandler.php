@@ -33,6 +33,6 @@ class OpaqueTokenResponseHandler implements AuthenticationSuccessHandlerInterfac
             $this->responseTemplate
         );
 
-        return $this->response->json($result);
+        return $this->response->json(json_decode($result));
     }
 }

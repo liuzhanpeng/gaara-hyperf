@@ -7,6 +7,7 @@ namespace Lzpeng\HyperfAuthGuard\EventListener;
 use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfToken;
 use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerInterface;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
+use Lzpeng\HyperfAuthGuard\Exception\InvalidCsrfTokenException;
 use Lzpeng\HyperfAuthGuard\Passport\CsrfTokenBadge;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -41,7 +42,7 @@ class CsrfTokenBadgeCheckListener implements EventSubscriberInterface
         $csrfToken = new CsrfToken($badge->getId(), $badge->getToken());
 
         if (!$this->csrfTokenManager->verify($csrfToken)) {
-            throw new \LogicException('Invalid CSRF token.');
+            throw new InvalidCsrfTokenException();
         }
 
         $badge->resolve();

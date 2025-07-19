@@ -6,7 +6,7 @@ namespace Lzpeng\HyperfAuthGuard;
 
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Event\Contract\ListenerInterface;
-use Hyperf\Framework\Event\BootApplication;
+use Hyperf\Framework\Event\BeforeMainServerStart;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\BuiltInAuthenticatorServiceProvider;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\BuiltInUserProviderServiceProvider;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\CsrfTokenManagerServiceProvider;
@@ -30,7 +30,7 @@ class AuthInitListener implements ListenerInterface
     public function listen(): array
     {
         return [
-            BootApplication::class
+            BeforeMainServerStart::class
         ];
     }
 

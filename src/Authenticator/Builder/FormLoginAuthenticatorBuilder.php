@@ -27,7 +27,7 @@ class FormLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 
         $options = array_merge([
             'target_path' => '/',
-            'failure_path' => $options['check_path'],
+            'failure_path' => '/login',
             'redirect_enabled' => true,
             'redirect_param' => 'redirect_to',
             'username_param' => 'username',

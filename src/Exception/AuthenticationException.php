@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Exception;
 
-use Lzpeng\HyperfAuthGuard\User\UserInterface;
-
 /**
  * 认证异常
  * 
@@ -14,33 +12,47 @@ use Lzpeng\HyperfAuthGuard\User\UserInterface;
 class AuthenticationException extends \RuntimeException
 {
     /**
-     * 用户
+     * 用户标识
      *
-     * @var UserInterface|null
+     * @var string
      */
-    private ?UserInterface $user = null;
+    protected string $userIdentifier;
 
-    /**
-     *
-     * @param string $message
-     * @param UserInterface|null $user
-     * @return static
-     */
-    public static function from(string $message, ?UserInterface $user = null): static
-    {
-        $self = new static($message);
-        $self->user = $user;
+    public function __construct(
+        string $message = '',
+        int $code = 0,
+        ?\Throwable $previous = null,
+        string $userIdentifier = ''
+    ) {
+        parent::__construct($message, $code, $previous);
+        $this->userIdentifier = $userIdentifier;
+    }
 
-        return $self;
+    public static function from(
+        string $message,
+        string $userIdentifier = '',
+        ?\Throwable $previous = null
+    ): static {
+        return new static($message, 0, $previous, $userIdentifier);
     }
 
     /**
-     * 返回用户
+     * 返回用户标识
      *
-     * @return UserInterface|null
+     * @return string
      */
-    public function getUser(): ?UserInterface
+    public function getUserIdentifier(): string
     {
-        return $this->user;
+        return $this->userIdentifier;
+    }
+
+    /**
+     * 返回显示消息
+     *
+     * @return string
+     */
+    public function getDisplayMessage(): string
+    {
+        return $this->message ?: '认证异常';
     }
 }

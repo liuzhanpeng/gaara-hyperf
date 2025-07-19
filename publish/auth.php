@@ -13,7 +13,6 @@ return [
                     'users' => [
                         'admin' => [
                             'password' => 'admin',
-                            'enabled' => true,
                         ],
                     ],
                 ],
@@ -21,7 +20,8 @@ return [
             'authenticators' => [
                 'form_login' => [
                     'check_path' => '/admin/login',
-                    'enable_csrf' => true,
+                    'failure_path' => '/admin/login',
+                    'csrf_enabled' => true,
                 ],
                 'json_login' => [
                     'check_path' => '/admin/check_login',

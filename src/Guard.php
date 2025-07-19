@@ -14,6 +14,7 @@ use Lzpeng\HyperfAuthGuard\Event\AuthenticationSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
 use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
+use Lzpeng\HyperfAuthGuard\Exception\InvalidCredentialsException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\RequestMatcher\RequestMatcherInterface;
 use Lzpeng\HyperfAuthGuard\Token\AuthenticatedToken;
@@ -144,7 +145,7 @@ class Guard implements GuardInterface
 
             foreach ($passport->getBadges() as $badge) {
                 if (!$badge->isResolved()) {
-                    throw AuthenticationException::from('Credential not resolved', $passport->getUser());
+                    throw AuthenticationException::from('Credential not resolved', $passport->getUser()->getIdentifier());
                 }
             }
 

@@ -70,10 +70,10 @@ class Passport
      */
     public function getUser(): UserInterface
     {
-        if (!is_null($this->user)) {
+        if (is_null($this->user)) {
             $user = ($this->userLoader)($this->userIdentifier);
             if (is_null($user)) {
-                throw UserNotFoundException::fromUserIdentifier($this->userIdentifier);
+                throw UserNotFoundException::from('用户不存在', $this->userIdentifier);
             }
 
             if (!$user instanceof UserInterface) {
