@@ -73,7 +73,7 @@ class Passport
         if (is_null($this->user)) {
             $user = ($this->userLoader)($this->userIdentifier);
             if (is_null($user)) {
-                throw UserNotFoundException::from('用户不存在', $this->userIdentifier);
+                throw new UserNotFoundException('用户不存在', $this->userIdentifier);
             }
 
             if (!$user instanceof UserInterface) {

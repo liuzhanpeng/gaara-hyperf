@@ -23,6 +23,10 @@ class DefaultAccessDeniedHandler implements AccessDeniedHandlerInterface
      */
     public function handle(ServerRequestInterface $request, ?TokenInterface $token, string|array $attribute, mixed $subject = null): ResponseInterface
     {
-        throw AccessDeniedException::from($token, $attribute, $subject);
+        throw new AccessDeniedException(
+            token: $token,
+            attribute: $attribute,
+            subject: $subject
+        );
     }
 }

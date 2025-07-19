@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\Exception;
 
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
+use TheSeer\Tokenizer\Token;
 
 /**
  * 未认证异常
@@ -13,22 +14,21 @@ use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
  */
 class UnauthenticatedException extends \RuntimeException
 {
-    /**
-     * 用户令牌
-     *
-     * @var TokenInterface|null
-     */
-    private ?TokenInterface $token = null;
+    private ?TokenInterface $token;
 
-    /**
-     * @param TokenInterface|null $token
-     * @return self
-     */
-    public static function from(?TokenInterface $token): self
+    public function __construct(?TokenInterface $token = null)
     {
-        $self = new self('Unauthorized', 401);
-        $self->token = $token;
+        parent::__construct('Unauthorized', 401);
+        $this->token = $token;
+    }
 
-        return $self;
+    public function getToken(): ?TokenInterface
+    {
+        return $this->token;
+    }
+
+    public function getDisplayMessage(): string
+    {
+        return '未认证或会话已过期';
     }
 }

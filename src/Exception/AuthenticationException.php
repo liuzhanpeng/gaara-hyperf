@@ -20,20 +20,12 @@ class AuthenticationException extends \RuntimeException
 
     public function __construct(
         string $message = '',
+        string $userIdentifier = '',
         int $code = 0,
         ?\Throwable $previous = null,
-        string $userIdentifier = ''
     ) {
         parent::__construct($message, $code, $previous);
         $this->userIdentifier = $userIdentifier;
-    }
-
-    public static function from(
-        string $message,
-        string $userIdentifier = '',
-        ?\Throwable $previous = null
-    ): static {
-        return new static($message, 0, $previous, $userIdentifier);
     }
 
     /**
@@ -53,6 +45,6 @@ class AuthenticationException extends \RuntimeException
      */
     public function getDisplayMessage(): string
     {
-        return $this->message ?: '认证异常';
+        return $this->message;
     }
 }

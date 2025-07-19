@@ -53,7 +53,10 @@ class AuthContext
     public function logout(): ResponseInterface
     {
         if (! $this->isAuthenticated()) {
-            throw new AccessDeniedException('未登录或会话已过期');
+            throw new AccessDeniedException(
+                token: $this->getToken(),
+                attribute: 'logout',
+            );
         }
 
         $guard = $this->guardResolver->resolve($this->getToken()->getGuardName());

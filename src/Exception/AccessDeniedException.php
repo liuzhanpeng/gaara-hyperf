@@ -13,36 +13,38 @@ use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
  */
 class AccessDeniedException extends \RuntimeException
 {
-    /**
-     * 用户令牌
-     *
-     * @var TokenInterface|null
-     */
     private ?TokenInterface $token = null;
-
-    /**
-     * @var string|array
-     */
     private string|array $attribute = [];
-
-    /**
-     * @var mixed
-     */
     private mixed $subject = null;
 
-    /**
-     * @param TokenInterface|null $token
-     * @param string|array $attribute
-     * @param mixed $subject
-     * @return self
-     */
-    public static function from(?TokenInterface $token, string|array $attribute, mixed $subject): self
-    {
-        $self = new self('Forbidden', 403);
-        $self->token = $token;
-        $self->attribute = $attribute;
-        $self->subject = $subject;
+    public function __construct(
+        ?TokenInterface $token = null,
+        string|array $attribute = [],
+        mixed $subject = null
+    ) {
+        parent::__construct('Forbidden', 403);
+        $this->token = $token;
+        $this->attribute = $attribute;
+        $this->subject = $subject;
+    }
 
-        return $self;
+    public function getToken(): ?TokenInterface
+    {
+        return $this->token;
+    }
+
+    public function getAttribute(): string|array
+    {
+        return $this->attribute;
+    }
+
+    public function getSubject(): mixed
+    {
+        return $this->subject;
+    }
+
+    public function getDisplayMessage(): string
+    {
+        return '访问被拒绝';
     }
 }

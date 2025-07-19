@@ -145,7 +145,7 @@ class Guard implements GuardInterface
 
             foreach ($passport->getBadges() as $badge) {
                 if (!$badge->isResolved()) {
-                    throw AuthenticationException::from('Credential not resolved', $passport->getUser()->getIdentifier());
+                    throw new AuthenticationException('Credential not resolved', $passport->getUser()->getIdentifier());
                 }
             }
 

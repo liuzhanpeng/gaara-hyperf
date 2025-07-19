@@ -53,7 +53,7 @@ class PasswordBadgeCheckListener implements EventSubscriberInterface
         }
 
         if (!$this->passwordHasher->verify($badge->getPassword(), $user->getPassword())) {
-            throw InvalidPasswordException::from('密码错误', $user->getIdentifier());
+            throw new InvalidPasswordException('密码错误', $user->getIdentifier());
         }
 
         $badge->resolve();

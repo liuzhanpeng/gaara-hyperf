@@ -69,7 +69,7 @@ class FormLogAuthenticator extends AbstractAuthenticator
         );
 
         if ($this->options['csrf_enabled'] && empty($credientials['csrf_token'])) {
-            throw AuthenticationException::from('CSRF token is missing.', $passport->getUser()->getIdentifier());
+            throw new AuthenticationException('CSRF token is missing', $passport->getUser()->getIdentifier());
         }
 
         if ($this->options['csrf_enabled']) {
@@ -134,13 +134,13 @@ class FormLogAuthenticator extends AbstractAuthenticator
         $credientials = [];
         $username = $request->getParsedBody()[$this->options['username_param']] ?? '';
         if (!is_string($username) || empty($username)) {
-            throw new InvalidCredentialsException('username must be string.');
+            throw new InvalidCredentialsException('username must be string');
         }
         $credientials['username'] = trim($username);
 
         $password = $request->getParsedBody()[$this->options['password_param']] ?? '';
         if (!is_string($password) || empty($password)) {
-            throw new InvalidCredentialsException('password must be string.');
+            throw new InvalidCredentialsException('password must be string');
         }
         $credientials['password'] = trim($password);
 
