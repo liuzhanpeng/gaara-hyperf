@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\OpaqueToken;
 
-use DateTime;
 use DateTimeImmutable;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;

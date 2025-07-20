@@ -18,3 +18,4 @@ An authentication library for hyperf
 - [ ] Limiting Login Attempts
 - [ ] Password expiration strategy
 - [ ] IP Binding/UA binding
+- [ ] User Disabled

@@ -6,6 +6,7 @@ namespace Lzpeng\HyperfAuthGuard\Event;
 
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Passport 检查事件
@@ -17,10 +18,12 @@ class CheckPassportEvent
     /**
      * @param AuthenticatorInterface $authenticator 不同的认证方法需要不同的验证方式，因此将Authenticator作为参数
      * @param Passport $passport
+     * @param ServerRequestInterface $request 请求对象
      */
     public function __construct(
         private AuthenticatorInterface $authenticator,
         private Passport $passport,
+        private ServerRequestInterface $request,
     ) {}
 
     /**
@@ -41,5 +44,15 @@ class CheckPassportEvent
     public function getPassport(): Passport
     {
         return $this->passport;
+    }
+
+    /**
+     * 返回请求对象
+     *
+     * @return ServerRequestInterface
+     */
+    public function getRequest(): ServerRequestInterface
+    {
+        return $this->request;
     }
 }

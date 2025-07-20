@@ -6,6 +6,7 @@ namespace Lzpeng\HyperfAuthGuard\Event;
 
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * 用户认证令牌已创建事件
@@ -17,10 +18,12 @@ class AuthenticatedTokenCreatedEvent
     /**
      * @param Passport $passport 可能需要Passport的信息对Token进行修改
      * @param TokenInterface $token
+     * @param ServerRequestInterface $request 请求对象
      */
     public function __construct(
         private Passport $passport,
-        private TokenInterface $token
+        private TokenInterface $token,
+        private ServerRequestInterface $request
     ) {}
 
     /**
@@ -54,5 +57,15 @@ class AuthenticatedTokenCreatedEvent
     public function setToken(TokenInterface $token): void
     {
         $this->token = $token;
+    }
+
+    /**
+     * 返回请求对象
+     *
+     * @return ServerRequestInterface
+     */
+    public function getRequest(): ServerRequestInterface
+    {
+        return $this->request;
     }
 }

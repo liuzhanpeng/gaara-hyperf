@@ -139,7 +139,7 @@ class Guard implements GuardInterface
                 $passport = $authenticator->authenticate($request, $this->name);
             }
 
-            $checkPassportEvent = new CheckPassportEvent($authenticator, $passport);
+            $checkPassportEvent = new CheckPassportEvent($authenticator, $passport, $request);
             $this->eventDispatcher->dispatch($checkPassportEvent);
 
             foreach ($passport->getBadges() as $badge) {
@@ -152,7 +152,7 @@ class Guard implements GuardInterface
             /**
              * @var TokenInterface $token
              */
-            $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($passport, $token))->getToken();
+            $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($passport, $token, $request))->getToken();
 
             $token->getUser()->eraseCredentials();
 
