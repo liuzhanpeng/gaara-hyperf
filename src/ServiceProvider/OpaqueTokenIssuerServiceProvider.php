@@ -25,8 +25,8 @@ class OpaqueTokenIssuerServiceProvider implements ServiceProviderInterface
         $opaqueTokenIssuerConfig = array_merge([
             'default' => [
                 'cache' => [
-                    'cache_prefix' => 'auth:opaque_token',
-                    'expires_in' => 60 * 20
+                    'prefix' => 'auth:opaque_token',
+                    'ttl' => 60 * 20,
                 ],
             ],
         ], $config->serviceConfig('opaque_token_issuers'));

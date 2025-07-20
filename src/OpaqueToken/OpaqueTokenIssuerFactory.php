@@ -27,7 +27,8 @@ class OpaqueTokenIssuerFactory
         switch ($type) {
             case 'cache':
                 return $this->container->make(CacheOpaqueTokenIssuer::class, [
-                    'cachePrefix' => $options['cache_prefix'] ?? 'auth:opaque_token:',
+                    'prefix' => $options['prefix'] ?? 'auth:opaque_token:',
+                    'ttl' => $options['ttl'] ?? 60 * 20
                 ]);
             case 'custom':
                 $customConfig = CustomConfig::from($options);

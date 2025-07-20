@@ -102,8 +102,9 @@ return [
         'opaque_token_issuers' => [
             'admin_opaque_token_issuer' => [
                 'cache' => [
-                    'cache_prefix' => 'auth:opaque_token',
-                    'expires_in' => 60 * 20,
+                    'prefix' => 'auth:opaque_token',
+                    'ttl' => 60,
+                    'expires_in' => 100
                 ],
                 // 'custom' => [
                 //     'class' => CustomOpaqueTokenIssuer::class,

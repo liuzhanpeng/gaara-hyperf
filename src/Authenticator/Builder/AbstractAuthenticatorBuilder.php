@@ -32,21 +32,19 @@ abstract class AbstractAuthenticatorBuilder implements AuthenticatorBuilderInter
             return null;
         }
 
-        $successHandlerOption = $options['success_handler'];
-        unset($options['success_handler']);
-        if (is_string($successHandlerOption)) {
-            $successHandlerOption = [
-                'class' => $successHandlerOption,
+        if (is_string($options['success_handler'])) {
+            $options['success_handler'] = [
+                'class' => $options['success_handler'],
             ];
         }
 
         $successHandler = $this->container->make(
-            $successHandlerOption['class'],
-            $successHandlerOption['args'] ?? []
+            $options['success_handler']['class'],
+            $options['success_handler']['args'] ?? []
         );
 
         if (!$successHandler instanceof AuthenticationSuccessHandlerInterface) {
-            throw new \InvalidArgumentException(sprintf('%s must implement %s', $successHandlerOption['class'], AuthenticationSuccessHandlerInterface::class));
+            throw new \InvalidArgumentException(sprintf('%s must implement %s', $options['success_handler']['class'], AuthenticationSuccessHandlerInterface::class));
         }
 
         return $successHandler;
@@ -64,21 +62,19 @@ abstract class AbstractAuthenticatorBuilder implements AuthenticatorBuilderInter
             return null;
         }
 
-        $failureHandlerOption = $options['failure_handler'];
-        unset($options['failure_handler']);
-        if (is_string($failureHandlerOption)) {
-            $failureHandlerOption = [
-                'class' => $failureHandlerOption,
+        if (!is_array($options['failure_handler'])) {
+            $options['failure_handler'] = [
+                'class' => $options['failure_handler'],
             ];
         }
 
         $failureHandler = $this->container->make(
-            $failureHandlerOption['class'],
-            $failureHandlerOption['args'] ?? []
+            $options['failure_handler']['class'],
+            $options['failure_handler']['args'] ?? []
         );
 
         if (!$failureHandler instanceof AuthenticationFailureHandlerInterface) {
-            throw new \InvalidArgumentException(sprintf('%s must implement %s', $failureHandlerOption['class'], AuthenticationFailureHandlerInterface::class));
+            throw new \InvalidArgumentException(sprintf('%s must implement %s', $options['failure_handler']['class'], AuthenticationFailureHandlerInterface::class));
         }
 
         return $failureHandler;

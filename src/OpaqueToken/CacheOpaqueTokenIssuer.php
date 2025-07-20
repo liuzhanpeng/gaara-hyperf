@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\OpaqueToken;
 
+use DateTime;
+use DateTimeImmutable;
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Psr\SimpleCache\CacheInterface;
 
@@ -16,19 +19,19 @@ class CacheOpaqueTokenIssuer implements OpaqueTokenIssuerInterface
 {
     public function __construct(
         private CacheInterface $cache,
-        private string $cachePrefix,
-        private ?int $ttl = null, // 令牌的有效期，单位为秒
+        private RequestInterface $request,
+        private string $prefix,
+        private int $ttl,
     ) {}
 
     public function issue(TokenInterface $token): OpaqueToken
     {
         $accessToken = bin2hex(random_bytes(32));
+        $expiresAt =  (new \DateTimeImmutable())->add(new \DateInterval('PT' . $this->ttl . 'S'));
+
         $this->cache->set($this->getAccessTokenKey($accessToken), $token, $this->ttl);
 
-        return new OpaqueToken(
-            $accessToken,
-            (new \DateTimeImmutable())->add(new \DateInterval('PT' . $this->ttl . 'S'))
-        );
+        return new OpaqueToken($accessToken, $expiresAt);
     }
 
     public function revoke(string $accessToken): void
@@ -39,7 +42,12 @@ class CacheOpaqueTokenIssuer implements OpaqueTokenIssuerInterface
     public function resolve(string $tokenStr, bool $refresh = true): ?TokenInterface
     {
         $token = $this->cache->get($this->getAccessTokenKey($tokenStr));
-        if (!is_null($token) && $refresh) {
+        if (is_null($token)) {
+            return null;
+        }
+
+
+        if ($refresh) {
             $this->cache->set($this->getAccessTokenKey($tokenStr), $token, $this->ttl);
         }
 
@@ -54,6 +62,6 @@ class CacheOpaqueTokenIssuer implements OpaqueTokenIssuerInterface
      */
     private function getAccessTokenKey(string $accessToken): string
     {
-        return sprintf('%s:%s', $this->cachePrefix, $accessToken);
+        return sprintf('%s:%s', $this->prefix, $accessToken);
     }
 }

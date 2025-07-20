@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\User;
 
-class MemoryUser implements UserInterface, PasswordUserInterface
+class MemoryUser implements UserInterface, PasswordUserInterface, \Serializable
 {
     public function __construct(
         private string $username,
@@ -35,5 +35,36 @@ class MemoryUser implements UserInterface, PasswordUserInterface
     public function getPassword(): string
     {
         return $this->password;
+    }
+
+    public function eraseCredentials(): void
+    {
+        $this->password = '';
+    }
+
+    public function __serialize(): array
+    {
+        return [$this->username, $this->password];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        [$this->username, $this->password] = $data;
+    }
+
+    /**
+     * @internal
+     */
+    final public function serialize(): string
+    {
+        throw new \BadMethodCallException('Cannot serialize ' . __CLASS__);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    final public function unserialize(string $serialized): void
+    {
+        $this->__unserialize(unserialize($serialized));
     }
 }

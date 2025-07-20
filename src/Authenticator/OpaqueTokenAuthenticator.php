@@ -41,9 +41,9 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
     {
         $accessToken = $this->extractAccessToken($request);
 
-        $token = $this->tokenIssuer->resolve($accessToken, $this->options['refresh']);
+        $token = $this->tokenIssuer->resolve($accessToken, $this->options['token_refresh']);
         if (is_null($token)) {
-            throw new UnauthenticatedException('Token is invalid.');
+            throw new UnauthenticatedException();
         }
 
         return new Passport(

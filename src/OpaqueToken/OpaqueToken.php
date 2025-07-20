@@ -11,7 +11,7 @@ class OpaqueToken
 {
     /**
      * @param string $tokenStr
-     * @param DateTimeInterface|null $expiresAt
+     * @param DateTimeInterface|null $expiresAt 过期时间
      */
     public function __construct(
         private string $tokenStr,

@@ -11,6 +11,7 @@ use Lzpeng\HyperfAuthGuard\ServiceProvider\BuiltInAuthenticatorServiceProvider;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\BuiltInUserProviderServiceProvider;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\CsrfTokenManagerServiceProvider;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\GuardServiceProvider;
+use Lzpeng\HyperfAuthGuard\ServiceProvider\OpaqueTokenIssuerServiceProvider;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\PasswordHasherServiceProvider;
 
 /**
@@ -39,10 +40,15 @@ class AuthInitListener implements ListenerInterface
      */
     public function process(object $event): void
     {
+        /**
+         * @var AuthInitializer $initializer
+         */
         $initializer = $this->container->get(AuthInitializer::class);
+
         // 注册内置服务提供者
         $initializer->registerService(new PasswordHasherServiceProvider())
             ->registerService(new CsrfTokenManagerServiceProvider())
+            ->registerService(new OpaqueTokenIssuerServiceProvider())
             ->registerService(new BuiltInUserProviderServiceProvider())
             ->registerService(new BuiltInAuthenticatorServiceProvider())
             ->registerService(new GuardServiceProvider())

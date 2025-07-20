@@ -14,7 +14,6 @@ use Lzpeng\HyperfAuthGuard\Event\AuthenticationSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
 use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
-use Lzpeng\HyperfAuthGuard\Exception\InvalidCredentialsException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\RequestMatcher\RequestMatcherInterface;
 use Lzpeng\HyperfAuthGuard\Token\AuthenticatedToken;
@@ -150,7 +149,12 @@ class Guard implements GuardInterface
             }
 
             $token = $authenticator->createToken($passport, $this->name);
+            /**
+             * @var TokenInterface $token
+             */
             $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($passport, $token))->getToken();
+
+            $token->getUser()->eraseCredentials();
 
             return $this->handleAuthenticationSuccess($request, $authenticator, $passport, $token);
         } catch (AuthenticationException $exception) {

@@ -17,3 +17,4 @@ An authentication library for hyperf
 - [ ] IP WhiteList
 - [ ] Limiting Login Attempts
 - [ ] Password expiration strategy
+- [ ] IP Binding/UA binding
