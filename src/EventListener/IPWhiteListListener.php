@@ -6,6 +6,7 @@ namespace Lzpeng\HyperfAuthGuard\EventListener;
 
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
+use Lzpeng\HyperfAuthGuard\Exception\IPNotInWhiteListException;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -35,7 +36,7 @@ class IPWhiteListListener implements EventSubscriberInterface
             return;
         }
 
-        throw new AuthenticationException('IP not in whitelist', $passport->getUser()->getIdentifier());
+        throw new IPNotInWhiteListException('IP not in whitelist', $passport->getUser()->getIdentifier());
     }
 
     /**
