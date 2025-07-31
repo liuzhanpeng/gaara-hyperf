@@ -12,6 +12,7 @@ use Lzpeng\HyperfAuthGuard\Event\AuthenticatedTokenCreatedEvent;
 use Lzpeng\HyperfAuthGuard\Event\AuthenticationFailureEvent;
 use Lzpeng\HyperfAuthGuard\Event\AuthenticationSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
+use Lzpeng\HyperfAuthGuard\Event\LoginSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
@@ -154,8 +155,6 @@ class Guard implements GuardInterface
              */
             $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($passport, $token, $request))->getToken();
 
-            $token->getUser()->eraseCredentials();
-
             return $this->handleAuthenticationSuccess($request, $authenticator, $passport, $token);
         } catch (AuthenticationException $exception) {
             return $this->handleAuthenticationFailure($request, $authenticator, $exception, $passport);
@@ -172,26 +171,20 @@ class Guard implements GuardInterface
      */
     private function handleAuthenticationSuccess(ServerRequestInterface $request, AuthenticatorInterface $authenticator, Passport $passport, TokenInterface $token): ?ResponseInterface
     {
+        $token->getUser()->eraseCredentials();
         $previousToken = $this->tokenContext->getToken();
         $this->tokenContext->setToken($token);
-        if ($authenticator->isInteractive()) {
-            $this->tokenStorage->set($this->name, $token);
-        }
 
         $response = $authenticator->onAuthenticationSuccess($request, $token);
 
-        $authenticationSuccess = new AuthenticationSuccessEvent(
-            $authenticator,
-            $passport,
-            $token,
-            $request,
-            $response,
-            $previousToken
-        );
+        if ($authenticator->isInteractive()) {
+            $response = $this->eventDispatcher->dispatch(new LoginSuccessEvent($authenticator, $passport, $token, $request, $response, $previousToken))->getResponse();
+            $this->tokenStorage->set($this->name, $token);
+        } else {
+            $response = $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($authenticator, $passport, $token, $request, $response, $previousToken))->getResponse();
+        }
 
-        $this->eventDispatcher->dispatch($authenticationSuccess);
-
-        return $authenticationSuccess->getResponse();
+        return $response;
     }
 
     /**
@@ -207,17 +200,7 @@ class Guard implements GuardInterface
     {
         $response = $authenticator->onAuthenticationFailure($request, $exception, $passport);
 
-        $authenticationFailureEvent = new AuthenticationFailureEvent(
-            $authenticator,
-            $passport,
-            $exception,
-            $request,
-            $response
-        );
-
-        $this->eventDispatcher->dispatch($authenticationFailureEvent);
-
-        return $authenticationFailureEvent->getResponse();
+        return $this->eventDispatcher->dispatch(new AuthenticationFailureEvent($authenticator, $passport, $exception, $request, $response))->getResponse();
     }
 
     /**

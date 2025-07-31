@@ -6,7 +6,10 @@
     "autoload": {
         "psr-4": {
             "Lzpeng\\HyperfAuthGuard\\": "src/"
-        }
+        },
+        "files": [
+            "src/functions.php"
+        ]
     },
     "authors": [
         {
