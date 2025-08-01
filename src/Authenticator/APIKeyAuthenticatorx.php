@@ -17,7 +17,7 @@ use Psr\Http\Message\ResponseInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class ApiKeyAuthenticator implements AuthenticatorInterface
+class APIKeyAuthenticator implements AuthenticatorInterface
 {
     public function __construct(
         private UserProviderInterface $userProvider,

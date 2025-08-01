@@ -14,7 +14,6 @@ use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
-use PHPUnit\Event\Runtime\PHP;
 use Psr\Http\Message\ResponseInterface;
 
 /**

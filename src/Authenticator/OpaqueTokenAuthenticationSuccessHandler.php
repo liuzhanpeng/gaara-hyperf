@@ -14,7 +14,7 @@ use Psr\Http\Message\ResponseInterface;
  *
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class OpaqueTokenResponseHandler implements AuthenticationSuccessHandlerInterface
+class OpaqueTokenAuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
     public function __construct(
         private OpaqueTokenIssuerResolverInterface $opaqueTokenIssuerResolver,
