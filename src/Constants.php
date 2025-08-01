@@ -18,6 +18,7 @@ final class Constants
     public const PASSWORD_HASHER_PREFIX = 'auth.password_hasher';
     public const CSRF_TOKEN_MANAGER_PREFIX = 'auth.csrf_token_manager';
     public const OPAQUE_TOKEN_ISSUER_PREFIX = 'auth.opaque_token_issuer';
+    public const RATE_LIMITER_FACTORY_PREFIX = 'auth.rate_limiter_factory';
 
     private function __construct() {}
 }

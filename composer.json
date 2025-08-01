@@ -25,7 +25,8 @@
         "hyperf/http-server": "^3.1",
         "hyperf/db-connection": "^3.1",
         "hyperf/cache": "^3.1",
-        "symfony/event-dispatcher": "^6.4"
+        "symfony/event-dispatcher": "^6.4",
+        "symfony/rate-limiter": "^7.3"
     },
     "extra": {
         "hyperf": {
