@@ -13,12 +13,12 @@ class RequestMatcherConfig
 {
     /**
      * @param string $pattern
-     * @param string $logoutPath
+     * @param string|null $logoutPath
      * @param array $exclusions
      */
     public function __construct(
         private string $pattern,
-        private string $logoutPath,
+        private ?string $logoutPath,
         private array $exclusions
     ) {}
 
@@ -32,11 +32,7 @@ class RequestMatcherConfig
             throw new \InvalidArgumentException('pattern is required in request matcher config');
         }
 
-        if (!isset($config['logout_path'])) {
-            throw new \InvalidArgumentException('logout_path is required in request matcher config');
-        }
-
-        return new self($config['pattern'], $config['logout_path'], $config['exclusions'] ?? []);
+        return new self($config['pattern'], $config['logout_path'] ?? null, $config['exclusions'] ?? []);
     }
 
     /**
@@ -52,9 +48,9 @@ class RequestMatcherConfig
     /**
      * 获取注销路径
      *
-     * @return string
+     * @return string|null
      */
-    public function logoutPath(): string
+    public function logoutPath(): string|null
     {
         return $this->logoutPath;
     }

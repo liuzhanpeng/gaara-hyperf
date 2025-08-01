@@ -17,12 +17,12 @@ class RequestMatcher implements RequestMatcherInterface
 {
     /**
      * @param string $pattern  匹配的路径模式
-     * @param string $logoutPath 注销路径
+     * @param string|null $logoutPath 注销路径
      * @param array $exclusions 排除的路径模式数组
      */
     public function __construct(
         private string $pattern,
-        private string $logoutPath,
+        private ?string $logoutPath,
         private array $exclusions
     ) {}
 
@@ -35,6 +35,10 @@ class RequestMatcher implements RequestMatcherInterface
 
     public function matchesLogout(ServerRequestInterface $request): bool
     {
+        if (is_null($this->logoutPath)) {
+            return false;
+        }
+
         return strcmp($request->getUri()->getPath(), $this->logoutPath) === 0;
     }
 
