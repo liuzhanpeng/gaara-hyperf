@@ -13,10 +13,6 @@ class ApiKeyAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
-        if (!isset($options['check_path'])) {
-            throw new \InvalidArgumentException('The "check_path" option must be set.');
-        }
-
         $options = array_merge([
             'api_key_param' => 'X-API-KEY',
         ], $options);
