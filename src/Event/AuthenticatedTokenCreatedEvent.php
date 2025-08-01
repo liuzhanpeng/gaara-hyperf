@@ -16,15 +16,27 @@ use Psr\Http\Message\ServerRequestInterface;
 class AuthenticatedTokenCreatedEvent
 {
     /**
+     * @param string $guardName 认证守卫名称
      * @param Passport $passport 可能需要Passport的信息对Token进行修改
-     * @param TokenInterface $token
+     * @param TokenInterface $token 认证令牌
      * @param ServerRequestInterface $request 请求对象
      */
     public function __construct(
+        private string $guardName,
         private Passport $passport,
         private TokenInterface $token,
         private ServerRequestInterface $request
     ) {}
+
+    /**
+     * 返回认证守卫名称
+     *
+     * @return string
+     */
+    public function getGuardName(): string
+    {
+        return $this->guardName;
+    }
 
     /**
      * 返回Passport

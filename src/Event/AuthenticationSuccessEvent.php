@@ -18,14 +18,16 @@ use Psr\Http\Message\ResponseInterface;
 class AuthenticationSuccessEvent
 {
     /**
-     * @param AuthenticatorInterface $authenticator
-     * @param Passport $passport
-     * @param TokenInterface $token
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface|null $response
-     * @param TokenInterface|null $previousToken
+     * @param string $guardName 认证守卫名称
+     * @param AuthenticatorInterface $authenticator 认证器
+     * @param Passport $passport 认证通行证
+     * @param TokenInterface $token 认证令牌
+     * @param ServerRequestInterface $request 请求对象
+     * @param ResponseInterface|null $response 响应对象
+     * @param TokenInterface|null $previousToken 上一个认证令牌
      */
     public function __construct(
+        private string $guardName,
         private AuthenticatorInterface $authenticator,
         private Passport $passport,
         private TokenInterface $token,
@@ -33,6 +35,16 @@ class AuthenticationSuccessEvent
         private ?ResponseInterface $response,
         private ?TokenInterface $previousToken
     ) {}
+
+    /**
+     * 返回认证守卫名称
+     *
+     * @return string
+     */
+    public function getGuardName(): string
+    {
+        return $this->guardName;
+    }
 
     /**
      * 返回认证器

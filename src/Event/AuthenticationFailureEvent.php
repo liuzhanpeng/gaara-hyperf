@@ -18,19 +18,31 @@ use Psr\Http\Message\ResponseInterface;
 class AuthenticationFailureEvent
 {
     /**
-     * @param AuthenticatorInterface $authenticator
-     * @param Passport|null $passport
-     * @param AuthenticationException $exception
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface|null $response
+     * @param string $guardName 认证守卫名称
+     * @param AuthenticatorInterface $authenticator 认证器
+     * @param Passport|null $passport 认证通行证
+     * @param AuthenticationException $exception 认证异常
+     * @param ServerRequestInterface $request 请求对象
+     * @param ResponseInterface|null $response 响应对象
      */
     public function __construct(
+        private string $guardName,
         private AuthenticatorInterface $authenticator,
         private ?Passport $passport,
         private AuthenticationException $exception,
         private ServerRequestInterface $request,
         private ?ResponseInterface $response
     ) {}
+
+    /**
+     * 返回认证守卫名称
+     *
+     * @return string
+     */
+    public function getGuardName(): string
+    {
+        return $this->guardName;
+    }
 
     /**
      * 返回认证器

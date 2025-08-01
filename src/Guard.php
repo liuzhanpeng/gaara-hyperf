@@ -57,16 +57,36 @@ class Guard implements GuardInterface
         private EventDispatcherInterface $eventDispatcher
     ) {}
 
+    /**
+     * 返回认证守卫名称
+     *
+     * @return string
+     */
     public function name(): string
     {
         return $this->name;
     }
 
+    /**
+     * 检查请求是否匹配当前守卫
+     *
+     * @param ServerRequestInterface $request
+     * @return boolean
+     */
     public function supports(ServerRequestInterface $request): bool
     {
         return $this->requestMatcher->matchesPattern($request);
     }
 
+    /**
+     * 认证用户
+     *
+     * @param UserInterface $user
+     * @param ServerRequestInterface $request
+     * @param string|null $authenticator
+     * @param array $badges
+     * @return ResponseInterface|null
+     */
     public function authenticateUser(UserInterface $user, ServerRequestInterface $request, ?string $authenticator = null, array $badges = []): ?ResponseInterface
     {
         $passport = new Passport($this->name, $user->getIdentifier(), fn() => $user, $badges);
@@ -90,6 +110,12 @@ class Guard implements GuardInterface
         return $this->authenticators[$authenticator] ?? null;
     }
 
+    /**
+     * 认证请求
+     *
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface|null
+     */
     public function authenticate(ServerRequestInterface $request): ?ResponseInterface
     {
         $token = $this->tokenStorage->get($this->name);
@@ -140,7 +166,7 @@ class Guard implements GuardInterface
                 $passport = $authenticator->authenticate($request, $this->name);
             }
 
-            $checkPassportEvent = new CheckPassportEvent($authenticator, $passport, $request);
+            $checkPassportEvent = new CheckPassportEvent($this->name, $authenticator, $passport, $request);
             $this->eventDispatcher->dispatch($checkPassportEvent);
 
             foreach ($passport->getBadges() as $badge) {
@@ -153,7 +179,7 @@ class Guard implements GuardInterface
             /**
              * @var TokenInterface $token
              */
-            $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($passport, $token, $request))->getToken();
+            $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($this->name, $passport, $token, $request))->getToken();
 
             return $this->handleAuthenticationSuccess($request, $authenticator, $passport, $token);
         } catch (AuthenticationException $exception) {
@@ -178,10 +204,10 @@ class Guard implements GuardInterface
         $response = $authenticator->onAuthenticationSuccess($request, $token);
 
         if ($authenticator->isInteractive()) {
-            $response = $this->eventDispatcher->dispatch(new LoginSuccessEvent($authenticator, $passport, $token, $request, $response, $previousToken))->getResponse();
+            $response = $this->eventDispatcher->dispatch(new LoginSuccessEvent($this->name, $authenticator, $passport, $token, $request, $response, $previousToken))->getResponse();
             $this->tokenStorage->set($this->name, $token);
         } else {
-            $response = $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($authenticator, $passport, $token, $request, $response, $previousToken))->getResponse();
+            $response = $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($this->name, $authenticator, $passport, $token, $request, $response, $previousToken))->getResponse();
         }
 
         return $response;
@@ -200,7 +226,7 @@ class Guard implements GuardInterface
     {
         $response = $authenticator->onAuthenticationFailure($request, $exception, $passport);
 
-        return $this->eventDispatcher->dispatch(new AuthenticationFailureEvent($authenticator, $passport, $exception, $request, $response))->getResponse();
+        return $this->eventDispatcher->dispatch(new AuthenticationFailureEvent($this->name, $authenticator, $passport, $exception, $request, $response))->getResponse();
     }
 
     /**
