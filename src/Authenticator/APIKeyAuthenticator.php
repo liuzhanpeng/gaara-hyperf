@@ -25,10 +25,6 @@ class APIKeyAuthenticator implements AuthenticatorInterface
         private ?AuthenticationFailureHandlerInterface $failureHandler,
         private array $options,
     ) {
-        if (!isset($options['check_path'])) {
-            throw new \InvalidArgumentException('The "check_path" option must be set.');
-        }
-
         $this->options = array_merge([
             'api_key_param' => 'X-API-KEY',
         ], $this->options);
