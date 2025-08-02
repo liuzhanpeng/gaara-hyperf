@@ -64,6 +64,16 @@ class Passport
     }
 
     /**
+     * 返回用户标识
+     *
+     * @return string
+     */
+    public function getUserIdentifier(): string
+    {
+        return $this->userIdentifier;
+    }
+
+    /**
      * 返回所属用户
      *
      * @return UserInterface

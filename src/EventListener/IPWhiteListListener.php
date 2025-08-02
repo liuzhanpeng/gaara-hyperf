@@ -7,7 +7,6 @@ namespace Lzpeng\HyperfAuthGuard\EventListener;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
 use Lzpeng\HyperfAuthGuard\Exception\IPNotInWhiteListException;
 use Lzpeng\HyperfAuthGuard\Utils\IpResolver;
-use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**

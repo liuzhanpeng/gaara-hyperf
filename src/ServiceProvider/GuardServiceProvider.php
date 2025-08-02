@@ -9,11 +9,13 @@ use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorFactory;
 use Lzpeng\HyperfAuthGuard\Config\ConfigLoaderInterface;
 use Lzpeng\HyperfAuthGuard\Config\GuardConfig;
 use Lzpeng\HyperfAuthGuard\Constants;
+use Lzpeng\HyperfAuthGuard\EventListener\LoginThrottlingListener;
 use Lzpeng\HyperfAuthGuard\EventListener\PasswordBadgeCheckListener;
 use Lzpeng\HyperfAuthGuard\Guard;
 use Lzpeng\HyperfAuthGuard\GuardInterface;
 use Lzpeng\HyperfAuthGuard\GuardResolver;
 use Lzpeng\HyperfAuthGuard\GuardResolverInterface;
+use Lzpeng\HyperfAuthGuard\LoginThrottler\LoginThrottlerFactory;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolverInterface;
 use Lzpeng\HyperfAuthGuard\RequestMatcher\RequestMatcher;
 use Lzpeng\HyperfAuthGuard\Token\TokenContext;
@@ -21,6 +23,7 @@ use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
 use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageFactory;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandlerFactory;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderFactory;
+use Lzpeng\HyperfAuthGuard\Utils\IpResolver;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -81,10 +84,6 @@ class GuardServiceProvider implements ServiceProviderInterface
 
         $eventDispatcher = new EventDispatcher();
 
-        // 内置密码验证监听器
-        $passwordHasherId = $container->get(PasswordHasherResolverInterface::class)->resolve($guardConfig->passwordHasherId());
-        $eventDispatcher->addSubscriber(new PasswordBadgeCheckListener($passwordHasherId));
-
         // 注册自定义监听器
         foreach ($guardConfig->listenerConfigCollection() as $listenerConfig) {
             $listener = $container->make($listenerConfig->class(), $listenerConfig->args());
@@ -94,6 +93,17 @@ class GuardServiceProvider implements ServiceProviderInterface
 
             $eventDispatcher->addSubscriber($listener);
         }
+
+        // 注册登录限流监听器
+        $loginThrottlerConfig = $guardConfig->loginThrottlerConfig();
+        $eventDispatcher->addSubscriber(new LoginThrottlingListener(
+            $container->get(LoginThrottlerFactory::class)->create($loginThrottlerConfig),
+            $container->get(IpResolver::class)
+        ));
+
+        // 内置密码验证监听器
+        $passwordHasherId = $container->get(PasswordHasherResolverInterface::class)->resolve($guardConfig->passwordHasherId());
+        $eventDispatcher->addSubscriber(new PasswordBadgeCheckListener($passwordHasherId));
 
         $authenticators = [];
         $userProvider = $container->get(UserProviderFactory::class)->create($guardConfig->userProviderConfig());

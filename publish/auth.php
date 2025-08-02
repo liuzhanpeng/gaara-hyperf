@@ -59,9 +59,6 @@ return [
                 //    'args' => []
                 // ]
             ],
-            'listeners' =>  [
-                // CustomListener::class,
-            ],
             // 'authorization' => [
             //     'checker' => [
             //         'class' => AuthorizationChecker::class,
@@ -73,6 +70,15 @@ return [
             //     ],
             // ],
             // 'password_hasher' => 'default'
+            'login_throttler' => [
+                'sliding_window' => [
+                    'max_attempts' => 5,
+                    'interval' => 300,
+                ]
+            ],
+            'listeners' =>  [
+                // CustomListener::class,
+            ],
         ],
     ],
 
