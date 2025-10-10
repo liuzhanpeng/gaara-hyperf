@@ -30,7 +30,7 @@ return [
                         'class' => OpaqueTokenResponseHandler::class,
                         'args' => [
                             // 'tokenIssuer' => 'admin_opaque_token_issuer',
-                            // 'responseTemplate' => '{ "code": 0, "msg": "success", "data": { "access_token": "#TOKEN#"} }',
+                            // 'responseTemplate' => '{ "code": 0, "msg": "success", "data": { "access_token": "#ACCESS_TOKEN#"} }',
                         ],
                     ],
                     'failure_handler' => CustomFailureHandler::class,

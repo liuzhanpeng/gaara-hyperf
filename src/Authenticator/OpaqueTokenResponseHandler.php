@@ -32,7 +32,7 @@ class OpaqueTokenResponseHandler implements AuthenticationSuccessHandlerInterfac
                 throw new \InvalidArgumentException('Response template must be a valid JSON string');
             }
 
-            $responseData = json_decode(str_replace('#TOKEN#', (string)$accessToken, $this->responseTemplate), true);
+            $responseData = json_decode(str_replace('#ACCESS_TOKEN#', (string)$accessToken, $this->responseTemplate), true);
 
             return $this->response->json($responseData);
         }
