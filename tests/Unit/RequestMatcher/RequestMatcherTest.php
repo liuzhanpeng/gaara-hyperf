@@ -48,4 +48,12 @@ describe('RequestMatcher', function () {
         $request2 = mockRequest('/api/user/1');
         expect($matcher->matchesPattern($request2))->toBeFalse();
     });
+
+    it('matches pattern with wildcard', function () {
+        $matcher = new RequestMatcher('^/api/user/.*$', '/logout', []);
+        $request = mockRequest('/api/user');
+        expect($matcher->matchesPattern($request))->toBeFalse();
+        $request2 = mockRequest('/api/user/1');
+        expect($matcher->matchesPattern($request2))->toBeTrue();
+    });
 });
