@@ -7,7 +7,7 @@ namespace Lzpeng\HyperfAuthGuard\Authenticator\Builder;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\OpaqueTokenAuthenticator;
 use Lzpeng\HyperfAuthGuard\EventListener\OpaqueTokenRevokeLogoutListener;
-use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerResolverInterface;
+use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\OpaqueTokenIssuerResolverInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 

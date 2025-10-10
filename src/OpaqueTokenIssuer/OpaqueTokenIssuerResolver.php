@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\OpaqueToken;
+namespace Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer;
 
 use Hyperf\Contract\ContainerInterface;
 

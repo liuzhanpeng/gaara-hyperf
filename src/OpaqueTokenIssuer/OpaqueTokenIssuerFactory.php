@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\OpaqueToken;
+namespace Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer;
 
-use COM;
 use Hyperf\Contract\ContainerInterface;
 use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
 use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\OpaqueToken\CacheOpaqueTokenIssuer;
-use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerInterface;
+use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\CacheOpaqueTokenIssuer;
+use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\OpaqueTokenIssuerInterface;
 
 /**
  * OpaqueToken发行器创建工厂

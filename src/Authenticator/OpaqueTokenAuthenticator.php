@@ -7,7 +7,7 @@ namespace Lzpeng\HyperfAuthGuard\Authenticator;
 use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Exception\UnauthenticatedException;
-use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerInterface;
+use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\OpaqueTokenIssuerInterface;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;

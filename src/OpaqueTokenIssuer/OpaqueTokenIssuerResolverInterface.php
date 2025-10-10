@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\OpaqueToken;
+namespace Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer;
 
 /**
  * OpaqueToken发行器解析器接口
