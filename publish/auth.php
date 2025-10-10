@@ -6,7 +6,8 @@ return [
             'matcher' => [
                 'pattern' => '^/admin/',
                 'logout_path' => '/admin/logout',
-                'exclusions' => []
+                'exclusions' => [],
+                'cache_size' => 100, // 可选，启用路径匹配缓存，设置缓存大小，0表示不启用缓存
             ],
             'user_provider' => [
                 'memory' => [
@@ -69,8 +70,8 @@ return [
             //         'args' => []
             //     ],
             // ],
-            // 'password_hasher' => 'default'
-            'login_throttler' => [
+            'password_hasher' => 'admin',
+            'login_rate_limiter' => [
                 'sliding_window' => [
                     'max_attempts' => 5,
                     'interval' => 300,

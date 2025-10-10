@@ -24,7 +24,7 @@ class PasswordHasherResolver implements PasswordHasherResolverInterface
     public function resolve(string $name = 'default'): PasswordHasherInterface
     {
         if (!isset($this->passwordHasherMap[$name])) {
-            throw new \InvalidArgumentException("密码哈希器不存在: $name");
+            throw new \InvalidArgumentException(sprintf('Password hasher "%s" is not defined', $name));
         }
 
         $passwordHasherId = $this->passwordHasherMap[$name];

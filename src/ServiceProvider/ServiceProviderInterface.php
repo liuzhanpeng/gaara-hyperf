@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\ServiceProvider;
 
 use Hyperf\Contract\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * 服务提供者接口
+ * 
+ * 通过实现该接口, 可以向认证组件注册服务
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */

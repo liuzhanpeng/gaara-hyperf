@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authenticator\Builder;
 
-use Lzpeng\HyperfAuthGuard\Authenticator\ApiKeyAuthenticator;
+use Lzpeng\HyperfAuthGuard\Authenticator\APIKeyAuthenticator;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class ApiKeyAuthenticatorBuilder extends AbstractAuthenticatorBuilder
+class APIKeyAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
@@ -20,7 +20,7 @@ class ApiKeyAuthenticatorBuilder extends AbstractAuthenticatorBuilder
         $successHandler = $this->createSuccessHandler($options);
         $failureHandler = $this->createFailureHandler($options);
 
-        return new ApiKeyAuthenticator(
+        return new APIKeyAuthenticator(
             userProvider: $userProvider,
             successHandler: $successHandler,
             failureHandler: $failureHandler,

@@ -28,7 +28,7 @@ class CsrfTokenManagerServiceProvider implements ServiceProviderInterface
                     'prefix' => 'auth.csrf_token',
                 ],
             ],
-        ], $config->serviceConfig('csrf_token_managers'));
+        ], $config->serviceConfig('csrf_token_managers') ?? []);
 
         $csrfTokenManagerMap = [];
         foreach ($csrfTokenManagerConfig as $name => $config) {

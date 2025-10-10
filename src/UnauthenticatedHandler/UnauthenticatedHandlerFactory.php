@@ -19,7 +19,7 @@ use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandlerInterfac
 class UnauthenticatedHandlerFactory
 {
     public function __construct(
-        private ContainerInterface  $container,
+        private ContainerInterface $container,
     ) {}
 
     public function create(UnauthenticatedHandlerConfig $unauthenticatedHandlerConfig): UnauthenticatedHandlerInterface
@@ -39,13 +39,13 @@ class UnauthenticatedHandlerFactory
 
                 $unauthenticatedHandler = $this->container->make($customConfig->class(), $customConfig->args());
                 if (!$unauthenticatedHandler instanceof UnauthenticatedHandlerInterface) {
-                    throw new \InvalidArgumentException(sprintf('%s must implement %s', $customConfig->class(), UnauthenticatedHandlerInterface::class));
+                    throw new \InvalidArgumentException(sprintf('Unauthenticated Handler "%s" must implement %s', $customConfig->class(), UnauthenticatedHandlerInterface::class));
                 }
 
                 return $unauthenticatedHandler;
 
             default:
-                throw new \InvalidArgumentException("不支持的未认证处理器类型: $type");
+                throw new \InvalidArgumentException(sprintf('Unsupported unauthenticated handler type: %s', $type));
         }
     }
 }

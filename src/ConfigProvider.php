@@ -14,7 +14,6 @@ class ConfigProvider
         return [
             'dependencies' => [
                 ConfigLoaderInterface::class => ConfigLoader::class,
-                AuthInitializer::class => AuthInitializer::class,
             ],
             'listeners' => [
                 AuthInitListener::class,

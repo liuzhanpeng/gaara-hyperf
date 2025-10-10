@@ -18,7 +18,6 @@ class JsonLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
         }
 
         $options = array_merge([
-            'target_path' => '/',
             'username_param' => 'username',
             'password_param' => 'password',
         ], $options);

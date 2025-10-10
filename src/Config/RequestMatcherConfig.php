@@ -19,7 +19,8 @@ class RequestMatcherConfig
     public function __construct(
         private string $pattern,
         private ?string $logoutPath,
-        private array $exclusions
+        private array $exclusions,
+        private int $cacheSize,
     ) {}
 
     /**
@@ -32,7 +33,7 @@ class RequestMatcherConfig
             throw new \InvalidArgumentException('pattern is required in request matcher config');
         }
 
-        return new self($config['pattern'], $config['logout_path'] ?? null, $config['exclusions'] ?? []);
+        return new self($config['pattern'], $config['logout_path'] ?? null, $config['exclusions'] ?? [], $config['cache_size'] ?? 0);
     }
 
     /**
@@ -63,5 +64,15 @@ class RequestMatcherConfig
     public function exclusions(): array
     {
         return $this->exclusions;
+    }
+
+    /**
+     * 获取缓存大小
+     *
+     * @return integer
+     */
+    public function cacheSize(): int
+    {
+        return $this->cacheSize;
     }
 }

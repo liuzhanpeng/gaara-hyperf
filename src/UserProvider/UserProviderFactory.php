@@ -23,6 +23,9 @@ class UserProviderFactory
      */
     private array $builders = [];
 
+    /**
+     * @param ContainerInterface $container
+     */
     public function __construct(
         private ContainerInterface $container
     ) {}
@@ -44,15 +47,22 @@ class UserProviderFactory
 
             $userProvider = $this->container->make($customConfig->class(), $customConfig->args());
             if (!$userProvider instanceof UserProviderInterface) {
-                throw new \LogicException("自定义类型的用户提供器必须实现UserProviderInterface接口");
+                throw new \LogicException("The custom user provider must implement the UserProviderInterface.");
             }
 
             return $userProvider;
         }
 
-        throw new \InvalidArgumentException("未支持的用户提供器类型: {$type}");
+        throw new \InvalidArgumentException("Unsupported user provider type: {$type}");
     }
 
+    /**
+     * 注册用户提供者构建器
+     *
+     * @param string $type
+     * @param string $builderClass
+     * @return void
+     */
     public function registerBuilder(string $type, string $builderClass): void
     {
         if (!is_subclass_of($builderClass, UserProviderBuilderInterface::class)) {

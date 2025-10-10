@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard;
 
 use Hyperf\Contract\ContainerInterface;
+use Lzpeng\HyperfAuthGuard\ServiceProvider\ServiceProviderRegisterEvent;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\BuiltInAuthenticatorServiceProvider;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\BuiltInUserProviderServiceProvider;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\CsrfTokenManagerServiceProvider;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\GuardServiceProvider;
+use Lzpeng\HyperfAuthGuard\ServiceProvider\OpaqueTokenIssuerServiceProvider;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\PasswordHasherServiceProvider;
-use Lzpeng\HyperfAuthGuard\ServiceProvider\ServiceProviderInterface;
-use Lzpeng\HyperfAuthGuard\ServiceProvider\ServiceProviderManager;
+use Lzpeng\HyperfAuthGuard\ServiceProvider\ServiceProviderRegistrar;
+use Lzpeng\HyperfAuthGuard\ServiceProvider\ServiceProviderRegistry;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 /**
  * 认证组件初始化器
@@ -21,11 +24,6 @@ use Lzpeng\HyperfAuthGuard\ServiceProvider\ServiceProviderManager;
 class AuthInitializer
 {
     /**
-     * @var ServiceProviderInterface[]
-     */
-    private array $providers = [];
-
-    /**
      * @param ContainerInterface $container
      */
     public function __construct(
@@ -33,34 +31,32 @@ class AuthInitializer
     ) {}
 
     /**
+     * 初始化认证组件
+     *
      * @return void
      */
-    public function boot(): void
+    public function init(): void
     {
-        foreach ($this->providers as $provider) {
+        $serviceProviderRegistry = new ServiceProviderRegistry();
+
+        // 注册内置服务提供者
+        $serviceProviderRegistry
+            ->register(new BuiltInAuthenticatorServiceProvider())
+            ->register(new BuiltInUserProviderServiceProvider())
+            ->register(new PasswordHasherServiceProvider())
+            ->register(new CsrfTokenManagerServiceProvider())
+            ->register(new OpaqueTokenIssuerServiceProvider())
+            ->register(new GuardServiceProvider());
+
+        /**
+         * @var EventDispatcherInterface $eventDispatcher
+         */
+        $eventDispatcher = $this->container->get(EventDispatcherInterface::class);
+        // 分发认证服务注册事件，允许用户注册自定义的服务提供者
+        $eventDispatcher->dispatch(new ServiceProviderRegisterEvent($serviceProviderRegistry));
+
+        foreach ($serviceProviderRegistry->getProviders() as $provider) {
             $provider->register($this->container);
         }
-    }
-
-    /**
-     * 注册服务
-     * 
-     * 组件调用使用者可以重新注入AuthInitializer实现注册服务, 例:
-     * ```php
-     * // 在 config/autoload/dependencies.php 中
-     * AuthInitializer::class => function (ContainerInterface $container) {
-     *     $authInitializer = new AuthInitializer($container);
-     *     $authInitializer->registerService(new CustomServiceProvider());
-     *     return $authInitializer;
-     * }
-     * ```
-     *
-     * @param ServiceProviderInterface $providers
-     * @return self
-     */
-    public function registerService(ServiceProviderInterface $providers): self
-    {
-        $this->providers[] = $providers;
-        return $this;
     }
 }

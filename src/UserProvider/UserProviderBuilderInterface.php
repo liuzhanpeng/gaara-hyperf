@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\UserProvider;
 
+/**
+ * 用户提供者构建器接口
+ * 
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
 interface UserProviderBuilderInterface
 {
     /**

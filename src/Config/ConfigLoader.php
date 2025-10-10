@@ -9,6 +9,8 @@ use Hyperf\Contract\ConfigInterface;
 /**
  * 内置的配置加载器
  * 
+ * 通过Hyperf的配置组件加载配置
+ * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class ConfigLoader implements ConfigLoaderInterface

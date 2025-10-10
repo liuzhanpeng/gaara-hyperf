@@ -24,10 +24,19 @@ class AuthenticatorFactory
      */
     private array $builders = [];
 
+    /**
+     * @param ContainerInterface $container
+     */
     public function __construct(
         private ContainerInterface $container,
     ) {}
 
+    /**
+     * @param AuthenticatorConfig $authenticatorConfig
+     * @param UserProviderInterface $userProvider
+     * @param EventDispatcher $eventDispatcher
+     * @return AuthenticatorInterface
+     */
     public function create(
         AuthenticatorConfig $authenticatorConfig,
         UserProviderInterface $userProvider,
@@ -48,7 +57,7 @@ class AuthenticatorFactory
             return $authenticator;
         }
 
-        throw new \InvalidArgumentException("未支持的认证器类型: {$type}");
+        throw new \InvalidArgumentException(sprintf("Unsupported authenticator type: %s", $type));
     }
 
     /**

@@ -9,7 +9,7 @@ namespace Lzpeng\HyperfAuthGuard\Config;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class LoginThrottlerConfig
+class LoginRateLimiterConfig
 {
     /**
      * @param string $type

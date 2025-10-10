@@ -7,7 +7,7 @@ namespace Lzpeng\HyperfAuthGuard\Passport;
 use Lzpeng\HyperfAuthGuard\Exception\InvalidPasswordException;
 
 /**
- * 密码凭证
+ * 密码凭证标识
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */

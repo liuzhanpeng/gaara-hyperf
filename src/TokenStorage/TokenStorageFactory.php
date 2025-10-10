@@ -33,8 +33,12 @@ class TokenStorageFactory
 
         switch ($type) {
             case 'session':
+                if (!isset($options['prefix']) || !is_string($options['prefix'])) {
+                    throw new \InvalidArgumentException('The "prefix" option is required and must be a string for session token storage');
+                }
+
                 return $this->container->make(SessionTokenStorage::class, [
-                    'prefix' => $options['prefix'] ?? 'auth.token',
+                    'prefix' => $options['prefix']
                 ]);
             case 'null':
                 return $this->container->make(NullTokenStorage::class);
@@ -43,12 +47,12 @@ class TokenStorageFactory
 
                 $tokenStorage = $this->container->make($customConfig->class(), $customConfig->args());
                 if (!$tokenStorage instanceof TokenStorageInterface) {
-                    throw new \LogicException("自定义Token存储器必须实现TokenStorageInterface接口");
+                    throw new \LogicException(sprintf('Token storage "%s" must implement %s', $customConfig->class(), TokenStorageInterface::class));
                 }
 
                 return $tokenStorage;
             default:
-                throw new \InvalidArgumentException(sprintf('Invalid token storage type: %s', $type));
+                throw new \InvalidArgumentException(sprintf('Unsupported token storage type: %s', $type));
         }
     }
 }

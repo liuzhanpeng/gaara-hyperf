@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Lzpeng\HyperfAuthGuard\Exception\AccessDeniedException;
+use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\User\UserInterface;
@@ -21,7 +21,7 @@ class AuthContext
     public function __construct(
         private ServerRequestInterface $request,
         private TokenContextInterface $tokenContext,
-        private GuardResolverInterface $guardResolver,
+        private GuardResolver $guardResolver,
     ) {}
 
     /**
@@ -53,10 +53,7 @@ class AuthContext
     public function logout(): ResponseInterface
     {
         if (! $this->isAuthenticated()) {
-            throw new AccessDeniedException(
-                token: $this->getToken(),
-                attribute: 'logout',
-            );
+            throw new AuthenticationException('用户未认证, 无法登出');
         }
 
         $guard = $this->guardResolver->resolve($this->getToken()->getGuardName());

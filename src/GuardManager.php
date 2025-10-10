@@ -10,17 +10,17 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Guard管理器
  * 
- * 用于管理和处理守卫相关的逻辑
+ * 负责管理和调度各个Guard来处理请求 
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class GuardManager
 {
     /**
-     * @param GuardResolverInterface $guardResolver
+     * @param GuardResolver $guardResolver
      */
     public function __construct(
-        private GuardResolverInterface $guardResolver,
+        private GuardResolver $guardResolver,
     ) {}
 
     /**
@@ -31,8 +31,7 @@ class GuardManager
      */
     public function process(ServerRequestInterface $request): ?ResponseInterface
     {
-        foreach ($this->guardResolver->getGuardNames() as $guardName) {
-            $guard = $this->guardResolver->resolve($guardName);
+        foreach ($this->guardResolver as $guard) {
             if (!$guard->supports($request)) {
                 continue;
             }

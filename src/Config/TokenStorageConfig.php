@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Config;
 
+use Lzpeng\HyperfAuthGuard\Constants;
+
 /**
  * Token存储器配置
  * 
@@ -29,7 +31,7 @@ class TokenStorageConfig
         if (is_string($config)) {
             switch ($config) {
                 case 'session':
-                    $config = ['session' => ['prefix' => 'auth.token']];
+                    $config = ['session' => ['prefix' => Constants::DEFAULT_SESSION_TOKEN_PREFIX]];
                     break;
                 case 'null':
                     $config = ['null' => []];

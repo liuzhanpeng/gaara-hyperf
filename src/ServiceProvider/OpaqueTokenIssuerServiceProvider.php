@@ -29,7 +29,7 @@ class OpaqueTokenIssuerServiceProvider implements ServiceProviderInterface
                     'ttl' => 60 * 20,
                 ],
             ],
-        ], $config->serviceConfig('opaque_token_issuers'));
+        ], $config->serviceConfig('opaque_token_issuers') ?? []);
 
         $opaqueTokenIssuerMap = [];
         foreach ($opaqueTokenIssuerConfig as $name => $config) {

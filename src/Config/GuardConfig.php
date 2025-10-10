@@ -34,7 +34,7 @@ class GuardConfig
         private UnauthenticatedHandlerConfig $unauthenticatedHandlerConfig,
         private AuthorizationCheckerConfig $authorizationCheckerConfig,
         private AccessDeniedHandlerConfig $accessDeniedHandlerConfig,
-        private LoginThrottlerConfig $loginThrottlerConfig,
+        private LoginRateLimiterConfig $loginRateLimiterConfig,
         private ListenerConfigCollection $listenerConfigCollection,
         private string $passwordHasherId
     ) {}
@@ -56,12 +56,7 @@ class GuardConfig
         $accessDeniedHandlerConfig = AccessDeniedHandlerConfig::from($config['authorization']['access_denied_handler'] ?? [
             'class' => DefaultAccessDeniedHandler::class,
         ]);
-        $loginThrottlerConfig = LoginThrottlerConfig::from($config['login_throttler'] ?? [
-            'sliding_window' => [
-                'max_attempts' => 5,
-                'interval' => 300,
-            ]
-        ]);
+        $loginRateLimiterConfig = LoginRateLimiterConfig::from($config['login_throttler'] ?? ['no_limit' => []]);
         $listenerConfigCollection = ListenerConfigCollection::from($config['listeners'] ?? []);
         $passwordHasherId = $config['password_hasher'] ?? 'default';
 
@@ -73,7 +68,7 @@ class GuardConfig
             $unauthenticatedHandlerConfig,
             $authorizationCheckerConfig,
             $accessDeniedHandlerConfig,
-            $loginThrottlerConfig,
+            $loginRateLimiterConfig,
             $listenerConfigCollection,
             $passwordHasherId,
         );
@@ -152,11 +147,11 @@ class GuardConfig
     /**
      * 返回登录限流器配置
      *
-     * @return LoginThrottlerConfig
+     * @return LoginRateLimiterConfig
      */
-    public function loginThrottlerConfig(): LoginThrottlerConfig
+    public function loginRateLimiterConfig(): LoginRateLimiterConfig
     {
-        return $this->loginThrottlerConfig;
+        return $this->loginRateLimiterConfig;
     }
 
     /**

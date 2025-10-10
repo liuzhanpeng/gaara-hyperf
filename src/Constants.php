@@ -11,14 +11,21 @@ namespace Lzpeng\HyperfAuthGuard;
  */
 final class Constants
 {
-    public const REQUEST_AUTHORIZATION_ATTRIBUTE = 'auth.authorization_attribute';
-    public const REQUEST_AUTHORIZATION_SUBJECT = 'auth.authorization_subject';
+    public const __PREFIX = '__auth';
 
-    public const GUARD_PREFIX = 'auth.guard';
-    public const PASSWORD_HASHER_PREFIX = 'auth.password_hasher';
-    public const CSRF_TOKEN_MANAGER_PREFIX = 'auth.csrf_token_manager';
-    public const OPAQUE_TOKEN_ISSUER_PREFIX = 'auth.opaque_token_issuer';
-    public const RATE_LIMITER_FACTORY_PREFIX = 'auth.rate_limiter_factory';
+    public const TOKEN_CONTEXT_PREFIX = sprintf('%s.token_context', self::__PREFIX);
+
+    public const DEFAULT_SESSION_TOKEN_PREFIX =  sprintf('%s.session_token.', self::__PREFIX);
+
+    public const REQUEST_AUTHORIZATION_ATTRIBUTE = sprintf('%s.authorization_attribute', self::__PREFIX);
+    public const REQUEST_AUTHORIZATION_SUBJECT = sprintf('%s.authorization_subject', self::__PREFIX);
+
+    public const GUARD_PREFIX = sprintf('%s.guard', self::__PREFIX);
+    public const PASSWORD_HASHER_PREFIX = sprintf('%s.password_hasher', self::__PREFIX);
+    public const CSRF_TOKEN_MANAGER_PREFIX = sprintf('%s.csrf_token_manager', self::__PREFIX);
+    public const OPAQUE_TOKEN_ISSUER_PREFIX = sprintf('%s.opaque_token_issuer', self::__PREFIX);
+
+    public const LOGIN_RATE_LIMITER_PREFIX = sprintf('%s.login_rate_limiter:', self::__PREFIX);
 
     private function __construct() {}
 }

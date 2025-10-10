@@ -29,7 +29,7 @@ class MemoryUserProvider implements UserProviderInterface
         foreach ($this->users as $username => $info) {
             if ($username === $identifier) {
                 if (!isset($info['password'])) {
-                    throw new \InvalidArgumentException('用户信息中缺少密码字段');
+                    throw new \InvalidArgumentException("The 'password' field is missing in the user information.");
                 }
 
                 return new MemoryUser(

@@ -28,7 +28,7 @@ class PasswordHasherServiceProvider implements ServiceProviderInterface
                     'algo' => PASSWORD_DEFAULT,
                 ]
             ]
-        ], $config->serviceConfig('password_hashers'));
+        ], $config->serviceConfig('password_hashers') ?? []);
 
         $passwordHasherMap = [];
         foreach ($passwordHasherConfig as $name => $config) {
