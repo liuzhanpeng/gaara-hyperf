@@ -43,7 +43,7 @@ return [
                     'signature_param' => 'X-SIGNATURE',
                     'timestamp_param' => 'X-TIMESTAMP',
                     'nonce_param' => 'X-NONCE',
-                    'signature_ttl' => 60, // 请求签名的有效期，单位秒
+                    'ttl' => 60, // 请求签名的有效期，单位秒
                     'algo' => 'HMAC-SHA256', // 签名算法
                 ],
                 // 'custom' => [

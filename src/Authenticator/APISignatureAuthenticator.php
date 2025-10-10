@@ -31,7 +31,7 @@ class APISignatureAuthenticator implements AuthenticatorInterface
             'signature_param' => 'X-Signature',
             'timestamp_param' => 'X-Timestamp',
             'nonce_param' => 'X-Nonce',
-            'signature_ttl' => 60,
+            'ttl' => 60,
             'algo' => 'sha256',
         ], $this->options);
     }
@@ -54,7 +54,7 @@ class APISignatureAuthenticator implements AuthenticatorInterface
             throw new AuthenticationException('Missing required authentication headers', $apiKey);
         }
 
-        if ($timestamp + $this->options['signature_ttl'] < time()) {
+        if ($timestamp + $this->options['ttl'] < time()) {
             throw new AuthenticationException('Request signature has expired', $apiKey);
         }
 
@@ -67,7 +67,6 @@ class APISignatureAuthenticator implements AuthenticatorInterface
             throw new AuthenticationException('User must implement SecretAwareUserInterface', $apiKey);
         }
 
-        // 获取所有请求参数（包括查询参数和请求体参数）然后按字典序排序组合成key=value&key=value的形式
         $params = array_merge($request->getQueryParams(), $request->getParsedBody() ?? []);
         $params = array_merge($params, [
             $this->options['api_key_param'] => $apiKey,
@@ -75,7 +74,6 @@ class APISignatureAuthenticator implements AuthenticatorInterface
             $this->options['nonce_param'] => $nonce,
         ]);
         ksort($params);
-
         $paramStr = http_build_query($params);
 
         $computedSignature = hash_hmac($this->options['algo'], $paramStr, $user->getSecret());
