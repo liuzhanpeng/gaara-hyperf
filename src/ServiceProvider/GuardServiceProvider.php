@@ -44,9 +44,7 @@ class GuardServiceProvider implements ServiceProviderInterface
     public function register(ContainerInterface $container): void
     {
         // 注册内置的令牌上下文
-        $container->define(TokenContextInterface::class, function () {
-            return new TokenContext(Constants::TOKEN_CONTEXT_PREFIX);
-        });
+        $container->define(TokenContextInterface::class, fn() => new TokenContext(Constants::TOKEN_CONTEXT_PREFIX));
 
         $config = $container->get(ConfigLoaderInterface::class)->load();
 
@@ -54,9 +52,7 @@ class GuardServiceProvider implements ServiceProviderInterface
         foreach ($config->guardConfigCollection() as $guardName => $guardConfig) {
             $guardMap[$guardName] = sprintf('%s.%s', Constants::GUARD_PREFIX, $guardName);
 
-            $container->define($guardMap[$guardName], function () use ($container, $guardName, $guardConfig) {
-                return $this->createGuard($container, $guardName, $guardConfig);
-            });
+            $container->define($guardMap[$guardName], fn() => $this->createGuard($container, $guardName, $guardConfig));
         }
 
         $container->set(GuardResolver::class, new GuardResolver($guardMap, $container));

@@ -33,13 +33,9 @@ class CsrfTokenManagerServiceProvider implements ServiceProviderInterface
         $csrfTokenManagerMap = [];
         foreach ($csrfTokenManagerConfig as $name => $config) {
             $csrfTokenManagerMap[$name] = sprintf('%s.%s', Constants::CSRF_TOKEN_MANAGER_PREFIX, $name);
-            $container->define($csrfTokenManagerMap[$name], function () use ($container, $config) {
-                return $container->get(CsrfTokenManagerFactory::class)->create($config);
-            });
+            $container->define($csrfTokenManagerMap[$name], fn() => $container->get(CsrfTokenManagerFactory::class)->create($config));
         }
 
-        $container->define(CsrfTokenManagerResolverInterface::class, function () use ($container, $csrfTokenManagerMap) {
-            return new CsrfTokenManagerResolver($csrfTokenManagerMap, $container);
-        });
+        $container->define(CsrfTokenManagerResolverInterface::class, fn() => new CsrfTokenManagerResolver($csrfTokenManagerMap, $container));
     }
 }

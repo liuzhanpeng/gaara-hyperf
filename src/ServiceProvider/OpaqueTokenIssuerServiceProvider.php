@@ -40,13 +40,9 @@ class OpaqueTokenIssuerServiceProvider implements ServiceProviderInterface
         $opaqueTokenIssuerMap = [];
         foreach ($opaqueTokenIssuerConfig as $name => $config) {
             $opaqueTokenIssuerMap[$name] = sprintf('%s.%s', Constants::OPAQUE_TOKEN_ISSUER_PREFIX, $name);
-            $container->define($opaqueTokenIssuerMap[$name], function () use ($container, $config) {
-                return $container->get(OpaqueTokenIssuerFactory::class)->create($config);
-            });
+            $container->define($opaqueTokenIssuerMap[$name], fn() => $container->get(OpaqueTokenIssuerFactory::class)->create($config));
         }
 
-        $container->define(OpaqueTokenIssuerResolverInterface::class, function () use ($container, $opaqueTokenIssuerMap) {
-            return new OpaqueTokenIssuerResolver($opaqueTokenIssuerMap, $container);
-        });
+        $container->define(OpaqueTokenIssuerResolverInterface::class, fn() => new OpaqueTokenIssuerResolver($opaqueTokenIssuerMap, $container));
     }
 }

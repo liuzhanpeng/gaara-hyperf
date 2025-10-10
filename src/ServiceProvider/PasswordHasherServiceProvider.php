@@ -33,13 +33,9 @@ class PasswordHasherServiceProvider implements ServiceProviderInterface
         $passwordHasherMap = [];
         foreach ($passwordHasherConfig as $name => $config) {
             $passwordHasherMap[$name] = sprintf('%s.%s', Constants::PASSWORD_HASHER_PREFIX, $name);
-            $container->define($passwordHasherMap[$name], function () use ($container, $config) {
-                return $container->get(PasswordHasherFactory::class)->create($config);
-            });
+            $container->define($passwordHasherMap[$name], fn() => $container->get(PasswordHasherFactory::class)->create($config));
         }
 
-        $container->define(PasswordHasherResolverInterface::class, function () use ($container, $passwordHasherMap) {
-            return new PasswordHasherResolver($passwordHasherMap, $container);
-        });
+        $container->define(PasswordHasherResolverInterface::class, fn() => new PasswordHasherResolver($passwordHasherMap, $container));
     }
 }
