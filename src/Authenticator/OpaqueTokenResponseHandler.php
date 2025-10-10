@@ -20,15 +20,25 @@ class OpaqueTokenResponseHandler implements AuthenticationSuccessHandlerInterfac
         private OpaqueTokenIssuerResolverInterface $opaqueTokenIssuerResolver,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
         private string $tokenIssuer = 'default',
+        private ?string $responseTemplate = null,
     ) {}
 
     public function handle(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
     {
-        $opaqueToken = $this->opaqueTokenIssuerResolver->resolve($this->tokenIssuer)->issue($token);
+        $accessToken = $this->opaqueTokenIssuerResolver->resolve($this->tokenIssuer)->issue($token);
+
+        if (!is_null($this->responseTemplate)) {
+            if (!is_string($this->responseTemplate) || !is_array(json_decode($this->responseTemplate, true))) {
+                throw new \InvalidArgumentException('Response template must be a valid JSON string');
+            }
+
+            $responseData = json_decode(str_replace('#TOKEN#', (string)$accessToken, $this->responseTemplate), true);
+
+            return $this->response->json($responseData);
+        }
 
         return $this->response->json([
-            'access_token' => $opaqueToken->getTokenStr(),
-            'expires_at' => $opaqueToken->getExpiresAt()->getTimestamp(),
+            'access_token' => $accessToken,
         ]);
     }
 }

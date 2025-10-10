@@ -20,5 +20,5 @@ interface AuthenticationSuccessHandlerInterface
      * @param TokenInterface $token
      * @return ResponseInterface|null
      */
-    public function handle(ServerRequestInterface $request, TokenInterface  $token): ?ResponseInterface;
+    public function handle(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface;
 }
