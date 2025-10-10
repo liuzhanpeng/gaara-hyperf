@@ -8,7 +8,7 @@ use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
 use Lzpeng\HyperfAuthGuard\Exception\InvalidPasswordException;
 use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherInterface;
-use Lzpeng\HyperfAuthGuard\User\PasswordUserInterface;
+use Lzpeng\HyperfAuthGuard\User\PasswordAwareUserInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -48,8 +48,8 @@ class PasswordBadgeCheckListener implements EventSubscriberInterface
         }
 
         $user = $passport->getUser();
-        if (!$user instanceof PasswordUserInterface) {
-            throw new \LogicException('The user must implement PasswordUserInterface');
+        if (!$user instanceof PasswordAwareUserInterface) {
+            throw new \LogicException('The user must implement PasswordAwareUserInterface');
         }
 
         if (!$this->passwordHasher->verify($badge->getPassword(), $user->getPassword())) {

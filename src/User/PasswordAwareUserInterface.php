@@ -9,7 +9,7 @@ namespace Lzpeng\HyperfAuthGuard\User;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-interface PasswordUserInterface
+interface PasswordAwareUserInterface
 {
     /**
      * 返回密码

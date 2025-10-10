@@ -38,6 +38,9 @@ class APIKeyAuthenticator implements AuthenticatorInterface
     public function authenticate(ServerRequestInterface $request, string $guardName): Passport
     {
         $apiKey = $request->getHeaderLine($this->options['api_key_param']);
+        if (empty($apiKey)) {
+            throw new AuthenticationException('API key is missing', $apiKey);
+        }
 
         return new Passport(
             $guardName,

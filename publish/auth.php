@@ -38,6 +38,14 @@ return [
                 'opaque_token' => [
                     'token_issuer' => 'admin_opaque_token_issuer',
                 ],
+                'api_signature' => [
+                    'api_key_param' => 'X-API-KEY',
+                    'signature_param' => 'X-SIGNATURE',
+                    'timestamp_param' => 'X-TIMESTAMP',
+                    'nonce_param' => 'X-NONCE',
+                    'signature_ttl' => 60, // 请求签名的有效期，单位秒
+                    'algo' => 'HMAC-SHA256', // 签名算法
+                ],
                 // 'custom' => [
                 //     [
                 //         'class' => CustomAuthenticator::class,

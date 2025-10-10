@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\User;
 
-class MemoryUser implements UserInterface, PasswordUserInterface, \Serializable
+class MemoryUser implements UserInterface, PasswordAwareUserInterface, \Serializable
 {
     public function __construct(
         private string $username,
