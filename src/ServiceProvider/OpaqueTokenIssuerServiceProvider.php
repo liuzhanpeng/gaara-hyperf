@@ -7,9 +7,9 @@ namespace Lzpeng\HyperfAuthGuard\ServiceProvider;
 use Hyperf\Contract\ContainerInterface;
 use Lzpeng\HyperfAuthGuard\Config\ConfigLoaderInterface;
 use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerFactory;
-use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerResolver;
-use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerResolverInterface;
+use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\OpaqueTokenIssuerFactory;
+use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\OpaqueTokenIssuerResolver;
+use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\OpaqueTokenIssuerResolverInterface;
 
 /**
  * Opaque Token 发行器服务提供者

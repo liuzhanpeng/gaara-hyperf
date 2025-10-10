@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\EventListener;
 
 use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
-use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerInterface;
+use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\OpaqueTokenIssuerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
