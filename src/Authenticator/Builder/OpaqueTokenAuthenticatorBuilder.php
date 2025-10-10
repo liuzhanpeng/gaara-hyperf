@@ -11,6 +11,11 @@ use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerResolverInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+/**
+ * OpaqueToken认证器构建器
+ *
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
 class OpaqueTokenAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface

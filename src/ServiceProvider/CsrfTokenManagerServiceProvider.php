@@ -25,7 +25,7 @@ class CsrfTokenManagerServiceProvider implements ServiceProviderInterface
         $csrfTokenManagerConfig = array_merge([
             'default' => [
                 'session' => [
-                    'prefix' => 'auth.csrf_token',
+                    'prefix' => sprintf('%s:%s:', Constants::__PREFIX, 'csrf_token'),
                 ],
             ],
         ], $config->serviceConfig('csrf_token_managers') ?? []);

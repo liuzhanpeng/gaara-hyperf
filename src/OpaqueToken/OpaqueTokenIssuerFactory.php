@@ -4,17 +4,28 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\OpaqueToken;
 
+use COM;
 use Hyperf\Contract\ContainerInterface;
 use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
+use Lzpeng\HyperfAuthGuard\Constants;
 use Lzpeng\HyperfAuthGuard\OpaqueToken\CacheOpaqueTokenIssuer;
 use Lzpeng\HyperfAuthGuard\OpaqueToken\OpaqueTokenIssuerInterface;
 
+/**
+ * OpaqueToken发行器创建工厂
+ * 
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
 class OpaqueTokenIssuerFactory
 {
     public function __construct(
         private ContainerInterface $container,
     ) {}
 
+    /**
+     * @param array $config
+     * @return OpaqueTokenIssuerInterface
+     */
     public function create(array $config): OpaqueTokenIssuerInterface
     {
         if (count($config) !== 1) {
@@ -26,9 +37,21 @@ class OpaqueTokenIssuerFactory
 
         switch ($type) {
             case 'cache':
+                $expiresIn = $options['expires_in'] ?? 60 * 20;
+                $maxLifetime = $options['max_lifetime'] ?? 60 * 60 * 24;
+                if ($expiresIn > $maxLifetime) {
+                    throw new \InvalidArgumentException('The expires_in option must be less than or equal to max_lifetime option.');
+                }
+
                 return $this->container->make(CacheOpaqueTokenIssuer::class, [
-                    'prefix' => $options['prefix'] ?? 'auth:opaque_token:',
-                    'ttl' => $options['ttl'] ?? 60 * 20
+                    'prefix' => $options['prefix'] ?? sprintf('%s:%s:', Constants::__PREFIX, 'opaque_token'),
+                    'headerParam' => $options['header_param'] ?? 'Authorization',
+                    'tokenType' => $options['token_type'] ?? 'Bearer',
+                    'expiresIn' => $expiresIn,
+                    'maxLifetime' => $maxLifetime,
+                    'tokenRefresh' => $options['token_refresh'] ?? true,
+                    'ipBindEnabled' => $options['ip_bind_enabled'] ?? false,
+                    'userAgentBindEnabled' => $options['user_agent_bind_enabled'] ?? false,
                 ]);
             case 'custom':
                 $customConfig = CustomConfig::from($options);

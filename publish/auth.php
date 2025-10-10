@@ -36,10 +36,7 @@ return [
                     'failure_handler' => CustomFailureHandler::class,
                 ],
                 'opaque_token' => [
-                    'header_param' => 'Authorization',
-                    'token_type' => 'Bearer',
-                    // 'token_issuer' => 'admin_opaque_token_issuer',
-                    'token_refresh' => true,
+                    'token_issuer' => 'admin_opaque_token_issuer',
                 ],
                 // 'custom' => [
                 //     [
@@ -110,8 +107,13 @@ return [
             'admin_opaque_token_issuer' => [
                 'cache' => [
                     'prefix' => 'auth:opaque_token',
-                    'ttl' => 60,
-                    'expires_in' => 100
+                    'header_param' => 'Authorization',
+                    'token_type' => 'Bearer',
+                    'expires_in' => 60 * 20, // token过期时间，单位秒
+                    'max_lifetime' => 60 * 60 * 24, // token最大生命周期，单位秒
+                    'token_refresh' => true,
+                    'ip_bind_enabled' => false,
+                    'user_agent_bind_enabled' => false,
                 ],
                 // 'custom' => [
                 //     'class' => CustomOpaqueTokenIssuer::class,

@@ -21,6 +21,9 @@ class SessionCsrfTokenManager implements CsrfTokenManagerInterface
         private SessionInterface $session,
     ) {}
 
+    /**
+     * @inheritDoc
+     */
     public function generate(string $tokenId = 'authenticate'): CsrfToken
     {
         $csrfToken = new CsrfToken($tokenId, $this->generateToken());
@@ -33,6 +36,9 @@ class SessionCsrfTokenManager implements CsrfTokenManagerInterface
         return $csrfToken;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function verify(CsrfToken $token): bool
     {
         return $token->getValue() === $this->session->get(
@@ -40,11 +46,22 @@ class SessionCsrfTokenManager implements CsrfTokenManagerInterface
         );
     }
 
+    /**
+     * 生成随机令牌
+     *
+     * @return string
+     */
     private function generateToken(): string
     {
         return bin2hex(random_bytes(32));
     }
 
+    /**
+     * 获取存储在Session中的Key
+     *
+     * @param string $tokenId
+     * @return string
+     */
     private function getKey(string $tokenId): string
     {
         return sprintf('%s.%s', $this->prefix, $tokenId);

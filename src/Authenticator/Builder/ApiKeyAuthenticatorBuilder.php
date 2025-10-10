@@ -9,6 +9,11 @@ use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+/**
+ * API Key认证器构建器
+ *
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
 class APIKeyAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface

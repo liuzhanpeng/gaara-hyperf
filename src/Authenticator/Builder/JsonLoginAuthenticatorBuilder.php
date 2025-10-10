@@ -9,6 +9,11 @@ use Lzpeng\HyperfAuthGuard\Authenticator\JsonLoginAuthenticator;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+/**
+ * JSON登录认证器构建器
+ *
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
 class JsonLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface

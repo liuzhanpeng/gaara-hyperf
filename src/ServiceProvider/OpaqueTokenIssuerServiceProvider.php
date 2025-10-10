@@ -25,7 +25,7 @@ class OpaqueTokenIssuerServiceProvider implements ServiceProviderInterface
         $opaqueTokenIssuerConfig = array_merge([
             'default' => [
                 'cache' => [
-                    'prefix' => 'auth:opaque_token',
+                    'prefix' => sprintf('%s:%s:', Constants::__PREFIX, 'opaque_token'),
                     'ttl' => 60 * 20,
                 ],
             ],

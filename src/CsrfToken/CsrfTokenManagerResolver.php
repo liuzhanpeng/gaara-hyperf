@@ -13,6 +13,10 @@ use Psr\Container\ContainerInterface;
  */
 class CsrfTokenManagerResolver implements CsrfTokenManagerResolverInterface
 {
+    /**
+     * @param array $csrfTokenManagerMap
+     * @param ContainerInterface $container
+     */
     public function __construct(
         private array $csrfTokenManagerMap,
         private ContainerInterface $container,
@@ -24,13 +28,13 @@ class CsrfTokenManagerResolver implements CsrfTokenManagerResolverInterface
     public function resolve(string $name = 'default'): CsrfTokenManagerInterface
     {
         if (!isset($this->csrfTokenManagerMap[$name])) {
-            throw new \InvalidArgumentException("CSRF Token管理器不存在: $name");
+            throw new \InvalidArgumentException("CSRF Token Manager does not exist: $name");
         }
 
         $csrfTokenManagerId = $this->csrfTokenManagerMap[$name];
         $csrfTokenManager = $this->container->get($csrfTokenManagerId);
         if (!$csrfTokenManager instanceof CsrfTokenManagerInterface) {
-            throw new \LogicException(sprintf('CSRF Token管理器 "%s" 必须实现 %s 接口', $csrfTokenManagerId, CsrfTokenManagerInterface::class));
+            throw new \LogicException(sprintf('CSRF Token Manager "%s" must implement %s interface', $csrfTokenManagerId, CsrfTokenManagerInterface::class));
         }
 
         return $csrfTokenManager;

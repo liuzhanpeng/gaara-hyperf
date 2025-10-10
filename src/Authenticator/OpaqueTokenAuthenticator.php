@@ -23,7 +23,6 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
         private ?AuthenticationSuccessHandlerInterface $successHandler,
         private ?AuthenticationFailureHandlerInterface $failureHandler,
         private OpaqueTokenIssuerInterface $tokenIssuer,
-        private array $options,
     ) {}
 
     /**
@@ -31,7 +30,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
      */
     public function supports(ServerRequestInterface $request): bool
     {
-        return $this->extractAccessToken($request) !== null;
+        return $this->tokenIssuer->resolve() !== null;
     }
 
     /**
@@ -39,9 +38,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
      */
     public function authenticate(ServerRequestInterface $request, string $guardName): Passport
     {
-        $accessToken = $this->extractAccessToken($request);
-
-        $token = $this->tokenIssuer->resolve($accessToken, $this->options['token_refresh']);
+        $token = $this->tokenIssuer->resolve();
         if (is_null($token)) {
             throw new UnauthenticatedException();
         }
@@ -81,29 +78,5 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
     public function isInteractive(): bool
     {
         return false;
-    }
-
-    /**
-     * 提取AccessToken
-     *
-     * @param ServerRequestInterface $request
-     * @return string|null
-     */
-    private function extractAccessToken(ServerRequestInterface $request): ?string
-    {
-        if (!$request->hasHeader($this->options['header_param']) || !\is_string($header = $request->getHeaderLine($this->options['header_param']))) {
-            return null;
-        }
-
-        $regex = \sprintf(
-            '/^%s([a-zA-Z0-9\-_\+~\/\.]+=*)$/',
-            '' === $this->options['token_type'] ? '' : preg_quote($this->options['token_type']) . '\s+'
-        );
-
-        if (preg_match($regex, $header, $matches)) {
-            return $matches[1];
-        }
-
-        return null;
     }
 }

@@ -7,6 +7,7 @@ namespace Lzpeng\HyperfAuthGuard\CsrfToken;
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Contract\SessionInterface;
 use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
+use Lzpeng\HyperfAuthGuard\Constants;
 use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerInterface;
 
 /**
@@ -32,7 +33,7 @@ class CsrfTokenManagerFactory
         switch ($type) {
             case 'session':
                 return $this->container->make(SessionCsrfTokenManager::class, [
-                    'prefix' => $options['prefix'] ?? 'auth.csrf_token',
+                    'prefix' => $options['prefix'] ?? sprintf('%s:%s:', Constants::__PREFIX, 'csrf_token'),
                     'session' => $this->container->get(SessionInterface::class),
                 ]);
             case 'custom':
