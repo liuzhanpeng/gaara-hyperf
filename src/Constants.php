@@ -15,8 +15,6 @@ final class Constants
 
     public const TOKEN_CONTEXT_PREFIX = sprintf('%s.token_context', self::__PREFIX);
 
-    public const DEFAULT_SESSION_TOKEN_PREFIX =  sprintf('%s.session_token.', self::__PREFIX);
-
     public const REQUEST_AUTHORIZATION_ATTRIBUTE = sprintf('%s.authorization_attribute', self::__PREFIX);
     public const REQUEST_AUTHORIZATION_SUBJECT = sprintf('%s.authorization_subject', self::__PREFIX);
 
@@ -24,8 +22,6 @@ final class Constants
     public const PASSWORD_HASHER_PREFIX = sprintf('%s.password_hasher', self::__PREFIX);
     public const CSRF_TOKEN_MANAGER_PREFIX = sprintf('%s.csrf_token_manager', self::__PREFIX);
     public const OPAQUE_TOKEN_ISSUER_PREFIX = sprintf('%s.opaque_token_issuer', self::__PREFIX);
-
-    public const LOGIN_RATE_LIMITER_PREFIX = sprintf('%s.login_rate_limiter:', self::__PREFIX);
 
     private function __construct() {}
 }

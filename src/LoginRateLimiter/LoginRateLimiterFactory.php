@@ -33,7 +33,7 @@ class LoginRateLimiterFactory
                     $this->container->get(Redis::class),
                     $options['interval'] ?? 300,
                     $options['max_attempts'] ?? 5,
-                    Constants::LOGIN_RATE_LIMITER_PREFIX
+                    sprintf('%s:login_rate_limiter:sliding_window:', Constants::__PREFIX)
                 );
             default:
                 throw new \InvalidArgumentException("Unsupported rate limiter type: {$type}");

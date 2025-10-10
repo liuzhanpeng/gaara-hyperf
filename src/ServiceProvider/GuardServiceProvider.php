@@ -10,7 +10,6 @@ use Lzpeng\HyperfAuthGuard\Config\ConfigLoaderInterface;
 use Lzpeng\HyperfAuthGuard\Config\GuardConfig;
 use Lzpeng\HyperfAuthGuard\Constants;
 use Lzpeng\HyperfAuthGuard\EventListener\LoginRateLimitListener;
-use Lzpeng\HyperfAuthGuard\EventListener\LoginThrottlingListener;
 use Lzpeng\HyperfAuthGuard\EventListener\PasswordBadgeCheckListener;
 use Lzpeng\HyperfAuthGuard\Guard;
 use Lzpeng\HyperfAuthGuard\GuardInterface;

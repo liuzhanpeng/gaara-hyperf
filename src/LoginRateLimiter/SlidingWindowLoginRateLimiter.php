@@ -157,6 +157,6 @@ class SlidingWindowLoginRateLimiter implements LoginRateLimiterInterface
      */
     private function getKey(string $key): string
     {
-        return $this->prefix . $key;
+        return sprintf('%s:%s', $this->prefix, $key);
     }
 }

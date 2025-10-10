@@ -31,7 +31,7 @@ class TokenStorageConfig
         if (is_string($config)) {
             switch ($config) {
                 case 'session':
-                    $config = ['session' => ['prefix' => Constants::DEFAULT_SESSION_TOKEN_PREFIX]];
+                    $config = ['session' => ['prefix' => sprintf('%s:%s:', Constants::__PREFIX, 'session_token')]];
                     break;
                 case 'null':
                     $config = ['null' => []];
