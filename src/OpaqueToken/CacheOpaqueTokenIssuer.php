@@ -7,6 +7,7 @@ namespace Lzpeng\HyperfAuthGuard\OpaqueToken;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\Utils\IpResolver;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\SimpleCache\CacheInterface;
 
 /**
@@ -48,11 +49,9 @@ class CacheOpaqueTokenIssuer implements OpaqueTokenIssuerInterface
     /**
      * @inheritDoc
      */
-    public function issue(TokenInterface $token): OpaqueToken
+    public function issue(TokenInterface $token): string
     {
         $accessToken = bin2hex(random_bytes(32));
-        $expiresAt =  (new \DateTimeImmutable())->add(new \DateInterval('PT' . $this->expiresIn . 'S'));
-
         $time = time();
         $data = [
             'token' => $token,
@@ -70,7 +69,37 @@ class CacheOpaqueTokenIssuer implements OpaqueTokenIssuerInterface
 
         $this->cache->set($this->getAccessTokenKey($accessToken), $data, $this->expiresIn);
 
-        return new OpaqueToken($accessToken, $expiresAt);
+        return $accessToken;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function resolve(string $accessToken): ?TokenInterface
+    {
+        $data = $this->cache->get($this->getAccessTokenKey($accessToken));
+        if (is_null($data)) {
+            return null;
+        }
+
+        if ($data['expires_at'] < time()) {
+            $this->revoke($accessToken);
+            return null;
+        }
+
+        if ($this->ipBindEnabled && (!isset($data['ip']) || $data['ip'] !== $this->ipResolver->resolve($this->request))) {
+            return null;
+        }
+        if ($this->userAgentBindEnabled && (!isset($data['user_agent']) || $data['user_agent'] !== md5($this->request->getHeaderLine('User-Agent')))) {
+            return null;
+        }
+
+        if ($this->tokenRefresh) {
+            $this->cache->set($this->getAccessTokenKey($accessToken), $data, $this->expiresIn);
+        }
+
+        return $data['token'];
     }
 
     /**
@@ -84,45 +113,9 @@ class CacheOpaqueTokenIssuer implements OpaqueTokenIssuerInterface
     /**
      * @inheritDoc
      */
-    public function resolve(): ?TokenInterface
+    public function extractAccessToken(ServerRequestInterface $request): ?string
     {
-        $tokenStr = $this->extractAccessToken();
-        if (is_null($tokenStr)) {
-            return null;
-        }
-
-        $data = $this->cache->get($this->getAccessTokenKey($tokenStr));
-        if (is_null($data)) {
-            return null;
-        }
-
-        if ($data['expires_at'] < time()) {
-            $this->revoke($tokenStr);
-            return null;
-        }
-
-        if ($this->ipBindEnabled && (!isset($data['ip']) || $data['ip'] !== $this->ipResolver->resolve($this->request))) {
-            return null;
-        }
-        if ($this->userAgentBindEnabled && (!isset($data['user_agent']) || $data['user_agent'] !== md5($this->request->getHeaderLine('User-Agent')))) {
-            return null;
-        }
-
-        if ($this->tokenRefresh) {
-            $this->cache->set($this->getAccessTokenKey($tokenStr), $data, $this->expiresIn);
-        }
-
-        return $data['token'];
-    }
-
-    /**
-     * 提取AccessToken
-     *
-     * @return string|null
-     */
-    private function extractAccessToken(): ?string
-    {
-        if (!$this->request->hasHeader($this->headerParam) || !\is_string($header = $this->request->getHeaderLine($this->headerParam))) {
+        if (!$request->hasHeader($this->headerParam) || !\is_string($header = $request->getHeaderLine($this->headerParam))) {
             return null;
         }
 

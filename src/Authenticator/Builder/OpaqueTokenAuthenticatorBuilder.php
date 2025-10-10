@@ -21,24 +21,17 @@ class OpaqueTokenAuthenticatorBuilder extends AbstractAuthenticatorBuilder
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
         $options = array_merge([
-            'header_param' => 'Authorization',
-            'token_type' => 'Bearer',
             'token_issuer' => 'default',
-            'token_refresh' => true,
         ], $options);
 
 
         $tokenIssuer = $this->container->get(OpaqueTokenIssuerResolverInterface::class)->resolve($options['token_issuer']);
-        $eventDispatcher->addSubscriber(new OpaqueTokenRevokeLogoutListener(
-            opaqueTokenIssuer: $tokenIssuer,
-            options: $options,
-        ));
+        $eventDispatcher->addSubscriber(new OpaqueTokenRevokeLogoutListener(opaqueTokenIssuer: $tokenIssuer));
 
         return new OpaqueTokenAuthenticator(
             successHandler: $this->createSuccessHandler($options),
             failureHandler: $this->createFailureHandler($options),
             tokenIssuer: $tokenIssuer,
-            options: $options,
         );
     }
 }

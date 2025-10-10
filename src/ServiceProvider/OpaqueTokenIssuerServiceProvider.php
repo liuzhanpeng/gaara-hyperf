@@ -26,7 +26,13 @@ class OpaqueTokenIssuerServiceProvider implements ServiceProviderInterface
             'default' => [
                 'cache' => [
                     'prefix' => sprintf('%s:%s:', Constants::__PREFIX, 'opaque_token'),
-                    'ttl' => 60 * 20,
+                    'header_param' => 'Authorization',
+                    'token_type' => 'Bearer',
+                    'expires_in' => 60 * 20,
+                    'max_lifetime' => 60 * 60 * 24,
+                    'token_refresh' => true,
+                    'ip_bind_enabled' => false,
+                    'user_agent_bind_enabled' => false,
                 ],
             ],
         ], $config->serviceConfig('opaque_token_issuers') ?? []);

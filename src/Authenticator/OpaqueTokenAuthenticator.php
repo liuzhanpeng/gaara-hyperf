@@ -30,7 +30,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
      */
     public function supports(ServerRequestInterface $request): bool
     {
-        return $this->tokenIssuer->resolve() !== null;
+        return $this->tokenIssuer->extractAccessToken($request) !== null;
     }
 
     /**
@@ -38,7 +38,12 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
      */
     public function authenticate(ServerRequestInterface $request, string $guardName): Passport
     {
-        $token = $this->tokenIssuer->resolve();
+        $accessTokenStr = $this->tokenIssuer->extractAccessToken($request);
+        if (is_null($accessTokenStr)) {
+            throw new UnauthenticatedException();
+        }
+
+        $token = $this->tokenIssuer->resolve($accessTokenStr);
         if (is_null($token)) {
             throw new UnauthenticatedException();
         }
