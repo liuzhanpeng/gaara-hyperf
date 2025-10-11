@@ -8,7 +8,7 @@ use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Token\AuthenticatedToken;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
-use Lzpeng\HyperfAuthGuard\User\SecretAwareUserInterface;
+use Lzpeng\HyperfAuthGuard\User\PasswordAwareUserInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -63,8 +63,8 @@ class APISignatureAuthenticator implements AuthenticatorInterface
             throw new AuthenticationException('Invalid API key', $apiKey);
         }
 
-        if (!$user instanceof SecretAwareUserInterface) {
-            throw new AuthenticationException('User must implement SecretAwareUserInterface', $apiKey);
+        if (!$user instanceof PasswordAwareUserInterface) {
+            throw new AuthenticationException('User must implement PasswordAwareUserInterface', $apiKey);
         }
 
         $params = array_merge($request->getQueryParams(), $request->getParsedBody() ?? []);
@@ -76,7 +76,7 @@ class APISignatureAuthenticator implements AuthenticatorInterface
         ksort($params);
         $paramStr = http_build_query($params);
 
-        $computedSignature = hash_hmac($this->options['algo'], $paramStr, $user->getSecret());
+        $computedSignature = hash_hmac($this->options['algo'], $paramStr, $user->getPassword());
         if (!hash_equals($computedSignature, $signature)) {
             throw new AuthenticationException('Invalid request signature', $apiKey);
         }

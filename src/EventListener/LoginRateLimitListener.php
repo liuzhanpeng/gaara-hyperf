@@ -9,7 +9,6 @@ use Lzpeng\HyperfAuthGuard\Event\LoginFailureEvent;
 use Lzpeng\HyperfAuthGuard\Event\LoginSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Exception\TooManyLoginAttemptsException;
 use Lzpeng\HyperfAuthGuard\LoginRateLimiter\LoginRateLimiterInterface;
-use Lzpeng\HyperfAuthGuard\LoginThrottler\LoginThrottlerInterface;
 use Lzpeng\HyperfAuthGuard\Utils\IpResolver;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
