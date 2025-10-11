@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
+use ASCare\Shared\Infra\Encryptor;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Token\AuthenticatedToken;
@@ -24,6 +25,7 @@ class APISignatureAuthenticator implements AuthenticatorInterface
         private UserProviderInterface $userProvider,
         private ?AuthenticationSuccessHandlerInterface $successHandler,
         private ?AuthenticationFailureHandlerInterface $failureHandler,
+        private ?Encryptor $encryptor,
         private array $options,
     ) {
         $this->options = array_merge([
@@ -76,7 +78,12 @@ class APISignatureAuthenticator implements AuthenticatorInterface
         ksort($params);
         $paramStr = http_build_query($params);
 
-        $computedSignature = hash_hmac($this->options['algo'], $paramStr, $user->getPassword());
+        $secret = $user->getPassword();
+        if (!is_null($this->encryptor)) {
+            $secret = $this->encryptor->decrypt($secret);
+        }
+
+        $computedSignature = hash_hmac($this->options['algo'], $paramStr, $secret);
         if (!hash_equals($computedSignature, $signature)) {
             throw new AuthenticationException('Invalid request signature', $apiKey);
         }
