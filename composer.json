@@ -1,5 +1,5 @@
 {
-    "name": "lzpeng/hyperf-auth-guard",
+    "name": "lzpeng/gaara-hyperf",
     "description": "authentication library for hyperf",
     "type": "library",
     "license": "MIT",
