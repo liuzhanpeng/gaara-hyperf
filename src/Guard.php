@@ -177,6 +177,7 @@ class Guard implements GuardInterface
             }
 
             $token = $authenticator->createToken($passport, $this->name);
+
             /**
              * @var TokenInterface $token
              */

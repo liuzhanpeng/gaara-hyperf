@@ -46,7 +46,6 @@ class APIKeyAuthenticator implements AuthenticatorInterface
             $guardName,
             $apiKey,
             $this->userProvider->findByIdentifier(...),
-            []
         );
     }
 

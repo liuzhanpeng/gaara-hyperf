@@ -24,7 +24,7 @@ class ConfigProvider
                     'id' => 'hyperf-auth-guard',
                     'description' => 'The config for hyperf-auth-guard.',
                     'source' => __DIR__ . '/../publish/auth.php',
-                    'destination' => BASE_PATH . '/config/autoload/auth.php',
+                    'destination' => BASE_PATH . '/config/autoload/gaara.php',
                 ]
             ]
         ];

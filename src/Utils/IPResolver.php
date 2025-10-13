@@ -11,7 +11,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class IpResolver
+final class IpResolver
 {
     /**
      * 获取请求的真实IP地址，支持代理转发

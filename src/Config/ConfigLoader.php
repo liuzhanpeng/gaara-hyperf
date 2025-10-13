@@ -19,7 +19,7 @@ class ConfigLoader implements ConfigLoaderInterface
 
     public function load(): Config
     {
-        $config = $this->config->get('auth');
+        $config = $this->config->get('gaara');
 
         return Config::from($config);
     }

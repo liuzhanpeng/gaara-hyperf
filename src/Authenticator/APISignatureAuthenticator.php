@@ -92,7 +92,6 @@ class APISignatureAuthenticator implements AuthenticatorInterface
             $guardName,
             $apiKey,
             fn() => $user,
-            []
         );
     }
 

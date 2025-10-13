@@ -52,7 +52,6 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
             $guardName,
             $token->getUser()->getIdentifier(),
             fn() => $token->getUser(),
-            []
         );
     }
 

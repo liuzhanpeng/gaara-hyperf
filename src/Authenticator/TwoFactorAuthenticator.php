@@ -39,7 +39,6 @@ class TwoFactorAuthenticator implements AuthenticatorInterface
             $guardName,
             $credientials['username'],
             $this->userProvider->findByIdentifier(...),
-            []
         );
     }
 

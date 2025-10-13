@@ -11,15 +11,15 @@ use Lzpeng\HyperfAuthGuard\User\UserInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-abstract class AbstractToken implements TokenInterface, \Serializable
+abstract class AbstractToken implements TokenInterface
 {
     /**
      * @param string $guardName
      */
     public function __construct(
-        private string $guardName,
-        private UserInterface $user,
-        private array $attributes = []
+        protected string $guardName,
+        protected UserInterface $user,
+        protected array $attributes = []
     ) {}
 
     /**
@@ -78,43 +78,6 @@ abstract class AbstractToken implements TokenInterface, \Serializable
     public function setAttribute(string $name, mixed $value): void
     {
         $this->attributes[$name] = $value;
-    }
-
-    /**
-     * 序列化
-     *
-     * @return array
-     */
-    public function __serialize(): array
-    {
-        return [$this->guardName, $this->user, $this->attributes];
-    }
-
-    /**
-     * 反序列化
-     *
-     * @param array $data
-     * @return void
-     */
-    public function __unserialize(array $data): void
-    {
-        [$this->guardName, $this->user, $this->attributes] = $data;
-    }
-
-    /**
-     * @internal
-     */
-    final public function serialize(): string
-    {
-        throw new \BadMethodCallException('Cannot serialize ' . __CLASS__);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    final public function unserialize(string $serialized): void
-    {
-        $this->__unserialize(unserialize($serialized));
     }
 
     /**

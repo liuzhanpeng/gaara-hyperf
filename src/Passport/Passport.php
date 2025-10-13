@@ -45,7 +45,7 @@ class Passport
         private string $guardName,
         private string $userIdentifier,
         callable $userLoader,
-        array $badges,
+        array $badges = [],
     ) {
         $this->userLoader = \Closure::fromCallable($userLoader);
         foreach ($badges as $badge) {
