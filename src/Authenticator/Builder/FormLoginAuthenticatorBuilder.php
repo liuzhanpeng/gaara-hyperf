@@ -47,12 +47,12 @@ class FormLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
         $failureHandler = $this->createFailureHandler($options);
 
         return new FormLogAuthenticator(
-            successHandler: $successHandler,
-            failureHandler: $failureHandler,
             userProvider: $userProvider,
             response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
             session: $this->container->get(SessionInterface::class),
             options: $options,
+            successHandler: $successHandler,
+            failureHandler: $failureHandler,
         );
     }
 }

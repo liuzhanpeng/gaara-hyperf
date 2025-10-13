@@ -5,13 +5,10 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Exception\InvalidCredentialsException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
-use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * JSON登录认证
@@ -21,20 +18,13 @@ use Psr\Http\Message\ResponseInterface;
 class JsonLoginAuthenticator extends AbstractAuthenticator
 {
     public function __construct(
-        private ?AuthenticationSuccessHandlerInterface $successHandler,
-        private ?AuthenticationFailureHandlerInterface $failureHandler,
         private UserProviderInterface $userProvider,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
         private array $options,
+        ?AuthenticationSuccessHandlerInterface $successHandler,
+        ?AuthenticationFailureHandlerInterface $failureHandler,
     ) {
-        if (!isset($options['check_path'])) {
-            throw new \InvalidArgumentException('The "check_path" option must be set.');
-        }
-
-        $this->options = array_merge([
-            'username_param' => 'username',
-            'password_param' => 'password',
-        ], $options);
+        parent::__construct($successHandler, $failureHandler);
     }
 
     /**
@@ -52,12 +42,11 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
     /**
      * @inheritDoc
      */
-    public function authenticate(ServerRequestInterface $request, string $guardName): Passport
+    public function authenticate(ServerRequestInterface $request): Passport
     {
         $credientials = $this->getCredentials($request);
 
         $passport = new Passport(
-            $guardName,
             $credientials['username'],
             $this->userProvider->findByIdentifier(...),
             [
@@ -66,30 +55,6 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
         );
 
         return $passport;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function onAuthenticationSuccess(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
-    {
-        if (!is_null($this->successHandler)) {
-            return $this->successHandler->handle($request, $token);
-        }
-
-        return null;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function onAuthenticationFailure(ServerRequestInterface $request, AuthenticationException $exception): ?ResponseInterface
-    {
-        if (!is_null($this->failureHandler)) {
-            return $this->failureHandler->handle($request, $exception);
-        }
-
-        throw $exception;
     }
 
     /**

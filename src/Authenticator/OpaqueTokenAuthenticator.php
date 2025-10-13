@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Exception\UnauthenticatedException;
 use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\OpaqueTokenIssuerInterface;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
-use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * 不透明令牌认证器
@@ -20,10 +17,12 @@ use Psr\Http\Message\ResponseInterface;
 class OpaqueTokenAuthenticator extends AbstractAuthenticator
 {
     public function __construct(
-        private ?AuthenticationSuccessHandlerInterface $successHandler,
-        private ?AuthenticationFailureHandlerInterface $failureHandler,
         private OpaqueTokenIssuerInterface $tokenIssuer,
-    ) {}
+        ?AuthenticationSuccessHandlerInterface $successHandler,
+        ?AuthenticationFailureHandlerInterface $failureHandler,
+    ) {
+        parent::__construct($successHandler, $failureHandler);
+    }
 
     /**
      * @inheritDoc
@@ -36,7 +35,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
     /**
      * @inheritDoc
      */
-    public function authenticate(ServerRequestInterface $request, string $guardName): Passport
+    public function authenticate(ServerRequestInterface $request): Passport
     {
         $accessTokenStr = $this->tokenIssuer->extractAccessToken($request);
         if (is_null($accessTokenStr)) {
@@ -49,7 +48,6 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
         }
 
         return new Passport(
-            $guardName,
             $token->getUser()->getIdentifier(),
             fn() => $token->getUser(),
         );
@@ -58,27 +56,6 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
     /**
      * @inheritDoc
      */
-    public function onAuthenticationSuccess(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
-    {
-        if (!is_null($this->successHandler)) {
-            return $this->successHandler->handle($request, $token);
-        }
-
-        return null;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function onAuthenticationFailure(ServerRequestInterface $request, AuthenticationException $exception): ?ResponseInterface
-    {
-        if (!is_null($this->failureHandler)) {
-            return $this->failureHandler->handle($request, $exception);
-        }
-
-        throw $exception;
-    }
-
     public function isInteractive(): bool
     {
         return false;

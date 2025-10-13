@@ -29,13 +29,6 @@ class Passport
     private \Closure $userLoader;
 
     /**
-     * 认证标识集合
-     *
-     * @var array<string, BadgeInterface>
-     */
-    private array $badges = [];
-
-    /**
      * @param string $userIdentifier 用户标识
      * @param callable $userLoader 用户加载器
      * @param BadgeInterface[] $badges 认证标识集合
@@ -43,7 +36,7 @@ class Passport
     public function __construct(
         private string $userIdentifier,
         callable $userLoader,
-        array $badges = [],
+        private array $badges = [],
     ) {
         $this->userLoader = \Closure::fromCallable($userLoader);
         foreach ($badges as $badge) {
@@ -75,10 +68,7 @@ class Passport
             }
 
             if (!$user instanceof UserInterface) {
-                throw new \LogicException(sprintf(
-                    'The user provider must return a UserInterface object, %s given',
-                    get_debug_type($user)
-                ));
+                throw new \LogicException(sprintf('The user provider must return a UserInterface object, %s given', get_debug_type($user)));
             }
 
             $this->user = $user;

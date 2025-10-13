@@ -26,21 +26,23 @@ use Psr\Http\Message\ResponseInterface;
 class FormLogAuthenticator extends AbstractAuthenticator
 {
     /**
-     * @param string $options 配置
-     * @param AuthenticationSuccessHandlerInterface|null $successHandler 登录成功处理器
-     * @param AuthenticationFailureHandlerInterface|null $failureHandler 登录失败处理器
-     * @param UserProviderInterface $userProvider 用户提供者
+     * @param UserProviderInterface $userProvider
+     * @param AuthenticationSuccessHandlerInterface|null $successHandler
+     * @param AuthenticationFailureHandlerInterface|null $failureHandler
      * @param \Hyperf\HttpServer\Contract\ResponseInterface $response
      * @param SessionInterface $session
+     * @param array $options
      */
     public function __construct(
-        private ?AuthenticationSuccessHandlerInterface $successHandler,
-        private ?AuthenticationFailureHandlerInterface $failureHandler,
         private UserProviderInterface $userProvider,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
         private SessionInterface $session,
         private array $options,
-    ) {}
+        ?AuthenticationSuccessHandlerInterface $successHandler,
+        ?AuthenticationFailureHandlerInterface $failureHandler,
+    ) {
+        parent::__construct($successHandler, $failureHandler);
+    }
 
     /**
      * @inheritDoc
@@ -54,12 +56,11 @@ class FormLogAuthenticator extends AbstractAuthenticator
     /**
      * @inheritDoc
      */
-    public function authenticate(ServerRequestInterface $request, string $guardName): Passport
+    public function authenticate(ServerRequestInterface $request): Passport
     {
         $credientials = $this->getCredentials($request);
 
         $passport = new Passport(
-            $guardName,
             $credientials['username'],
             $this->userProvider->findByIdentifier(...),
             [

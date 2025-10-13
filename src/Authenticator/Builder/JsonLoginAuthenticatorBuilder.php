@@ -31,11 +31,11 @@ class JsonLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
         $failureHandler = $this->createFailureHandler($options);
 
         return new JsonLoginAuthenticator(
-            successHandler: $successHandler,
-            failureHandler: $failureHandler,
             userProvider: $userProvider,
             response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
             options: $options,
+            successHandler: $successHandler,
+            failureHandler: $failureHandler,
         );
     }
 }

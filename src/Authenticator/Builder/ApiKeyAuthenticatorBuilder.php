@@ -27,9 +27,9 @@ class APIKeyAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 
         return new APIKeyAuthenticator(
             userProvider: $userProvider,
+            options: $options,
             successHandler: $successHandler,
             failureHandler: $failureHandler,
-            options: $options,
         );
     }
 }

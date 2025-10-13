@@ -29,9 +29,9 @@ class OpaqueTokenAuthenticatorBuilder extends AbstractAuthenticatorBuilder
         $eventDispatcher->addSubscriber(new OpaqueTokenRevokeLogoutListener(opaqueTokenIssuer: $tokenIssuer));
 
         return new OpaqueTokenAuthenticator(
+            tokenIssuer: $tokenIssuer,
             successHandler: $this->createSuccessHandler($options),
             failureHandler: $this->createFailureHandler($options),
-            tokenIssuer: $tokenIssuer,
         );
     }
 }

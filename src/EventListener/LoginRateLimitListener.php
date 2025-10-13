@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\EventListener;
 
+use Lzpeng\HyperfAuthGuard\Event\AuthenticationFailureEvent;
+use Lzpeng\HyperfAuthGuard\Event\AuthenticationSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
 use Lzpeng\HyperfAuthGuard\Event\LoginFailureEvent;
 use Lzpeng\HyperfAuthGuard\Event\LoginSuccessEvent;
@@ -28,8 +30,8 @@ class LoginRateLimitListener implements EventSubscriberInterface
     {
         return [
             CheckPassportEvent::class => 'checkPassport',
-            LoginSuccessEvent::class => 'onLoginSuccess',
-            LoginFailureEvent::class => 'onLoginFailure',
+            AuthenticationSuccessEvent::class => 'onAuthenticationSuccess',
+            AuthenticationFailureEvent::class => 'onAuthenticationFailure',
         ];
     }
 
@@ -47,14 +49,22 @@ class LoginRateLimitListener implements EventSubscriberInterface
         }
     }
 
-    public function onLoginSuccess(LoginSuccessEvent $event): void
+    public function onAuthenticationSuccess(AuthenticationSuccessEvent $event): void
     {
+        if (!$event->getAuthenticator()->isInteractive()) {
+            return;
+        }
+
         $token = $event->getToken();
         $this->loginRateLimiter->reset($token->getUser()->getIdentifier() . $this->ipResolver->resolve($event->getRequest()));
     }
 
-    public function onLoginFailure(LoginFailureEvent $event): void
+    public function onAuthenticationFailure(AuthenticationFailureEvent $event): void
     {
+        if (!$event->getAuthenticator()->isInteractive()) {
+            return;
+        }
+
         $exception = $event->getException();
         $this->loginRateLimiter->attempt($exception->getUserIdentifier() . $this->ipResolver->resolve($event->getRequest()));
     }

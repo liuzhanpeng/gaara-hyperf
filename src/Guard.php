@@ -90,7 +90,7 @@ class Guard implements GuardInterface
      */
     public function authenticateUser(UserInterface $user, ServerRequestInterface $request, ?string $authenticator = null, array $badges = []): ?ResponseInterface
     {
-        $passport = new Passport($this->name, $user->getIdentifier(), fn() => $user, $badges);
+        $passport = new Passport($user->getIdentifier(), fn() => $user, $badges);
         $authenticator = $this->resolveAuthenticator($authenticator);
 
         return $this->executeAuthenticator($authenticator, $request, $passport);
@@ -205,11 +205,9 @@ class Guard implements GuardInterface
 
         $response = $authenticator->onAuthenticationSuccess($request, $token);
 
+        $response = $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($this->name, $authenticator, $passport, $token, $request, $response, $previousToken))->getResponse();
         if ($authenticator->isInteractive()) {
-            $response = $this->eventDispatcher->dispatch(new LoginSuccessEvent($this->name, $authenticator, $passport, $token, $request, $response, $previousToken))->getResponse();
             $this->tokenStorage->set($this->name, $token);
-        } else {
-            $response = $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($this->name, $authenticator, $passport, $token, $request, $response, $previousToken))->getResponse();
         }
 
         return $response;
@@ -227,12 +225,7 @@ class Guard implements GuardInterface
     private function handleAuthenticationFailure(ServerRequestInterface $request, AuthenticatorInterface $authenticator,  AuthenticationException $exception, ?Passport $passport): ?ResponseInterface
     {
         $response = $authenticator->onAuthenticationFailure($request, $exception, $passport);
-
-        if ($authenticator->isInteractive()) {
-            $response = $this->eventDispatcher->dispatch(new LoginFailureEvent($this->name, $authenticator, $passport, $exception, $request, $response))->getResponse();
-        } else {
-            $response = $this->eventDispatcher->dispatch(new AuthenticationFailureEvent($this->name, $authenticator, $passport, $exception, $request, $response))->getResponse();
-        }
+        $response = $this->eventDispatcher->dispatch(new AuthenticationFailureEvent($this->name, $authenticator, $passport, $exception, $request, $response))->getResponse();
 
         return $response;
     }

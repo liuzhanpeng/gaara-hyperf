@@ -7,11 +7,8 @@ namespace Lzpeng\HyperfAuthGuard\Authenticator;
 use ASCare\Shared\Infra\Encryptor;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
-use Lzpeng\HyperfAuthGuard\Token\AuthenticatedToken;
-use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\User\PasswordAwareUserInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -19,26 +16,29 @@ use Psr\Http\Message\ServerRequestInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class APISignatureAuthenticator implements AuthenticatorInterface
+class APISignatureAuthenticator extends AbstractAuthenticator
 {
+    /**
+     * @param UserProviderInterface $userProvider
+     * @param AuthenticationSuccessHandlerInterface|null $successHandler
+     * @param AuthenticationFailureHandlerInterface|null $failureHandler
+     * @param Encryptor|null $encryptor
+     * @param array $options
+     */
     public function __construct(
         private UserProviderInterface $userProvider,
-        private ?AuthenticationSuccessHandlerInterface $successHandler,
-        private ?AuthenticationFailureHandlerInterface $failureHandler,
-        private ?Encryptor $encryptor,
         private array $options,
+        private ?Encryptor $encryptor,
+        ?AuthenticationSuccessHandlerInterface $successHandler,
+        ?AuthenticationFailureHandlerInterface $failureHandler,
     ) {
-        $this->options = array_merge([
-            'api_key_param' => 'X-API-KEY',
-            'signature_param' => 'X-Signature',
-            'timestamp_param' => 'X-Timestamp',
-            'nonce_param' => 'X-Nonce',
-            'ttl' => 60,
-            'algo' => 'sha256',
-        ], $this->options);
+        parent::__construct($successHandler, $failureHandler);
     }
 
-    public function supports(\Psr\Http\Message\ServerRequestInterface $request): bool
+    /**
+     * @inheritDoc
+     */
+    public function supports(ServerRequestInterface $request): bool
     {
         return !empty($request->getHeaderLine($this->options['api_key_param'])) &&
             !empty($request->getHeaderLine($this->options['signature_param'])) &&
@@ -46,7 +46,10 @@ class APISignatureAuthenticator implements AuthenticatorInterface
             !empty($request->getHeaderLine($this->options['nonce_param']));
     }
 
-    public function authenticate(ServerRequestInterface $request, string $guardName): Passport
+    /**
+     * @inheritDoc
+     */
+    public function authenticate(ServerRequestInterface $request): Passport
     {
         $apiKey = $request->getHeaderLine($this->options['api_key_param']);
         $signature = $request->getHeaderLine($this->options['signature_param']);
@@ -89,35 +92,14 @@ class APISignatureAuthenticator implements AuthenticatorInterface
         }
 
         return new Passport(
-            $guardName,
             $apiKey,
             fn() => $user,
         );
     }
 
-    public function createToken(Passport $passport, string $guardName): TokenInterface
-    {
-        return new AuthenticatedToken($guardName, $passport->getUser());
-    }
-
-    public function onAuthenticationSuccess(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
-    {
-        if (!is_null($this->successHandler)) {
-            return $this->successHandler->handle($request, $token);
-        }
-
-        return null;
-    }
-
-    public function onAuthenticationFailure(ServerRequestInterface $request, AuthenticationException $exception): ?ResponseInterface
-    {
-        if (!is_null($this->failureHandler)) {
-            return $this->failureHandler->handle($request, $exception);
-        }
-
-        throw $exception;
-    }
-
+    /**
+     * @inheritDoc
+     */
     public function isInteractive(): bool
     {
         return false;

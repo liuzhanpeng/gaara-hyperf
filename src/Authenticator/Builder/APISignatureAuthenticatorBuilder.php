@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\Authenticator\Builder;
 
 use ASCare\Shared\Infra\Encryptor;
+use Lzpeng\HyperfAuthGuard\Authenticator\APISignatureAuthenticator;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
@@ -34,12 +35,12 @@ class APISignatureAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             ]);
         }
 
-        return new \Lzpeng\HyperfAuthGuard\Authenticator\APISignatureAuthenticator(
+        return new APISignatureAuthenticator(
+            userProvider: $userProvider,
+            options: $options,
+            encryptor: $encryptor,
             successHandler: $this->createSuccessHandler($options),
             failureHandler: $this->createFailureHandler($options),
-            userProvider: $userProvider,
-            encryptor: $encryptor,
-            options: $options,
         );
     }
 }
