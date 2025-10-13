@@ -26,8 +26,6 @@ class AuthenticatedToken extends AbstractToken
     }
 
     /**
-     * 支持新的反序列化接口 (PHP 8.1+)
-     *
      * @param array $data
      * @return void
      */
