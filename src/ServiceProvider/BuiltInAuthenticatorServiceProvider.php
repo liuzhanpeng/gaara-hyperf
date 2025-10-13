@@ -11,6 +11,7 @@ use Lzpeng\HyperfAuthGuard\Authenticator\Builder\APISignatureAuthenticatorBuilde
 use Lzpeng\HyperfAuthGuard\Authenticator\Builder\FormLoginAuthenticatorBuilder;
 use Lzpeng\HyperfAuthGuard\Authenticator\Builder\JsonLoginAuthenticatorBuilder;
 use Lzpeng\HyperfAuthGuard\Authenticator\Builder\OpaqueTokenAuthenticatorBuilder;
+use Lzpeng\HyperfAuthGuard\Authenticator\Builder\X509AuthenticatorBuilder;
 
 /**
  * 内置认证器服务提供者
@@ -30,5 +31,6 @@ class BuiltInAuthenticatorServiceProvider implements ServiceProviderInterface
         $authenticatorFactory->registerBuilder('api_key', APIKeyAuthenticatorBuilder::class);
         $authenticatorFactory->registerBuilder('api_signature', APISignatureAuthenticatorBuilder::class);
         $authenticatorFactory->registerBuilder('opaque_token', OpaqueTokenAuthenticatorBuilder::class);
+        $authenticatorFactory->registerBuilder('x509', X509AuthenticatorBuilder::class);
     }
 }
