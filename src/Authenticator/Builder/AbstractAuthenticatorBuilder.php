@@ -38,9 +38,18 @@ abstract class AbstractAuthenticatorBuilder implements AuthenticatorBuilderInter
             ];
         }
 
+        $args = $options['success_handler']['args'] ?? [];
+        if (count($args) > 0) {
+            // 将参数名称从下划线转换为驼峰命名
+            $args = array_combine(
+                array_map(fn($key) => lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))), array_keys($args)),
+                $args
+            );
+        }
+
         $successHandler = $this->container->make(
             $options['success_handler']['class'],
-            $options['success_handler']['args'] ?? []
+            $args
         );
 
         if (!$successHandler instanceof AuthenticationSuccessHandlerInterface) {
@@ -68,9 +77,18 @@ abstract class AbstractAuthenticatorBuilder implements AuthenticatorBuilderInter
             ];
         }
 
+        $args = $options['failure_handler']['args'] ?? [];
+        if (count($args) > 0) {
+            // 将参数名称从下划线转换为驼峰命名
+            $args = array_combine(
+                array_map(fn($key) => lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))), array_keys($args)),
+                $args
+            );
+        }
+
         $failureHandler = $this->container->make(
             $options['failure_handler']['class'],
-            $options['failure_handler']['args'] ?? []
+            $args
         );
 
         if (!$failureHandler instanceof AuthenticationFailureHandlerInterface) {
