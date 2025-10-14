@@ -18,7 +18,7 @@ class IPWhiteListListener implements EventSubscriberInterface
 {
     public function __construct(
         private IpResolver $ipResolver,
-        private array $ipWhiteList = []
+        private array $whiteList = []
     ) {}
 
     public static function getSubscribedEvents(): array
@@ -32,7 +32,7 @@ class IPWhiteListListener implements EventSubscriberInterface
     {
         $passport = $event->getPassport();
         $ip = $this->ipResolver->resolve($event->getRequest());
-        if (empty($this->ipWhiteList) || in_array($ip, $this->ipWhiteList, true)) {
+        if (empty($this->whiteList) || in_array($ip, $this->whiteList, true)) {
             return;
         }
 

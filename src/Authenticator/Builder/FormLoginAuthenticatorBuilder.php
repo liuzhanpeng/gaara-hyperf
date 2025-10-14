@@ -43,16 +43,13 @@ class FormLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             $eventDispatcher->addSubscriber(new CsrfTokenBadgeCheckListener($csrfTokenManager));
         }
 
-        $successHandler = $this->createSuccessHandler($options);
-        $failureHandler = $this->createFailureHandler($options);
-
         return new FormLogAuthenticator(
             userProvider: $userProvider,
             response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
             session: $this->container->get(SessionInterface::class),
             options: $options,
-            successHandler: $successHandler,
-            failureHandler: $failureHandler,
+            successHandler: $this->createSuccessHandler($options),
+            failureHandler: $this->createFailureHandler($options),
         );
     }
 }

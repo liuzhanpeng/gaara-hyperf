@@ -37,12 +37,12 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
      */
     public function authenticate(ServerRequestInterface $request): Passport
     {
-        $accessTokenStr = $this->tokenIssuer->extractAccessToken($request);
-        if (is_null($accessTokenStr)) {
+        $accessToken = $this->tokenIssuer->extractAccessToken($request);
+        if (is_null($accessToken)) {
             throw new UnauthenticatedException();
         }
 
-        $token = $this->tokenIssuer->resolve($accessTokenStr);
+        $token = $this->tokenIssuer->resolve($accessToken);
         if (is_null($token)) {
             throw new UnauthenticatedException();
         }

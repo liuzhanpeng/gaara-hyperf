@@ -18,5 +18,10 @@ class NoLoginRateLimiter implements LoginRateLimiterInterface
         return new LimitResult(true, PHP_INT_MAX, 0);
     }
 
+    public function check(string $key): LimitResult
+    {
+        return new LimitResult(true, PHP_INT_MAX, 0);
+    }
+
     public function reset(string $key): void {}
 }

@@ -22,14 +22,11 @@ class APIKeyAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             'api_key_param' => 'X-API-KEY',
         ], $options);
 
-        $successHandler = $this->createSuccessHandler($options);
-        $failureHandler = $this->createFailureHandler($options);
-
         return new APIKeyAuthenticator(
             userProvider: $userProvider,
             options: $options,
-            successHandler: $successHandler,
-            failureHandler: $failureHandler,
+            successHandler: $this->createSuccessHandler($options),
+            failureHandler: $this->createFailureHandler($options),
         );
     }
 }
