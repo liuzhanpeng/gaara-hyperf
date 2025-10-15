@@ -31,6 +31,7 @@ class HeaderAccessTokenExtractor implements AccessTokenExtractorInterface
             return null;
         }
 
+
         $regex = \sprintf(
             '/^%s([a-zA-Z0-9\-_\+~\/\.]+=*)$/',
             '' === $this->paramType ? '' : preg_quote($this->paramType) . '\s+'

@@ -33,7 +33,7 @@ class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
                 'ip_bind_enabled' => false,
                 'user_agent_bind_enabled' => false,
             ],
-        ], $config->serviceConfig('opaque_token_issuers') ?? []);
+        ], $config->serviceConfig('opaque_token_managers') ?? []);
 
         $opaqueTokenManagerMap = [];
         foreach ($opaqueTokenManagerConfig as $name => $config) {

@@ -19,13 +19,13 @@ class OpaqueTokenResponseHandler implements AuthenticationSuccessHandlerInterfac
     public function __construct(
         private OpaqueTokenManagerResolverInterface $opaqueTokenManagerResolver,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
-        private string $tokenIssuer = 'default',
+        private string $tokenManager = 'default',
         private ?string $responseTemplate = null,
     ) {}
 
     public function handle(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
     {
-        $accessToken = $this->opaqueTokenManagerResolver->resolve($this->tokenIssuer)->issue($token);
+        $accessToken = $this->opaqueTokenManagerResolver->resolve($this->tokenManager)->issue($token);
 
         if (!is_null($this->responseTemplate)) {
             if (!is_string($this->responseTemplate) || !is_array(json_decode($this->responseTemplate, true))) {

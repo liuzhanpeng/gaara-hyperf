@@ -26,13 +26,13 @@ class OpaqueTokenAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             'token_extractor' => 'default',
         ], $options);
 
-        $tokenManager = $this->container->get(OpaqueTokenManagerResolverInterface::class)->resolve($options['token_manager']);
-        $tokenExtractor = $this->container->get(AccessTokenExtractorResolverInterface::class)->resolve($options['token_extractor']);
-        $eventDispatcher->addSubscriber(new OpaqueTokenRevokeLogoutListener(opaqueTokenManager: $tokenManager, accessTokenExtractor: $tokenExtractor));
+        $opaqueTokenManager = $this->container->get(OpaqueTokenManagerResolverInterface::class)->resolve($options['token_manager']);
+        $accessTokenExtractor = $this->container->get(AccessTokenExtractorResolverInterface::class)->resolve($options['token_extractor']);
+        $eventDispatcher->addSubscriber(new OpaqueTokenRevokeLogoutListener($opaqueTokenManager, $accessTokenExtractor));
 
         return new OpaqueTokenAuthenticator(
-            tokenManager: $tokenManager,
-            accessTokenExtractor: $tokenExtractor,
+            opaqueTokenManager: $opaqueTokenManager,
+            accessTokenExtractor: $accessTokenExtractor,
             successHandler: $this->createSuccessHandler($options),
             failureHandler: $this->createFailureHandler($options),
         );
