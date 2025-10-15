@@ -25,7 +25,7 @@ class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
         $opaqueTokenManagerConfig = array_merge([
             'default' => [
                 'type' => 'default',
-                'prefix' => sprintf('%s:%s:', Constants::__PREFIX, 'opaque_token'),
+                'prefix' => 'default',
                 'expires_in' => 60 * 20,
                 'max_lifetime' => 60 * 60 * 24,
                 'token_refresh' => true,

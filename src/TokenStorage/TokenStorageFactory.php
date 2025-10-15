@@ -35,7 +35,7 @@ class TokenStorageFactory
                 }
 
                 return $this->container->make(SessionTokenStorage::class, [
-                    'prefix' => sprintf('%s:%s:', Constants::__PREFIX, $options['prefix'])
+                    'prefix' => sprintf('%s:token_storage:%s:', Constants::__PREFIX, $options['prefix'])
                 ]);
             case 'null':
                 return $this->container->make(NullTokenStorage::class);

@@ -17,7 +17,7 @@ use Psr\SimpleCache\CacheInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class OpaqueTokenManager implements OpaqueTokenManagerInterface
+class DefaultOpaqueTokenManager implements OpaqueTokenManagerInterface
 {
     /**
      * @param CacheInterface $cache

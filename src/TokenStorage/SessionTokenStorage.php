@@ -55,6 +55,6 @@ class SessionTokenStorage implements TokenStorageInterface
      */
     private function getKey(string $key): string
     {
-        return sprintf('%s.%s', $this->prefix, $key);
+        return sprintf('%s:%s', $this->prefix, $key);
     }
 }

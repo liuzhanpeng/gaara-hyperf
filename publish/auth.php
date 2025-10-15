@@ -133,13 +133,13 @@ return [
         'csrf_token_managers' => [
             'admin' => [
                 'type' => 'session',
-                'prefix' => 'auth.csrf_token'
+                'prefix' => 'admin'
             ]
         ],
         'opaque_token_managers' => [
             'admin_opaque_token_manager' => [
                 'type' => 'default',
-                'prefix' => 'auth:opaque_token',
+                'prefix' => 'admin',
                 'expires_in' => 60 * 20, // token过期时间，单位秒
                 'max_lifetime' => 60 * 60 * 24, // token最大生命周期，单位秒
                 'token_refresh' => true,
