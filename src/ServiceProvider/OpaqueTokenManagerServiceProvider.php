@@ -8,8 +8,8 @@ use Hyperf\Contract\ContainerInterface;
 use Lzpeng\HyperfAuthGuard\Config\ConfigLoaderInterface;
 use Lzpeng\HyperfAuthGuard\Constants;
 use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerFactory;
-use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerInterface;
 use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerResolver;
+use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerResolverInterface;
 
 /**
  * Opaque Token 管理器服务提供者
@@ -41,6 +41,6 @@ class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
             $container->define($opaqueTokenManagerMap[$name], fn() => $container->get(OpaqueTokenManagerFactory::class)->create($config));
         }
 
-        $container->define(OpaqueTokenManagerInterface::class, fn() => new OpaqueTokenManagerResolver($opaqueTokenManagerMap, $container));
+        $container->define(OpaqueTokenManagerResolverInterface::class, fn() => new OpaqueTokenManagerResolver($opaqueTokenManagerMap, $container));
     }
 }
