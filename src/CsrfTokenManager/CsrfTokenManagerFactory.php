@@ -29,7 +29,7 @@ class CsrfTokenManagerFactory
         switch ($type) {
             case 'session':
                 return $this->container->make(SessionCsrfTokenManager::class, [
-                    'prefix' => sprintf('%s:csrf_token:%s:', Constants::__PREFIX, $config['prefix'] ?? 'default'),
+                    'prefix' => sprintf('%s.csrf_token.%s', Constants::__PREFIX, $config['prefix'] ?? 'default'),
                     'session' => $this->container->get(SessionInterface::class),
                 ]);
             case 'custom':
