@@ -18,8 +18,8 @@ class HeaderAccessTokenExtractor implements AccessTokenExtractorInterface
      * @param string $type
      */
     public function __construct(
-        private string $param = 'Authorization',
-        private string $type = 'Bearer',
+        private string $paramName = 'Authorization',
+        private string $paramType = 'Bearer',
     ) {}
 
     /**
@@ -27,13 +27,13 @@ class HeaderAccessTokenExtractor implements AccessTokenExtractorInterface
      */
     public function extractAccessToken(ServerRequestInterface $request): ?string
     {
-        if (!$request->hasHeader($this->param) || !\is_string($header = $request->getHeaderLine($this->param))) {
+        if (!$request->hasHeader($this->paramName) || !\is_string($header = $request->getHeaderLine($this->paramName))) {
             return null;
         }
 
         $regex = \sprintf(
             '/^%s([a-zA-Z0-9\-_\+~\/\.]+=*)$/',
-            '' === $this->type ? '' : preg_quote($this->type) . '\s+'
+            '' === $this->paramType ? '' : preg_quote($this->paramType) . '\s+'
         );
 
         if (preg_match($regex, $header, $matches)) {

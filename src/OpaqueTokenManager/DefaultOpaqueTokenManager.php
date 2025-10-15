@@ -23,8 +23,6 @@ class DefaultOpaqueTokenManager implements OpaqueTokenManagerInterface
      * @param RequestInterface $request
      * @param IpResolver $ipResolver
      * @param string $prefix
-     * @param string $headerParam
-     * @param string $tokenType
      * @param integer $expiresIn
      * @param integer $maxLifetime
      * @param boolean $tokenRefresh
@@ -37,8 +35,6 @@ class DefaultOpaqueTokenManager implements OpaqueTokenManagerInterface
         private RequestInterface $request,
         private IpResolver $ipResolver,
         private string $prefix,
-        private string $headerParam,
-        private string $tokenType,
         private int $expiresIn,
         private int $maxLifetime,
         private bool $tokenRefresh,

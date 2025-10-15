@@ -17,7 +17,7 @@ class CookieAccessTokenExtractor implements AccessTokenExtractorInterface
      * @param string $param Cookie 名称
      */
     public function __construct(
-        private string $param = 'access_token',
+        private string $paramName = 'access_token',
     ) {}
 
     /**
@@ -27,11 +27,11 @@ class CookieAccessTokenExtractor implements AccessTokenExtractorInterface
     {
         $cookies = $request->getCookieParams();
 
-        if (!isset($cookies[$this->param])) {
+        if (!isset($cookies[$this->paramName])) {
             return null;
         }
 
-        $token = $cookies[$this->param];
+        $token = $cookies[$this->paramName];
 
         if (!\is_string($token) || empty($token)) {
             return null;
