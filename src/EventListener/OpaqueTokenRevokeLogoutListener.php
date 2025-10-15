@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\EventListener;
 
+use Lzpeng\HyperfAuthGuard\AccessTokenExtractor\AccessTokenExtractorInterface;
 use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
-use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\OpaqueTokenIssuerInterface;
+use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -16,7 +17,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class OpaqueTokenRevokeLogoutListener implements EventSubscriberInterface
 {
     public function __construct(
-        private OpaqueTokenIssuerInterface $opaqueTokenIssuer,
+        private OpaqueTokenManagerInterface $opaqueTokenManager,
+        private AccessTokenExtractorInterface $accessTokenExtractor,
     ) {}
 
     public static function getSubscribedEvents()
@@ -32,11 +34,11 @@ class OpaqueTokenRevokeLogoutListener implements EventSubscriberInterface
             return;
         }
 
-        $accessToken = $this->opaqueTokenIssuer->extractAccessToken($event->getRequest());
+        $accessToken = $this->accessTokenExtractor->extractAccessToken($event->getRequest());
         if (is_null($accessToken)) {
             return;
         }
 
-        $this->opaqueTokenIssuer->revoke($accessToken);
+        $this->opaqueTokenManager->revoke($accessToken);
     }
 }

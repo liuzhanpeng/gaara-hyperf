@@ -2,17 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer;
+namespace Lzpeng\HyperfAuthGuard\OpaqueTokenManager;
 
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * opaque token发行器接口
+ * opaque token管理器接口
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-interface OpaqueTokenIssuerInterface
+interface OpaqueTokenManagerInterface
 {
     /**
      * 发布一个opaque token
@@ -37,12 +36,4 @@ interface OpaqueTokenIssuerInterface
      * @return void
      */
     public function revoke(string $tokenStr): void;
-
-    /**
-     * 从请求中提取access token字符串 
-     *
-     * @param ServerRequestInterface $request
-     * @return string|null
-     */
-    public function extractAccessToken(ServerRequestInterface $request): ?string;
 }

@@ -40,7 +40,6 @@ abstract class AbstractAuthenticatorBuilder implements AuthenticatorBuilderInter
 
         $args = $options['success_handler']['args'] ?? [];
         if (count($args) > 0) {
-            // 将参数名称从下划线转换为驼峰命名
             $args = array_combine(
                 array_map(fn($key) => lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))), array_keys($args)),
                 $args
@@ -79,7 +78,6 @@ abstract class AbstractAuthenticatorBuilder implements AuthenticatorBuilderInter
 
         $args = $options['failure_handler']['args'] ?? [];
         if (count($args) > 0) {
-            // 将参数名称从下划线转换为驼峰命名
             $args = array_combine(
                 array_map(fn($key) => lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))), array_keys($args)),
                 $args

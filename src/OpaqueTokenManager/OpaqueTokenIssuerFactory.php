@@ -2,20 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer;
+namespace Lzpeng\HyperfAuthGuard\OpaqueTokenManager;
 
 use Hyperf\Contract\ContainerInterface;
 use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
 use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\CacheOpaqueTokenIssuer;
-use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\OpaqueTokenIssuerInterface;
 
 /**
- * OpaqueToken发行器创建工厂
+ * OpaqueToken管理器创建工厂
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class OpaqueTokenIssuerFactory
+class OpaqueTokenManagerFactory
 {
     public function __construct(
         private ContainerInterface $container,
@@ -23,26 +21,26 @@ class OpaqueTokenIssuerFactory
 
     /**
      * @param array $config
-     * @return OpaqueTokenIssuerInterface
+     * @return OpaqueTokenManagerInterface
      */
-    public function create(array $config): OpaqueTokenIssuerInterface
+    public function create(array $config): OpaqueTokenManagerInterface
     {
         if (count($config) !== 1) {
-            throw new \InvalidArgumentException('token_issuer config must have exactly one type defined.');
+            throw new \InvalidArgumentException('token_manager config must have exactly one type defined.');
         }
 
         $type = array_key_first($config);
         $options = $config[$type];
 
         switch ($type) {
-            case 'cache':
+            case 'default':
                 $expiresIn = $options['expires_in'] ?? 60 * 20;
                 $maxLifetime = $options['max_lifetime'] ?? 60 * 60 * 24;
                 if ($expiresIn > $maxLifetime) {
                     throw new \InvalidArgumentException('The expires_in option must be less than or equal to max_lifetime option.');
                 }
 
-                return $this->container->make(CacheOpaqueTokenIssuer::class, [
+                return $this->container->make(OpaqueTokenManager::class, [
                     'prefix' => $options['prefix'] ?? sprintf('%s:%s:', Constants::__PREFIX, 'opaque_token'),
                     'headerParam' => $options['header_param'] ?? 'Authorization',
                     'tokenType' => $options['token_type'] ?? 'Bearer',
@@ -55,14 +53,14 @@ class OpaqueTokenIssuerFactory
             case 'custom':
                 $customConfig = CustomConfig::from($options);
 
-                $opaqueTokenIssuer = $this->container->get($customConfig->class(), $customConfig->args());
-                if (!$opaqueTokenIssuer instanceof OpaqueTokenIssuerInterface) {
-                    throw new \LogicException(sprintf('The custom OpaqueTokenIssuer must implement %s.', OpaqueTokenIssuerInterface::class));
+                $opaqueTokenManager = $this->container->get($customConfig->class(), $customConfig->args());
+                if (!$opaqueTokenManager instanceof OpaqueTokenManagerInterface) {
+                    throw new \LogicException(sprintf('The custom OpaqueTokenManager must implement %s.', OpaqueTokenManagerInterface::class));
                 }
 
-                return $opaqueTokenIssuer;
+                return $opaqueTokenManager;
             default:
-                throw new \InvalidArgumentException('Unsupported opaque token issuer type: ' . $type);
+                throw new \InvalidArgumentException('Unsupported opaque token manager type: ' . $type);
         }
     }
 }

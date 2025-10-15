@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer;
+namespace Lzpeng\HyperfAuthGuard\OpaqueTokenManager;
 
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
@@ -11,13 +11,13 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\SimpleCache\CacheInterface;
 
 /**
- * 内置的OpaqueToken发行器
+ * 内置的OpaqueToken管理器
  * 
  * 基于缓存实现
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class CacheOpaqueTokenIssuer implements OpaqueTokenIssuerInterface
+class OpaqueTokenManager implements OpaqueTokenManagerInterface
 {
     /**
      * @param CacheInterface $cache
@@ -29,6 +29,7 @@ class CacheOpaqueTokenIssuer implements OpaqueTokenIssuerInterface
      * @param integer $expiresIn
      * @param integer $maxLifetime
      * @param boolean $tokenRefresh
+     * @param boolean $singleSession
      * @param boolean $ipBindEnabled
      * @param boolean $userAgentBindEnabled
      */
@@ -42,6 +43,7 @@ class CacheOpaqueTokenIssuer implements OpaqueTokenIssuerInterface
         private int $expiresIn,
         private int $maxLifetime,
         private bool $tokenRefresh,
+        private bool $singleSession,
         private bool $ipBindEnabled,
         private bool $userAgentBindEnabled,
     ) {}
@@ -140,5 +142,16 @@ class CacheOpaqueTokenIssuer implements OpaqueTokenIssuerInterface
     private function getAccessTokenKey(string $accessToken): string
     {
         return sprintf('%s:%s', $this->prefix, $accessToken);
+    }
+
+    /**
+     * 返回用户Token列表键
+     *
+     * @param string $identifier
+     * @return string
+     */
+    private function getUserTokensKey(string $identifier): string
+    {
+        return sprintf('%s:%s:tokens', $this->prefix, md5($identifier));
     }
 }

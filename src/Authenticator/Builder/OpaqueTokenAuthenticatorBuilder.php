@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authenticator\Builder;
 
+use Lzpeng\HyperfAuthGuard\AccessTokenExtractor\AccessTokenExtractorResolverInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\OpaqueTokenAuthenticator;
 use Lzpeng\HyperfAuthGuard\EventListener\OpaqueTokenRevokeLogoutListener;
-use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\OpaqueTokenIssuerResolverInterface;
+use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerResolverInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -21,15 +22,17 @@ class OpaqueTokenAuthenticatorBuilder extends AbstractAuthenticatorBuilder
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
         $options = array_merge([
-            'token_issuer' => 'default',
+            'token_manager' => 'default',
+            'token_extractor' => 'default',
         ], $options);
 
-
-        $tokenIssuer = $this->container->get(OpaqueTokenIssuerResolverInterface::class)->resolve($options['token_issuer']);
-        $eventDispatcher->addSubscriber(new OpaqueTokenRevokeLogoutListener(opaqueTokenIssuer: $tokenIssuer));
+        $tokenManager = $this->container->get(OpaqueTokenManagerResolverInterface::class)->resolve($options['token_manager']);
+        $tokenExtractor = $this->container->get(AccessTokenExtractorResolverInterface::class)->resolve($options['token_extractor']);
+        $eventDispatcher->addSubscriber(new OpaqueTokenRevokeLogoutListener(opaqueTokenManager: $tokenManager, accessTokenExtractor: $tokenExtractor));
 
         return new OpaqueTokenAuthenticator(
-            tokenIssuer: $tokenIssuer,
+            tokenManager: $tokenManager,
+            accessTokenExtractor: $tokenExtractor,
             successHandler: $this->createSuccessHandler($options),
             failureHandler: $this->createFailureHandler($options),
         );

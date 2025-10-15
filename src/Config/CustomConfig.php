@@ -34,7 +34,15 @@ class CustomConfig
             throw new \InvalidArgumentException('class is required');
         }
 
-        return new self($config['class'], $config['args'] ?? []);
+        $args = $config['args'] ?? [];
+        if (count($args) > 0) {
+            $args = array_combine(
+                array_map(fn($key) => lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))), array_keys($args)),
+                $args
+            );
+        }
+
+        return new self($config['class'], $args);
     }
 
     /**

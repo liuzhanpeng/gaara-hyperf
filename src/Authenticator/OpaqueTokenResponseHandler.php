@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\OpaqueTokenIssuerResolverInterface;
+use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerResolverInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -17,7 +17,7 @@ use Psr\Http\Message\ResponseInterface;
 class OpaqueTokenResponseHandler implements AuthenticationSuccessHandlerInterface
 {
     public function __construct(
-        private OpaqueTokenIssuerResolverInterface $opaqueTokenIssuerResolver,
+        private OpaqueTokenManagerResolverInterface $opaqueTokenManagerResolver,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
         private string $tokenIssuer = 'default',
         private ?string $responseTemplate = null,
@@ -25,7 +25,7 @@ class OpaqueTokenResponseHandler implements AuthenticationSuccessHandlerInterfac
 
     public function handle(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
     {
-        $accessToken = $this->opaqueTokenIssuerResolver->resolve($this->tokenIssuer)->issue($token);
+        $accessToken = $this->opaqueTokenManagerResolver->resolve($this->tokenIssuer)->issue($token);
 
         if (!is_null($this->responseTemplate)) {
             if (!is_string($this->responseTemplate) || !is_array(json_decode($this->responseTemplate, true))) {

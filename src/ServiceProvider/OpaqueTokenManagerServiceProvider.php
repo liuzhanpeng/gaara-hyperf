@@ -7,24 +7,24 @@ namespace Lzpeng\HyperfAuthGuard\ServiceProvider;
 use Hyperf\Contract\ContainerInterface;
 use Lzpeng\HyperfAuthGuard\Config\ConfigLoaderInterface;
 use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\OpaqueTokenIssuerFactory;
-use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\OpaqueTokenIssuerResolver;
-use Lzpeng\HyperfAuthGuard\OpaqueTokenIssuer\OpaqueTokenIssuerResolverInterface;
+use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerFactory;
+use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerInterface;
+use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerResolver;
 
 /**
- * Opaque Token 发行器服务提供者
+ * Opaque Token 管理器服务提供者
  *
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class OpaqueTokenIssuerServiceProvider implements ServiceProviderInterface
+class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
 {
     public function register(ContainerInterface $container): void
     {
         $config = $container->get(ConfigLoaderInterface::class)->load();
 
-        $opaqueTokenIssuerConfig = array_merge([
+        $opaqueTokenManagerConfig = array_merge([
             'default' => [
-                'cache' => [
+                'default' => [
                     'prefix' => sprintf('%s:%s:', Constants::__PREFIX, 'opaque_token'),
                     'header_param' => 'Authorization',
                     'token_type' => 'Bearer',
@@ -37,12 +37,12 @@ class OpaqueTokenIssuerServiceProvider implements ServiceProviderInterface
             ],
         ], $config->serviceConfig('opaque_token_issuers') ?? []);
 
-        $opaqueTokenIssuerMap = [];
-        foreach ($opaqueTokenIssuerConfig as $name => $config) {
-            $opaqueTokenIssuerMap[$name] = sprintf('%s.%s', Constants::OPAQUE_TOKEN_ISSUER_PREFIX, $name);
-            $container->define($opaqueTokenIssuerMap[$name], fn() => $container->get(OpaqueTokenIssuerFactory::class)->create($config));
+        $opaqueTokenManagerMap = [];
+        foreach ($opaqueTokenManagerConfig as $name => $config) {
+            $opaqueTokenManagerMap[$name] = sprintf('%s.%s', Constants::OPAQUE_TOKEN_MANAGER_PREFIX, $name);
+            $container->define($opaqueTokenManagerMap[$name], fn() => $container->get(OpaqueTokenManagerFactory::class)->create($config));
         }
 
-        $container->define(OpaqueTokenIssuerResolverInterface::class, fn() => new OpaqueTokenIssuerResolver($opaqueTokenIssuerMap, $container));
+        $container->define(OpaqueTokenManagerInterface::class, fn() => new OpaqueTokenManagerResolver($opaqueTokenManagerMap, $container));
     }
 }

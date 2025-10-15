@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard;
 
 use Hyperf\Contract\ContainerInterface;
+use Lzpeng\HyperfAuthGuard\ServiceProvider\AccessTokenExtractorServiceProvider;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\ServiceProviderRegisterEvent;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\BuiltInAuthenticatorServiceProvider;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\BuiltInUserProviderServiceProvider;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\CsrfTokenManagerServiceProvider;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\GuardServiceProvider;
-use Lzpeng\HyperfAuthGuard\ServiceProvider\OpaqueTokenIssuerServiceProvider;
+use Lzpeng\HyperfAuthGuard\ServiceProvider\OpaqueTokenManagerServiceProvider;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\PasswordHasherServiceProvider;
-use Lzpeng\HyperfAuthGuard\ServiceProvider\ServiceProviderRegistrar;
 use Lzpeng\HyperfAuthGuard\ServiceProvider\ServiceProviderRegistry;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
@@ -45,7 +45,8 @@ class AuthInitializer
             ->register(new BuiltInUserProviderServiceProvider())
             ->register(new PasswordHasherServiceProvider())
             ->register(new CsrfTokenManagerServiceProvider())
-            ->register(new OpaqueTokenIssuerServiceProvider())
+            ->register(new OpaqueTokenManagerServiceProvider())
+            ->register(new AccessTokenExtractorServiceProvider())
             ->register(new GuardServiceProvider());
 
         /**
