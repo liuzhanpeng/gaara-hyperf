@@ -69,7 +69,12 @@ class DefaultOpaqueTokenManager implements OpaqueTokenManagerInterface
             $data['user_agent'] = md5($this->request->getHeaderLine('User-Agent'));
         }
 
+        if ($this->singleSession) {
+            $this->cache->delete($this->getUserTokenKey($token->getUser()->getIdentifier()));
+        }
+
         $this->cache->set($this->getAccessTokenKey($accessToken), $data, $this->expiresIn);
+        $this->cache->set($this->getUserTokenKey($token->getUser()->getIdentifier()), $accessToken, $this->maxLifetime);
 
         return $accessToken;
     }
@@ -110,27 +115,12 @@ class DefaultOpaqueTokenManager implements OpaqueTokenManagerInterface
     public function revoke(string $accessToken): void
     {
         $this->cache->delete($this->getAccessTokenKey($accessToken));
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function extractAccessToken(ServerRequestInterface $request): ?string
-    {
-        if (!$request->hasHeader($this->headerParam) || !\is_string($header = $request->getHeaderLine($this->headerParam))) {
-            return null;
+        if ($this->singleSession) {
+            $data = $this->cache->get($this->getAccessTokenKey($accessToken));
+            if (!is_null($data)) {
+                $this->cache->delete($this->getUserTokenKey($data['token']->getUser()->getIdentifier()));
+            }
         }
-
-        $regex = \sprintf(
-            '/^%s([a-zA-Z0-9\-_\+~\/\.]+=*)$/',
-            '' === $this->tokenType ? '' : preg_quote($this->tokenType) . '\s+'
-        );
-
-        if (preg_match($regex, $header, $matches)) {
-            return $matches[1];
-        }
-
-        return null;
     }
 
     /**
@@ -145,13 +135,13 @@ class DefaultOpaqueTokenManager implements OpaqueTokenManagerInterface
     }
 
     /**
-     * 返回用户Token列表键
+     * 返回用户Token键
      *
      * @param string $identifier
      * @return string
      */
-    private function getUserTokensKey(string $identifier): string
+    private function getUserTokenKey(string $identifier): string
     {
-        return sprintf('%s:%s:tokens', $this->prefix, md5($identifier));
+        return sprintf('%s:user:%s', $this->prefix, $identifier);
     }
 }
