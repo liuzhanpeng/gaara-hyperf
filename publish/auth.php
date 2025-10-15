@@ -36,11 +36,11 @@ return [
                     'success_handler' => [
                         'class' => OpaqueTokenResponseHandler::class,
                         'args' => [
-                            // 'tokenManager' => 'admin_opaque_token_manager',
-                            // 'responseTemplate' => '{ "code": 0, "msg": "success", "data": { "access_token": "#ACCESS_TOKEN#"} }',
+                            // 'token_manager' => 'admin_opaque_token_manager',
+                            // 'response_template' => '{ "code": 0, "msg": "success", "data": { "access_token": "#ACCESS_TOKEN#"} }',
                         ],
                     ],
-                    'failure_handler' => 'CustomFailureHandler', // 字符串形式，用户需要实现此类
+                    // 'failure_handler' => CustomFailureHandler::class
                 ],
                 'opaque_token' => [
                     'token_manager' => 'admin_opaque_token_manager',
@@ -104,11 +104,15 @@ return [
             ],
             'listeners' =>  [
                 // CustomListener::class,
-                [
-                    'class' => IPWhiteListListener::class,
-                    'args' => [
-                        'whiteList' => ['192.168.1.1']
-                    ]
+                // [
+                //     'class' => IPWhiteListListener::class,
+                //     'args' => [
+                //         'whiteList' => [
+                //             '192.168.1.1',
+                //             '192.168.2.*',
+                //             '172.31.0.0/16',
+                //         ]
+                //     ]
                 ]
             ],
         ],
