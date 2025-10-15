@@ -7,7 +7,6 @@ namespace Lzpeng\HyperfAuthGuard\OpaqueTokenManager;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\Utils\IpResolver;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\SimpleCache\CacheInterface;
 
 /**

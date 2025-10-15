@@ -1,12 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lzpeng\HyperfAuthGuard\RequestMatcher;
 
 use Hyperf\Contract\ContainerInterface;
 use Lzpeng\HyperfAuthGuard\Config\ComponentConfig;
 use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
-
-declare(strict_types=1);
 
 /**
  * 请求匹配器工厂
