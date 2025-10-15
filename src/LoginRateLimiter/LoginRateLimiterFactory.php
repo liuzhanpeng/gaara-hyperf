@@ -6,7 +6,7 @@ namespace Lzpeng\HyperfAuthGuard\LoginRateLimiter;
 
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Redis\Redis;
-use Lzpeng\HyperfAuthGuard\Config\LoginRateLimiterConfig;
+use Lzpeng\HyperfAuthGuard\Config\ComponentConfig;
 use Lzpeng\HyperfAuthGuard\Constants;
 
 /**
@@ -20,20 +20,20 @@ class LoginRateLimiterFactory
         private ContainerInterface $container,
     ) {}
 
-    public function create(LoginRateLimiterConfig $loginRateLimiterConfig): LoginRateLimiterInterface
+    public function create(ComponentConfig $config): LoginRateLimiterInterface
     {
-        $type = $loginRateLimiterConfig->type();
-        $options = $loginRateLimiterConfig->options();
+        $type = $config->type();
+        $options = $config->options();
 
         switch ($type) {
             case 'no_limit':
                 return new NoLoginRateLimiter();
             case 'sliding_window':
                 return new SlidingWindowLoginRateLimiter(
-                    $this->container->get(Redis::class),
-                    $options['interval'] ?? 300,
-                    $options['max_attempts'] ?? 5,
-                    sprintf('%s:login_rate_limiter:sliding_window:', Constants::__PREFIX)
+                    redis: $this->container->get(Redis::class),
+                    interval: $options['interval'] ?? 300,
+                    limit: $options['limit'] ?? 5,
+                    prefix: sprintf('%s:login_rate_limiter:sliding_window:%s', Constants::__PREFIX, $options['prefix'] ?? 'default'),
                 );
             default:
                 throw new \InvalidArgumentException("Unsupported rate limiter type: {$type}");

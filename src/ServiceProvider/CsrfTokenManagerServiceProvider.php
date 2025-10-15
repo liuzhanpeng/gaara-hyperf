@@ -7,9 +7,9 @@ namespace Lzpeng\HyperfAuthGuard\ServiceProvider;
 use Hyperf\Contract\ContainerInterface;
 use Lzpeng\HyperfAuthGuard\Config\ConfigLoaderInterface;
 use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerFactory;
-use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerResolver;
-use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerResolverInterface;
+use Lzpeng\HyperfAuthGuard\CsrfTokenManager\CsrfTokenManagerFactory;
+use Lzpeng\HyperfAuthGuard\CsrfTokenManager\CsrfTokenManagerResolver;
+use Lzpeng\HyperfAuthGuard\CsrfTokenManager\CsrfTokenManagerResolverInterface;
 
 /**
  * CSRF令牌管理器服务提供者
@@ -24,9 +24,8 @@ class CsrfTokenManagerServiceProvider implements ServiceProviderInterface
 
         $csrfTokenManagerConfig = array_merge([
             'default' => [
-                'session' => [
-                    'prefix' => sprintf('%s:%s:', Constants::__PREFIX, 'csrf_token'),
-                ],
+                'type' => 'session',
+                'prefix' => sprintf('%s:%s:', Constants::__PREFIX, 'csrf_token'),
             ],
         ], $config->serviceConfig('csrf_token_managers') ?? []);
 

@@ -28,14 +28,16 @@ class RedirectUnauthenticatedHandler implements UnauthenticatedHandlerInterface
 
         $this->options = array_merge([
             'redirect_enabled' => true,
-            'redirect_param' => 'redirect_to'
+            'redirect_param' => 'redirect_to',
+            'authentication_error_param' => 'authentication_error',
+            'authentication_error_message' => '未认证或已登出，请重新登录'
         ], $this->options);
     }
 
     public function handle(ServerRequestInterface $request, ?TokenInterface $token): ResponseInterface
     {
         if ($this->session instanceof Session) {
-            $this->session->flash('authentication_error', '未认证或已登出，请重新登录！');
+            $this->session->flash($this->options['authentication_error_param'], $this->options['authentication_error_message']);
         }
 
         $targetPath = $this->options['target_path'];

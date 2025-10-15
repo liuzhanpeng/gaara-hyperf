@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\UserProvider;
 
 use Hyperf\Contract\ContainerInterface;
+use Lzpeng\HyperfAuthGuard\Config\ComponentConfig;
 use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
 use Lzpeng\HyperfAuthGuard\Config\UserProviderConfig;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
@@ -34,10 +35,10 @@ class UserProviderFactory
      * @param UserProviderConfig $userProviderConfig
      * @return UserProviderInterface
      */
-    public function create(UserProviderConfig $userProviderConfig): UserProviderInterface
+    public function create(ComponentConfig $config): UserProviderInterface
     {
-        $type = $userProviderConfig->type();
-        $options = $userProviderConfig->options();
+        $type = $config->type();
+        $options = $config->options();
 
         if (isset($this->builders[$type])) {
             $builder = $this->container->get($this->builders[$type]);

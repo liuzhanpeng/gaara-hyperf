@@ -20,25 +20,21 @@ class AccessTokenExtractorFactory
 
     public function create(array $config): AccessTokenExtractorInterface
     {
-        if (count($config) !== 1) {
-            throw new \InvalidArgumentException('access_token_extractor config must have exactly one type defined.');
-        }
-
-        $type = array_key_first($config);
-        $options = $config[$type];
+        $type = $config['type'] ?? 'header';
+        unset($config['type']);
 
         switch ($type) {
             case 'header':
                 return $this->container->make(HeaderAccessTokenExtractor::class, [
-                    'param' => $options['param'] ?? 'Authorization',
-                    'type' => $options['type'] ?? 'Bearer',
+                    'param_name' => $config['param_name'] ?? 'Authorization',
+                    'param_type' => $config['param_type'] ?? 'Bearer',
                 ]);
             case 'cookie':
                 return $this->container->make(CookieAccessTokenExtractor::class, [
-                    'param' => $options['param'] ?? 'access_token',
+                    'param_name' => $config['param_name'] ?? 'access_token',
                 ]);
             case 'custom':
-                $customConfig = CustomConfig::from($options);
+                $customConfig = CustomConfig::from($config);
 
                 $accessTokenExtractor = $this->container->get($customConfig->class(), $customConfig->args());
                 if (!$accessTokenExtractor instanceof AccessTokenExtractorInterface) {

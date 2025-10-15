@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\TokenStorage;
 
 use Hyperf\Contract\ContainerInterface;
+use Lzpeng\HyperfAuthGuard\Config\ComponentConfig;
 use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
-use Lzpeng\HyperfAuthGuard\Config\TokenStorageConfig;
+use Lzpeng\HyperfAuthGuard\Constants;
 use Lzpeng\HyperfAuthGuard\TokenStorage\NullTokenStorage;
 use Lzpeng\HyperfAuthGuard\TokenStorage\SessionTokenStorage;
 use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageInterface;
@@ -22,14 +23,10 @@ class TokenStorageFactory
         private ContainerInterface $container
     ) {}
 
-    /**
-     * @param TokenStorageConfig $tokenStorageConfig
-     * @return TokenStorageInterface
-     */
-    public function create(TokenStorageConfig $tokenStorageConfig): TokenStorageInterface
+    public function create(ComponentConfig $config): TokenStorageInterface
     {
-        $type = $tokenStorageConfig->type();
-        $options = $tokenStorageConfig->options();
+        $type = $config->type();
+        $options = $config->options();
 
         switch ($type) {
             case 'session':
@@ -38,7 +35,7 @@ class TokenStorageFactory
                 }
 
                 return $this->container->make(SessionTokenStorage::class, [
-                    'prefix' => $options['prefix']
+                    'prefix' => sprintf('%s:%s:', Constants::__PREFIX, $options['prefix'])
                 ]);
             case 'null':
                 return $this->container->make(NullTokenStorage::class);

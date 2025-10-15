@@ -7,7 +7,7 @@ namespace Lzpeng\HyperfAuthGuard\Authenticator\Builder;
 use Hyperf\Contract\SessionInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\FormLogAuthenticator;
-use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerResolverInterface;
+use Lzpeng\HyperfAuthGuard\CsrfTokenManager\CsrfTokenManagerResolverInterface;
 use Lzpeng\HyperfAuthGuard\EventListener\CsrfTokenBadgeCheckListener;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;

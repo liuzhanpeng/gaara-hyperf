@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\CsrfToken;
+namespace Lzpeng\HyperfAuthGuard\CsrfTokenManager;
 
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Contract\SessionInterface;
 use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
 use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerInterface;
+use Lzpeng\HyperfAuthGuard\CsrfTokenManager\CsrfTokenManagerInterface;
 
 /**
  * CSRF令牌管理器工厂
@@ -23,21 +23,17 @@ class CsrfTokenManagerFactory
 
     public function create(array $config): CsrfTokenManagerInterface
     {
-        if (count($config) !== 1) {
-            throw new \InvalidArgumentException('csrf_token_manager config must be an associative array with a single key-value pair');
-        }
-
-        $type = array_key_first($config);
-        $options = $config[$type];
+        $type = $config['type'] ?? 'session';
+        unset($config['type']);
 
         switch ($type) {
             case 'session':
                 return $this->container->make(SessionCsrfTokenManager::class, [
-                    'prefix' => $options['prefix'] ?? sprintf('%s:%s:', Constants::__PREFIX, 'csrf_token'),
+                    'prefix' => $config['prefix'] ?? sprintf('%s:%s:', Constants::__PREFIX, 'csrf_token'),
                     'session' => $this->container->get(SessionInterface::class),
                 ]);
             case 'custom':
-                $customConfig = CustomConfig::from($options);
+                $customConfig = CustomConfig::from($config);
 
                 $csrfTokenManager = $this->container->get($customConfig->class(), $customConfig->args());
                 if (!$csrfTokenManager instanceof CsrfTokenManagerInterface) {
@@ -46,7 +42,7 @@ class CsrfTokenManagerFactory
 
                 return $csrfTokenManager;
             default:
-                throw new \InvalidArgumentException('csrf_token_manager配置类型错误');
+                throw new \InvalidArgumentException("Unsupported CSRF Token Manager type: $type");
         }
     }
 }

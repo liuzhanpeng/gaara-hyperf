@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Config;
 
-use Traversable;
-
 /**
  * 认证器配置集合
  * 
@@ -51,9 +49,9 @@ class AuthenticatorConfigCollection implements \IteratorAggregate
     /**
      * @inheritDoc
      * 
-     * @return Traversable<AuthenticatorConfig>
+     * @return \Traversable<AuthenticatorConfig>
      */
-    public function getIterator(): Traversable
+    public function getIterator(): \Traversable
     {
         yield from $this->authenticatorConfigCollection;
     }

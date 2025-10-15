@@ -24,10 +24,9 @@ class AccessTokenExtractorServiceProvider implements ServiceProviderInterface
 
         $accessTokenExtractorConfig = array_merge([
             'default' => [
-                'header' => [
-                    'param' => 'Authorization',
-                    'type' => 'Bearer',
-                ]
+                'type' => 'header',
+                'param_name' => 'Authorization',
+                'param_type' => 'Bearer',
             ]
         ], $config->serviceConfig('access_token_extractors') ?? []);
 

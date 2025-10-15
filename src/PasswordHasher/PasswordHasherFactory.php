@@ -18,20 +18,16 @@ class PasswordHasherFactory
         private ContainerInterface $container,
     ) {}
 
-    public function create(array $passwordHasherConfig): PasswordHasherInterface
+    public function create(array $config): PasswordHasherInterface
     {
-        if (count($passwordHasherConfig) !== 1) {
-            throw new \InvalidArgumentException('password_hasher config must be an associative array with a single key-value pair');
-        }
-
-        $type = array_key_first($passwordHasherConfig);
-        $options = $passwordHasherConfig[$type];
+        $type = $config['type'] ?? 'default';
+        unset($config['type']);
 
         switch ($type) {
             case 'default':
-                return new DefaultPasswordHasher($options['algo'] ?? PASSWORD_BCRYPT);
+                return new DefaultPasswordHasher($config['algo'] ?? PASSWORD_BCRYPT);
             case 'custom':
-                $customConfig = CustomConfig::from($options);
+                $customConfig = CustomConfig::from($config);
 
                 $passwordHasher = $this->container->make($customConfig->class(), $customConfig->args());
                 if (!$passwordHasher instanceof PasswordHasherInterface) {

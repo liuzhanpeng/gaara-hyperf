@@ -15,26 +15,26 @@ use Lzpeng\HyperfAuthGuard\Authorization\NullAuthorizationChecker;
 class GuardConfig
 {
     /**
-     * @param RequestMatcherConfig $requestMatcherConfig
-     * @param UserProviderConfig $userProviderConfig
+     * @param ComponentConfig $requestMatcherConfig
+     * @param ComponentConfig $userProviderConfig
      * @param AuthenticatorConfigCollection $authenticatorConfigCollection
-     * @param TokenStorageConfig $tokenStorageConfig
-     * @param UnauthenticatedHandlerConfig $unauthenticatedHandlerConfig
-     * @param AuthorizationCheckerConfig $authorizationCheckerConfig
-     * @param AccessDeniedHandlerConfig $accessDeniedHandlerConfig
-     * @param LoginThrottlerConfig $loginThrottlerConfig
+     * @param ComponentConfig $tokenStorageConfig
+     * @param ComponentConfig $unauthenticatedHandlerConfig
+     * @param CustomConfig $authorizationCheckerConfig
+     * @param CustomConfig $accessDeniedHandlerConfig
+     * @param ComponentConfig $loginRateLimiterConfig
      * @param ListenerConfigCollection $listenerConfigCollection
      * @param string $passwordHasherId
      */
     public function __construct(
-        private RequestMatcherConfig $requestMatcherConfig,
-        private UserProviderConfig $userProviderConfig,
+        private ComponentConfig $requestMatcherConfig,
+        private ComponentConfig $userProviderConfig,
         private AuthenticatorConfigCollection $authenticatorConfigCollection,
-        private TokenStorageConfig $tokenStorageConfig,
-        private UnauthenticatedHandlerConfig $unauthenticatedHandlerConfig,
-        private AuthorizationCheckerConfig $authorizationCheckerConfig,
-        private AccessDeniedHandlerConfig $accessDeniedHandlerConfig,
-        private LoginRateLimiterConfig $loginRateLimiterConfig,
+        private ComponentConfig $tokenStorageConfig,
+        private ComponentConfig $unauthenticatedHandlerConfig,
+        private CustomConfig $authorizationCheckerConfig,
+        private CustomConfig $accessDeniedHandlerConfig,
+        private ComponentConfig $loginRateLimiterConfig,
         private ListenerConfigCollection $listenerConfigCollection,
         private string $passwordHasherId
     ) {}
@@ -45,23 +45,23 @@ class GuardConfig
      */
     public static function from(array $config): self
     {
-        $reqeustMatcherConfig = RequestMatcherConfig::from($config['matcher'] ??  throw new \InvalidArgumentException('matcher config is required'));
-        $userProviderConfig = UserProviderConfig::from($config['user_provider'] ?? throw new \InvalidArgumentException('user_provider config is required'));
+        $requestMatcherConfig = ComponentConfig::from($config['matcher'] ??  throw new \InvalidArgumentException('matcher config is required'), 'default');
+        $userProviderConfig = ComponentConfig::from($config['user_provider'] ?? throw new \InvalidArgumentException('user_provider config is required'));
         $authenticatorConfigCollection = AuthenticatorConfigCollection::from($config['authenticators'] ?? throw new \InvalidArgumentException('authenticators config is required'));
-        $tokenStorageConfig = TokenStorageConfig::from($config['token_storage'] ?? ['null' => []]);
-        $unauthenticatedHandlerConfig = UnauthenticatedHandlerConfig::from($config['unauthenticated_handler'] ?? ['default' => []]);
-        $authorizationCheckerConfig = AuthorizationCheckerConfig::from($config['authorization']['checker'] ?? [
+        $tokenStorageConfig = ComponentConfig::from($config['token_storage'] ?? ['type' => 'null']);
+        $unauthenticatedHandlerConfig = ComponentConfig::from($config['unauthenticated_handler'] ?? ['type' => 'default']);
+        $authorizationCheckerConfig = CustomConfig::from($config['authorization']['checker'] ?? [
             'class' => NullAuthorizationChecker::class,
         ]);
-        $accessDeniedHandlerConfig = AccessDeniedHandlerConfig::from($config['authorization']['access_denied_handler'] ?? [
+        $accessDeniedHandlerConfig = CustomConfig::from($config['authorization']['access_denied_handler'] ?? [
             'class' => DefaultAccessDeniedHandler::class,
         ]);
-        $loginRateLimiterConfig = LoginRateLimiterConfig::from($config['login_throttler'] ?? ['no_limit' => []]);
+        $loginRateLimiterConfig = ComponentConfig::from($config['login_rate_limiter'] ?? ['type' => 'no_limit']);
         $listenerConfigCollection = ListenerConfigCollection::from($config['listeners'] ?? []);
         $passwordHasherId = $config['password_hasher'] ?? 'default';
 
         return new self(
-            $reqeustMatcherConfig,
+            $requestMatcherConfig,
             $userProviderConfig,
             $authenticatorConfigCollection,
             $tokenStorageConfig,
@@ -77,9 +77,9 @@ class GuardConfig
     /**
      * 返回请求匹配器配置
      *
-     * @return RequestMatcherConfig
+     * @return ComponentConfig
      */
-    public function requestMatcherConfig(): RequestMatcherConfig
+    public function requestMatcherConfig(): ComponentConfig
     {
         return $this->requestMatcherConfig;
     }
@@ -87,9 +87,9 @@ class GuardConfig
     /**
      * 返回认证存储器配置
      *
-     * @return TokenStorageConfig
+     * @return ComponentConfig
      */
-    public function tokenStorageConfig(): TokenStorageConfig
+    public function tokenStorageConfig(): ComponentConfig
     {
         return $this->tokenStorageConfig;
     }
@@ -97,9 +97,9 @@ class GuardConfig
     /**
      * 返回用户提供者配置
      *
-     * @return UserProviderConfig
+     * @return ComponentConfig
      */
-    public function userProviderConfig(): UserProviderConfig
+    public function userProviderConfig(): ComponentConfig
     {
         return $this->userProviderConfig;
     }
@@ -117,9 +117,9 @@ class GuardConfig
     /**
      * 返回未认证处理器配置
      *
-     * @return UnauthenticatedHandlerConfig
+     * @return ComponentConfig
      */
-    public function unauthenticatedHandlerConfig(): UnauthenticatedHandlerConfig
+    public function unauthenticatedHandlerConfig(): ComponentConfig
     {
         return $this->unauthenticatedHandlerConfig;
     }
@@ -127,9 +127,9 @@ class GuardConfig
     /**
      * 返回授权检查器配置
      *
-     * @return AuthorizationCheckerConfig
+     * @return CustomConfig
      */
-    public function authorizationCheckerConfig(): AuthorizationCheckerConfig
+    public function authorizationCheckerConfig(): CustomConfig
     {
         return $this->authorizationCheckerConfig;
     }
@@ -137,9 +137,9 @@ class GuardConfig
     /**
      * 返回拒绝访问处理器配置
      *
-     * @return AccessDeniedHandlerConfig
+     * @return CustomConfig
      */
-    public function accessDeniedHandlerConfig(): AccessDeniedHandlerConfig
+    public function accessDeniedHandlerConfig(): CustomConfig
     {
         return $this->accessDeniedHandlerConfig;
     }
@@ -147,9 +147,9 @@ class GuardConfig
     /**
      * 返回登录限流器配置
      *
-     * @return LoginRateLimiterConfig
+     * @return ComponentConfig
      */
-    public function loginRateLimiterConfig(): LoginRateLimiterConfig
+    public function loginRateLimiterConfig(): ComponentConfig
     {
         return $this->loginRateLimiterConfig;
     }

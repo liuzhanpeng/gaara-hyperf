@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\EventListener;
 
-use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfToken;
-use Lzpeng\HyperfAuthGuard\CsrfToken\CsrfTokenManagerInterface;
+use Lzpeng\HyperfAuthGuard\CsrfTokenManager\CsrfToken;
+use Lzpeng\HyperfAuthGuard\CsrfTokenManager\CsrfTokenManagerInterface;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
 use Lzpeng\HyperfAuthGuard\Exception\InvalidCsrfTokenException;
 use Lzpeng\HyperfAuthGuard\Passport\CsrfTokenBadge;

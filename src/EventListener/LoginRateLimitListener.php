@@ -7,8 +7,6 @@ namespace Lzpeng\HyperfAuthGuard\EventListener;
 use Lzpeng\HyperfAuthGuard\Event\AuthenticationFailureEvent;
 use Lzpeng\HyperfAuthGuard\Event\AuthenticationSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
-use Lzpeng\HyperfAuthGuard\Event\LoginFailureEvent;
-use Lzpeng\HyperfAuthGuard\Event\LoginSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Exception\TooManyLoginAttemptsException;
 use Lzpeng\HyperfAuthGuard\LoginRateLimiter\LoginRateLimiterInterface;
 use Lzpeng\HyperfAuthGuard\Utils\IpResolver;

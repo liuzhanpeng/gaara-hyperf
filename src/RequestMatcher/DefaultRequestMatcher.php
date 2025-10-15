@@ -7,22 +7,24 @@ namespace Lzpeng\HyperfAuthGuard\RequestMatcher;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * 请求匹配器
+ * 默认请求匹配器
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class RequestMatcher implements RequestMatcherInterface
+class DefaultRequestMatcher implements RequestMatcherInterface
 {
     /**
-     * @param string $pattern 匹配的路径模式
+     * @param string|array $pattern 匹配的路径模式
      * @param string|null $logoutPath 注销路径
      * @param array $exclusions 排除的路径模式数组
      */
     public function __construct(
-        private string $pattern,
+        private string|array $pattern,
         private ?string $logoutPath,
         private array $exclusions,
-    ) {}
+    ) {
+        $this->pattern = is_array($this->pattern) ? $pattern : [$pattern];
+    }
 
     /**
      * @inheritDoc
@@ -31,7 +33,13 @@ class RequestMatcher implements RequestMatcherInterface
     {
         $path = $request->getUri()->getPath();
 
-        return $this->matches($path, $this->pattern);
+        foreach ($this->pattern as $pattern) {
+            if ($this->matches($path, $pattern)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

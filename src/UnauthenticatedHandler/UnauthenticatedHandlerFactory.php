@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\UnauthenticatedHandler;
 
 use Hyperf\Contract\ContainerInterface;
+use Lzpeng\HyperfAuthGuard\Config\ComponentConfig;
 use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
-use Lzpeng\HyperfAuthGuard\Config\UnauthenticatedHandlerConfig;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\DefaultUnauthenticatedHandler;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\RedirectUnauthenticatedHandler;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandlerInterface;
@@ -22,10 +22,10 @@ class UnauthenticatedHandlerFactory
         private ContainerInterface $container,
     ) {}
 
-    public function create(UnauthenticatedHandlerConfig $unauthenticatedHandlerConfig): UnauthenticatedHandlerInterface
+    public function create(ComponentConfig $config): UnauthenticatedHandlerInterface
     {
-        $type = $unauthenticatedHandlerConfig->type();
-        $options = $unauthenticatedHandlerConfig->options();
+        $type = $config->type();
+        $options = $config->options();
 
         switch ($type) {
             case 'default':

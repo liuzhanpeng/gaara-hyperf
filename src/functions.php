@@ -6,6 +6,9 @@ namespace Lzpeng\HyperfAuthGuard;
 
 use function Hyperf\Support\make;
 
+/**
+ * @return AuthContext
+ */
 function auth(): AuthContext
 {
     return make(AuthContext::class);

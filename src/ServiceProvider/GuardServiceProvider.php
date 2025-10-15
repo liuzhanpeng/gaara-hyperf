@@ -16,7 +16,7 @@ use Lzpeng\HyperfAuthGuard\GuardInterface;
 use Lzpeng\HyperfAuthGuard\GuardResolver;
 use Lzpeng\HyperfAuthGuard\LoginRateLimiter\LoginRateLimiterFactory;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolverInterface;
-use Lzpeng\HyperfAuthGuard\RequestMatcher\RequestMatcher;
+use Lzpeng\HyperfAuthGuard\RequestMatcher\RequestMatcherFactory;
 use Lzpeng\HyperfAuthGuard\Token\TokenContext;
 use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
 use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageFactory;
@@ -68,16 +68,8 @@ class GuardServiceProvider implements ServiceProviderInterface
      */
     private function createGuard(ContainerInterface $container, string $guardName, GuardConfig $guardConfig): GuardInterface
     {
-        $requestMatcherConfig = $guardConfig->requestMatcherConfig();
-        $requestMatcher = new RequestMatcher(
-            $requestMatcherConfig->pattern(),
-            $requestMatcherConfig->logoutPath(),
-            $requestMatcherConfig->exclusions(),
-            $requestMatcherConfig->cacheSize(),
-        );
-
+        $requestMatcher = $container->get(RequestMatcherFactory::class)->create($guardConfig->requestMatcherConfig());
         $tokenStorage = $container->get(TokenStorageFactory::class)->create($guardConfig->tokenStorageConfig());
-
         $unauthenticatedHandler = $container->get(UnauthenticatedHandlerFactory::class)->create($guardConfig->unauthenticatedHandlerConfig());
 
         $authorizationCheckerConfig = $guardConfig->authorizationCheckerConfig();
@@ -93,8 +85,7 @@ class GuardServiceProvider implements ServiceProviderInterface
         $eventDispatcher->addSubscriber(new PasswordBadgeCheckListener($passwordHasher));
 
         // 注册登录限流监听器
-        $loginRateLimiterConfig = $guardConfig->loginRateLimiterConfig();
-        $rateLimiter = $container->get(LoginRateLimiterFactory::class)->create($loginRateLimiterConfig);
+        $rateLimiter = $container->get(LoginRateLimiterFactory::class)->create($guardConfig->loginRateLimiterConfig());
         $eventDispatcher->addSubscriber(new LoginRateLimitListener($rateLimiter, $container->get(IpResolver::class)));
 
         $userProvider = $container->get(UserProviderFactory::class)->create($guardConfig->userProviderConfig());

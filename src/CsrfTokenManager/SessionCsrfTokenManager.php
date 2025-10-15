@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\CsrfToken;
+namespace Lzpeng\HyperfAuthGuard\CsrfTokenManager;
 
 use Hyperf\Contract\SessionInterface;
-use Hyperf\HttpServer\Contract\RequestInterface;
 
 /**
  * 内置的CsrfToken管理器

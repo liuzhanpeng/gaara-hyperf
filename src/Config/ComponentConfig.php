@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\Config;
 
 /**
- * 未认证处理器配置
+ * 内部组件通用配置
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class UnauthenticatedHandlerConfig
+class ComponentConfig
 {
     /**
      * @param string $type
@@ -17,28 +17,29 @@ class UnauthenticatedHandlerConfig
      */
     public function __construct(
         private string $type,
-        private array $options,
+        private array $options = []
     ) {}
 
     /**
      * @param array $config
+     * @param string $default
      * @return self
      */
-    public static function from(array $config): self
+    public static function from(array $config, string $default = ''): self
     {
-        if (count($config) !== 1) {
-            throw new \InvalidArgumentException('unauthenticated_handler config must be an associative array with a single key-value pair');
+        if (!isset($config['type']) && empty($default)) {
+            throw new \InvalidArgumentException('type is required for component config');
         }
 
-        $type = array_key_first($config);
-        $options = $config[$type];
+        $type = $config['type'] ?? $default;
+        unset($config['type']);
 
-        return new self($type, $options);
+        return new self($type, $config);
     }
 
     /**
-     * 返回匹配类型
-     * 
+     * 返回类型
+     *
      * @return string
      */
     public function type(): string
@@ -47,8 +48,8 @@ class UnauthenticatedHandlerConfig
     }
 
     /**
-     * 返回选项
-     *
+     * 返回参数
+     * 
      * @return array
      */
     public function options(): array

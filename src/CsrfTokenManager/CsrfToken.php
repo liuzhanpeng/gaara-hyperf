@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\CsrfToken;
+namespace Lzpeng\HyperfAuthGuard\CsrfTokenManager;
 
 /**
  * CSRF令牌
