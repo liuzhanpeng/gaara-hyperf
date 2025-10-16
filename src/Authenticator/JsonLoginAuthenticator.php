@@ -17,6 +17,13 @@ use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
  */
 class JsonLoginAuthenticator extends AbstractAuthenticator
 {
+    /**
+     * @param UserProviderInterface $userProvider
+     * @param \Hyperf\HttpServer\Contract\ResponseInterface $response
+     * @param array $options
+     * @param AuthenticationSuccessHandlerInterface|null $successHandler
+     * @param AuthenticationFailureHandlerInterface|null $failureHandler
+     */
     public function __construct(
         private UserProviderInterface $userProvider,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,

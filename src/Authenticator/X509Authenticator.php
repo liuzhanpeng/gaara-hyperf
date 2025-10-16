@@ -16,11 +16,17 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class X509Authenticator extends AbstractAuthenticator
 {
+    /**
+     * @param UserProviderInterface $userProvider
+     * @param array $options
+     * @param AuthenticationSuccessHandlerInterface|null $successHandler
+     * @param AuthenticationFailureHandlerInterface|null $failureHandler
+     */
     public function __construct(
         private UserProviderInterface $userProvider,
+        private array $options,
         ?AuthenticationSuccessHandlerInterface $successHandler,
         ?AuthenticationFailureHandlerInterface $failureHandler,
-        private array $options,
     ) {
         parent::__construct($successHandler, $failureHandler);
     }

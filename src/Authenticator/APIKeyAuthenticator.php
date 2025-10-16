@@ -18,9 +18,9 @@ class APIKeyAuthenticator extends AbstractAuthenticator
 {
     /**
      * @param UserProviderInterface $userProvider
+     * @param array $options
      * @param AuthenticationSuccessHandlerInterface|null $successHandler
      * @param AuthenticationFailureHandlerInterface|null $failureHandler
-     * @param array $options
      */
     public function __construct(
         private UserProviderInterface $userProvider,

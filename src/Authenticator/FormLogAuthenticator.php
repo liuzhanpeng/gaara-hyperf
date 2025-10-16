@@ -27,11 +27,11 @@ class FormLogAuthenticator extends AbstractAuthenticator
 {
     /**
      * @param UserProviderInterface $userProvider
-     * @param AuthenticationSuccessHandlerInterface|null $successHandler
-     * @param AuthenticationFailureHandlerInterface|null $failureHandler
      * @param \Hyperf\HttpServer\Contract\ResponseInterface $response
      * @param SessionInterface $session
      * @param array $options
+     * @param AuthenticationSuccessHandlerInterface|null $successHandler
+     * @param AuthenticationFailureHandlerInterface|null $failureHandler
      */
     public function __construct(
         private UserProviderInterface $userProvider,

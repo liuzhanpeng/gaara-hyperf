@@ -17,6 +17,12 @@ use Lzpeng\HyperfAuthGuard\Passport\Passport;
  */
 class OpaqueTokenAuthenticator extends AbstractAuthenticator
 {
+    /**
+     * @param OpaqueTokenManagerInterface $opaqueTokenManager
+     * @param AccessTokenExtractorInterface $accessTokenExtractor
+     * @param AuthenticationSuccessHandlerInterface|null $successHandler
+     * @param AuthenticationFailureHandlerInterface|null $failureHandler
+     */
     public function __construct(
         private OpaqueTokenManagerInterface $opaqueTokenManager,
         private AccessTokenExtractorInterface $accessTokenExtractor,
