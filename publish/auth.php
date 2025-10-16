@@ -53,7 +53,9 @@ return [
                     'api_key_param' => 'X-API-KEY',
                     'signature_param' => 'X-SIGNATURE',
                     'timestamp_param' => 'X-TIMESTAMP',
+                    'nonce_enabled' => true,
                     'nonce_param' => 'X-NONCE',
+                    // 'nonce_cache_prefix' => 'default',
                     'ttl' => 60, // 请求签名的有效期，单位秒
                     'algo' => 'HMAC-SHA256', // 签名算法
                     // 'secret_crypto_enabled' => true, // 是否启用密钥加密
