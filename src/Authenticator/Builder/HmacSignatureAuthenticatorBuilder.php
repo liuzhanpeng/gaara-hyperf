@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\Authenticator\Builder;
 
 use ASCare\Shared\Infra\Encryptor;
-use Lzpeng\HyperfAuthGuard\Authenticator\APISignatureAuthenticator;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
+use Lzpeng\HyperfAuthGuard\Authenticator\HmacSignatureAuthenticator;
 
-class APISignatureAuthenticatorBuilder extends AbstractAuthenticatorBuilder
+class HmacSignatureAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
@@ -35,7 +35,7 @@ class APISignatureAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             ]);
         }
 
-        return new APISignatureAuthenticator(
+        return new HmacSignatureAuthenticator(
             userProvider: $userProvider,
             options: $options,
             encryptor: $encryptor,

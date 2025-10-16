@@ -35,6 +35,10 @@ class LoginRateLimitListener implements EventSubscriberInterface
 
     public function checkPassport(CheckPassportEvent $event): void
     {
+        if (!$event->getAuthenticator()->isInteractive()) {
+            return;
+        }
+
         $passport = $event->getPassport();
         $request = $event->getRequest();
 

@@ -12,11 +12,11 @@ use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * API签名认证器
+ * Hmac签名认证器
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class APISignatureAuthenticator extends AbstractAuthenticator
+class HmacSignatureAuthenticator extends AbstractAuthenticator
 {
     /**
      * @param UserProviderInterface $userProvider

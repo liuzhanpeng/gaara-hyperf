@@ -7,8 +7,8 @@ namespace Lzpeng\HyperfAuthGuard\ServiceProvider;
 use Hyperf\Contract\ContainerInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorFactory;
 use Lzpeng\HyperfAuthGuard\Authenticator\Builder\APIKeyAuthenticatorBuilder;
-use Lzpeng\HyperfAuthGuard\Authenticator\Builder\APISignatureAuthenticatorBuilder;
 use Lzpeng\HyperfAuthGuard\Authenticator\Builder\FormLoginAuthenticatorBuilder;
+use Lzpeng\HyperfAuthGuard\Authenticator\Builder\HmacSignatureAuthenticatorBuilder;
 use Lzpeng\HyperfAuthGuard\Authenticator\Builder\JsonLoginAuthenticatorBuilder;
 use Lzpeng\HyperfAuthGuard\Authenticator\Builder\OpaqueTokenAuthenticatorBuilder;
 use Lzpeng\HyperfAuthGuard\Authenticator\Builder\X509AuthenticatorBuilder;
@@ -29,7 +29,7 @@ class BuiltInAuthenticatorServiceProvider implements ServiceProviderInterface
         $authenticatorFactory->registerBuilder('form_login', FormLoginAuthenticatorBuilder::class);
         $authenticatorFactory->registerBuilder('json_login', JsonLoginAuthenticatorBuilder::class);
         $authenticatorFactory->registerBuilder('api_key', APIKeyAuthenticatorBuilder::class);
-        $authenticatorFactory->registerBuilder('api_signature', APISignatureAuthenticatorBuilder::class);
+        $authenticatorFactory->registerBuilder('hmac_signature', HmacSignatureAuthenticatorBuilder::class);
         $authenticatorFactory->registerBuilder('opaque_token', OpaqueTokenAuthenticatorBuilder::class);
         $authenticatorFactory->registerBuilder('x509', X509AuthenticatorBuilder::class);
     }

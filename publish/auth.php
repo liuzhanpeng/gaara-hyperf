@@ -46,7 +46,10 @@ return [
                     'token_manager' => 'admin_opaque_token_manager',
                     'token_extractor' => 'admin_opaque_token_extractor'
                 ],
-                'api_signature' => [
+                'api_key' => [
+                    'api_key_param' => 'X-API-KEY',
+                ],
+                'hmac_signature' => [
                     'api_key_param' => 'X-API-KEY',
                     'signature_param' => 'X-SIGNATURE',
                     'timestamp_param' => 'X-TIMESTAMP',
