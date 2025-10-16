@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
-use ASCare\Shared\Infra\Encryptor;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\User\PasswordAwareUserInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
+use Lzpeng\HyperfAuthGuard\Utils\Encryptor;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\SimpleCache\CacheInterface;
 

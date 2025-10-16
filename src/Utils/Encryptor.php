@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ASCare\Shared\Infra;
+namespace Lzpeng\HyperfAuthGuard\Utils;
 
 /**
  * 数据加密器
