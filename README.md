@@ -6,9 +6,12 @@ An authentication library for hyperf
 
 - [x] Form Login Authentication
 - [x] JSON login Authentication
+- [x] Opaque Token Authentication
+    - [x] IP Binding/UA binding
+    - [x] Single session
 - [x] API Key Authentication
-- [x] Opaque Token Authentication (with IP Binding/UA binding)
 - [x] API Signature Authentication
+- [x] X.509 Client Certificates Authentication
 - [ ] Magic Link Authentication
 - [ ] JWT Authentication (with BlackList)
 - [ ] OAuth 2.0/OpenID Connect
@@ -17,15 +20,7 @@ An authentication library for hyperf
 - [ ] 2FA
 - [x] IP WhiteList
 - [x] Limiting Login Attempts
-- [ ] Password expiration
+- [ ] Password Expiration
 - [ ] User Disabled
-- [ ] Single device login
-
--------
-
-2fa流程
-    - 进行第一次登录认证
-    - 认证成功后生成一个TwoFactorToken
-    - 跳转到2fa-challenge页面
-    - 输入TOTP码, 提交到TwoFactorAuthenticator
-    - 认证成功后，保存AuthenticatedToken
+- [ ] Step-up/Risk-based Authentication
+- [ ] i18n supports
