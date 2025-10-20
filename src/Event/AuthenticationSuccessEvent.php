@@ -77,6 +77,17 @@ class AuthenticationSuccessEvent
     }
 
     /**
+     * 设置认证令牌
+     *
+     * @param TokenInterface $token
+     * @return void
+     */
+    public function setToken(TokenInterface $token): void
+    {
+        $this->token = $token;
+    }
+
+    /**
      * 返回请求
      *
      * @return ServerRequestInterface

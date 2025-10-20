@@ -112,13 +112,20 @@ return [
                 // [
                 //     'class' => IPWhiteListListener::class,
                 //     'args' => [
-                //         'whiteList' => [
+                //         'white_list' => [
                 //             '192.168.1.1',
                 //             '192.168.2.*',
                 //             '172.31.0.0/16',
                 //         ]
                 //     ]
-                // ]
+                // ],
+                [
+                    'class' => EnforcePasswordChangeListener::class,
+                    'args' => [
+                        'password_change_route' => 'admin/password'
+                    ]
+                ]
+
             ],
         ],
     ],

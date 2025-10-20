@@ -176,11 +176,6 @@ class Guard implements GuardInterface
 
             $token = $authenticator->createToken($passport, $this->name);
 
-            /**
-             * @var TokenInterface $token
-             */
-            $token = $this->eventDispatcher->dispatch(new AuthenticatedTokenCreatedEvent($this->name, $passport, $token, $request))->getToken();
-
             return $this->handleAuthenticationSuccess($request, $authenticator, $passport, $token);
         } catch (AuthenticationException $exception) {
             return $this->handleAuthenticationFailure($request, $authenticator, $exception, $passport);
@@ -199,11 +194,14 @@ class Guard implements GuardInterface
     {
         $token->getUser()->eraseCredentials();
         $previousToken = $this->tokenContext->getToken();
-        $this->tokenContext->setToken($token);
 
         $response = $authenticator->onAuthenticationSuccess($request, $token);
 
-        $response = $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($this->name, $authenticator, $passport, $token, $request, $response, $previousToken))->getResponse();
+        $authenticationSuccessEvent = $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($this->name, $authenticator, $passport, $token, $request, $response, $previousToken));
+        $token = $authenticationSuccessEvent->getToken();
+        $response = $authenticationSuccessEvent->getResponse();
+
+        $this->tokenContext->setToken($token);
         if ($authenticator->isInteractive()) {
             $this->tokenStorage->set($this->name, $token);
         }
