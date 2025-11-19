@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Lzpeng\HyperfAuthGuard\Exception\InvalidCredentialsException;
+use Lzpeng\HyperfAuthGuard\Exception\InvalidPasswordException;
+use Lzpeng\HyperfAuthGuard\Exception\UserNotFoundException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
@@ -83,13 +84,13 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
         $credientials = [];
         $username = $request->getParsedBody()[$this->options['username_param']] ?? '';
         if (!is_string($username) || empty($username)) {
-            throw new InvalidCredentialsException('username must be string');
+            throw new UserNotFoundException();
         }
         $credientials['username'] = trim($username);
 
         $password = $request->getParsedBody()[$this->options['password_param']] ?? '';
         if (!is_string($password) || empty($password)) {
-            throw new InvalidCredentialsException('password must be string');
+            throw new InvalidPasswordException($username);
         }
         $credientials['password'] = trim($password);
 

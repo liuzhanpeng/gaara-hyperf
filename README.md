@@ -21,6 +21,4 @@ An authentication library for hyperf
 - [x] IP WhiteList
 - [x] Limiting Login Attempts
 - [ ] Password Expiration
-- [ ] User Disabled
 - [ ] Step-up/Risk-based Authentication
-- [ ] i18n supports

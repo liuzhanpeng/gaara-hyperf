@@ -32,6 +32,7 @@ class FormLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             'redirect_param' => 'redirect_to',
             'username_param' => 'username',
             'password_param' => 'password',
+            'error_message' => '用户名或密码错误',
             'csrf_enabled' => true,
             'csrf_id' => 'authenticate',
             'csrf_param' => '_csrf_token',

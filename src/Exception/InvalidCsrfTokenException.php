@@ -9,10 +9,4 @@ namespace Lzpeng\HyperfAuthGuard\Exception;
  *
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class InvalidCsrfTokenException extends AuthenticationException
-{
-    public function getDisplayMessage(): string
-    {
-        return '无效的CSRF令牌';
-    }
-}
+class InvalidCsrfTokenException extends AuthenticationException {}

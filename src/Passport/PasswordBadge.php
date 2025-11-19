@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Passport;
 
-use Lzpeng\HyperfAuthGuard\Exception\InvalidPasswordException;
 
 /**
  * 密码凭证标识
@@ -26,11 +25,7 @@ class PasswordBadge implements BadgeInterface
     public function __construct(
         #[\SensitiveParameter]
         private string $password
-    ) {
-        if (empty($password)) {
-            throw new InvalidPasswordException('密码不能为空');
-        }
-    }
+    ) {}
 
     /**
      * 返回密码

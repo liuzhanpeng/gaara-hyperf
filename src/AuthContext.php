@@ -53,7 +53,7 @@ class AuthContext
     public function logout(): ResponseInterface
     {
         if (! $this->isAuthenticated()) {
-            throw new AuthenticationException('用户未认证, 无法登出');
+            throw new AuthenticationException($this->getToken()->getUser()->getIdentifier());
         }
 
         $guard = $this->guardResolver->resolve($this->getToken()->getGuardName());

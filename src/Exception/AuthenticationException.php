@@ -9,22 +9,16 @@ namespace Lzpeng\HyperfAuthGuard\Exception;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class AuthenticationException extends \RuntimeException
+class AuthenticationException extends \Exception
 {
     /**
-     * 用户标识
-     *
-     * @var string
+     * @param string $userIdentifier 用户标识
      */
-    protected string $userIdentifier;
-
     public function __construct(
-        string $message = '',
-        string $userIdentifier = '',
-        int $code = 0,
-        ?\Throwable $previous = null,
+        private string $userIdentifier = '',
+        string $message = ''
     ) {
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message);
         $this->userIdentifier = $userIdentifier;
     }
 
@@ -36,15 +30,5 @@ class AuthenticationException extends \RuntimeException
     public function getUserIdentifier(): string
     {
         return $this->userIdentifier;
-    }
-
-    /**
-     * 返回显示消息
-     *
-     * @return string
-     */
-    public function getDisplayMessage(): string
-    {
-        return $this->message;
     }
 }

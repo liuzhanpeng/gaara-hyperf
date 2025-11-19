@@ -1,5 +1,4 @@
 <?php
-<?php
 
 declare(strict_types=1);
 
@@ -40,9 +39,9 @@ class IPWhiteListListener implements EventSubscriberInterface
 
         $passport = $event->getPassport();
         $ip = $this->ipResolver->resolve($event->getRequest());
-        
+
         if (!$this->isIpAllowed($ip)) {
-            throw new IPNotInWhiteListException('IP not in whitelist', $passport->getUser()->getIdentifier());
+            throw new IPNotInWhiteListException($passport->getUser()->getIdentifier(), $ip);
         }
     }
 
@@ -100,7 +99,7 @@ class IPWhiteListListener implements EventSubscriberInterface
     private function matchesCidr(string $ip, string $cidr): bool
     {
         [$network, $mask] = explode('/', $cidr, 2);
-        
+
         // 验证IP格式
         if (!filter_var($ip, FILTER_VALIDATE_IP) || !filter_var($network, FILTER_VALIDATE_IP)) {
             return false;
@@ -137,13 +136,13 @@ class IPWhiteListListener implements EventSubscriberInterface
     {
         $ipLong = ip2long($ip);
         $networkLong = ip2long($network);
-        
+
         if ($ipLong === false || $networkLong === false) {
             return false;
         }
 
         $maskLong = -1 << (32 - $mask);
-        
+
         return ($ipLong & $maskLong) === ($networkLong & $maskLong);
     }
 
@@ -159,7 +158,7 @@ class IPWhiteListListener implements EventSubscriberInterface
     {
         $ipBinary = inet_pton($ip);
         $networkBinary = inet_pton($network);
-        
+
         if ($ipBinary === false || $networkBinary === false) {
             return false;
         }
@@ -176,7 +175,7 @@ class IPWhiteListListener implements EventSubscriberInterface
         if ($bitsToCheck > 0) {
             $byte1 = ord($ipBinary[$bytesToCheck]) >> (8 - $bitsToCheck);
             $byte2 = ord($networkBinary[$bytesToCheck]) >> (8 - $bitsToCheck);
-            
+
             if ($byte1 !== $byte2) {
                 return false;
             }
@@ -196,7 +195,7 @@ class IPWhiteListListener implements EventSubscriberInterface
     {
         // 将通配符转换为正则表达式
         $regex = '/^' . str_replace(['\.', '\*'], ['\.', '[0-9]+'], preg_quote($pattern, '/')) . '$/';
-        
+
         return preg_match($regex, $ip) === 1;
     }
 }

@@ -9,10 +9,4 @@ namespace Lzpeng\HyperfAuthGuard\Exception;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class InvalidCredentialsException extends AuthenticationException
-{
-    public function getDisplayMessage(): string
-    {
-        return '用户名或密码错误';
-    }
-}
+class InvalidCredentialsException extends AuthenticationException {}

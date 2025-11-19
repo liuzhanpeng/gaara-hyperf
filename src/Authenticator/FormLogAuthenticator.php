@@ -8,7 +8,8 @@ use Hyperf\Contract\SessionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Hyperf\Session\Session;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
-use Lzpeng\HyperfAuthGuard\Exception\InvalidCredentialsException;
+use Lzpeng\HyperfAuthGuard\Exception\InvalidPasswordException;
+use Lzpeng\HyperfAuthGuard\Exception\UserNotFoundException;
 use Lzpeng\HyperfAuthGuard\Passport\CsrfTokenBadge;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
@@ -109,7 +110,13 @@ class FormLogAuthenticator extends AbstractAuthenticator
         }
 
         if ($this->session instanceof Session) {
-            $this->session->flash('authentication_error', $exception->getDisplayMessage());
+            if (is_callable($this->options['error_message'])) {
+                $msg = call_user_func($this->options['error_message'], $exception);
+            } else {
+                $msg = $this->options['error_message'];
+            }
+
+            $this->session->flash('authentication_error', $msg);
         }
 
         return $this->response->redirect($this->options['failure_path']);
@@ -134,13 +141,13 @@ class FormLogAuthenticator extends AbstractAuthenticator
         $credientials = [];
         $username = $request->getParsedBody()[$this->options['username_param']] ?? '';
         if (!is_string($username) || empty($username)) {
-            throw new InvalidCredentialsException('username must be string');
+            throw new UserNotFoundException();
         }
         $credientials['username'] = trim($username);
 
         $password = $request->getParsedBody()[$this->options['password_param']] ?? '';
         if (!is_string($password) || empty($password)) {
-            throw new InvalidCredentialsException('password must be string');
+            throw new InvalidPasswordException($username);
         }
         $credientials['password'] = trim($password);
 

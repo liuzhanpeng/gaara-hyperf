@@ -42,7 +42,7 @@ class CsrfTokenBadgeCheckListener implements EventSubscriberInterface
         $csrfToken = new CsrfToken($badge->getId(), $badge->getToken());
 
         if (!$this->csrfTokenManager->verify($csrfToken)) {
-            throw new InvalidCsrfTokenException('CSRF token is invalid or expired');
+            throw new InvalidCsrfTokenException($event->getPassport()->getUser()->getIdentifier());
         }
 
         $badge->resolve();
