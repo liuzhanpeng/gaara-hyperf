@@ -6,7 +6,7 @@ namespace Lzpeng\HyperfAuthGuard\Authenticator\Builder;
 
 use Hyperf\Contract\SessionInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
-use Lzpeng\HyperfAuthGuard\Authenticator\FormLogAuthenticator;
+use Lzpeng\HyperfAuthGuard\Authenticator\FormLoginAuthenticator;
 use Lzpeng\HyperfAuthGuard\CsrfTokenManager\CsrfTokenManagerResolverInterface;
 use Lzpeng\HyperfAuthGuard\EventListener\CsrfTokenBadgeCheckListener;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
@@ -44,7 +44,7 @@ class FormLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             $eventDispatcher->addSubscriber(new CsrfTokenBadgeCheckListener($csrfTokenManager));
         }
 
-        return new FormLogAuthenticator(
+        return new FormLoginAuthenticator(
             userProvider: $userProvider,
             response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
             session: $this->container->get(SessionInterface::class),

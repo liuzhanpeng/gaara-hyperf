@@ -24,7 +24,7 @@ use Psr\Http\Message\ResponseInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class FormLogAuthenticator extends AbstractAuthenticator
+class FormLoginAuthenticator extends AbstractAuthenticator
 {
     /**
      * @param UserProviderInterface $userProvider
