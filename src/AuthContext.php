@@ -18,6 +18,8 @@ use Psr\Http\Message\ResponseInterface;
  */
 class AuthContext
 {
+    private ?UserInterface $user = null;
+
     /**
      * @param ServerRequestInterface $request
      * @param TokenContextInterface $tokenContext
@@ -83,10 +85,20 @@ class AuthContext
      */
     public function getUser(): ?UserInterface
     {
-        $userIdentifier =  $this->getToken()?->getUserIdentifier();
-        $guard = $this->guardResolver->resolve($this->getToken()->getGuardName());
+        if ($this->user !== null) {
+            return $this->user;
+        }
 
-        return $guard->getUserProvider()->findByIdentifier($userIdentifier);
+        $token = $this->getToken();
+        if (is_null($token)) {
+            return null;
+        }
+
+        $userIdentifier = $token->getUserIdentifier();
+        $guard = $this->guardResolver->resolve($token->getGuardName());
+        $this->user = $guard->getUserProvider()->findByIdentifier($userIdentifier);
+
+        return $this->user;
     }
 
     /**
