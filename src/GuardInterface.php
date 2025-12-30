@@ -46,7 +46,7 @@ interface GuardInterface
     public function authenticateUser(UserInterface $user, ServerRequestInterface $request, ?string $authenticator = null, array $badges = []): ?ResponseInterface;
 
     /**
-     * 处理认证请求
+     * 处理认证请求; 返回null表示请求不需要认证
      * 
      * @param ServerRequestInterface $request
      * @return ResponseInterface|null

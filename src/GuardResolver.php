@@ -9,7 +9,7 @@ use Psr\Container\ContainerInterface;
 /**
  * 认证守卫解析器
  * 
- * 这里会延时加载Guard实例，为了避免启动时的循环依赖; 否则子组件编写时要考虑依赖注入顺序问题, 增加编写难度
+ * 为了避免启动时的循环依赖, 这里会延时加载Guard实例, 否则子组件编写时要考虑依赖注入顺序问题, 增加代码编写难度
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */

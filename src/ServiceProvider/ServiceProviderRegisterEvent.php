@@ -23,7 +23,7 @@ class ServiceProviderRegisterEvent
      *
      * @return ServiceProviderRegistry
      */
-    public function ServiceProviderRegistry(): ServiceProviderRegistry
+    public function serviceProviderRegistry(): ServiceProviderRegistry
     {
         return $this->serviceProviderRegistry;
     }

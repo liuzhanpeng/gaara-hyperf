@@ -21,8 +21,8 @@ class ConfigProvider
             'commands' => [],
             'publish' => [
                 [
-                    'id' => 'hyperf-auth-guard',
-                    'description' => 'The config for hyperf-auth-guard.',
+                    'id' => 'gaara-hyperf',
+                    'description' => 'The config for gaara-hyperf.',
                     'source' => __DIR__ . '/../publish/auth.php',
                     'destination' => BASE_PATH . '/config/autoload/gaara.php',
                 ]

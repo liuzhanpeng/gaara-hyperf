@@ -97,15 +97,15 @@ class Guard implements GuardInterface
      * 解析认证器
      *
      * @param string|null $authenticator
-     * @return AuthenticatorInterface|null
+     * @return AuthenticatorInterface
      */
-    private function resolveAuthenticator(?string $authenticator): ?AuthenticatorInterface
+    private function resolveAuthenticator(?string $authenticator): AuthenticatorInterface
     {
         if ($authenticator === null) {
-            return $this->authenticators[0] ?? null;
+            return $this->authenticators[0] ?? throw new \RuntimeException('No authenticator configured for guard ' . $this->name);
         }
 
-        return $this->authenticators[$authenticator] ?? null;
+        return $this->authenticators[$authenticator] ?? throw new \RuntimeException('Authenticator "' . $authenticator . '" not found for guard ' . $this->name);
     }
 
     /**
@@ -119,6 +119,7 @@ class Guard implements GuardInterface
         $token = $this->tokenStorage->get($this->name);
         $this->tokenContext->setToken($token);
 
+        // 在设置token上下文后再检查请求是否被排除是为了可以以在排除逻辑中使用token信息
         if ($this->requestMatcher->matchesExcluded($request)) {
             return null;
         }
@@ -134,7 +135,7 @@ class Guard implements GuardInterface
             }
         }
 
-        // 未经过认证器认证 或 认证器处理认证逻辑后继续放行
+        // 认证器处理认证逻辑后继续放行
         $token = $this->tokenContext->getToken();
         if ($token === null || !$token instanceof AuthenticatedToken) {
             return $this->unauthenticatedHandler->handle($request, $token);
@@ -177,7 +178,7 @@ class Guard implements GuardInterface
 
             return $this->handleAuthenticationSuccess($request, $authenticator, $passport, $token);
         } catch (AuthenticationException $exception) {
-            return $this->handleAuthenticationFailure($request, $authenticator, $exception, $passport);
+            return $this->handleAuthenticationFailure($request, $authenticator, $passport, $exception);
         }
     }
 
@@ -217,7 +218,7 @@ class Guard implements GuardInterface
      * @param Passport|null $passport
      * @return ResponseInterface|null
      */
-    private function handleAuthenticationFailure(ServerRequestInterface $request, AuthenticatorInterface $authenticator,  AuthenticationException $exception, ?Passport $passport): ?ResponseInterface
+    private function handleAuthenticationFailure(ServerRequestInterface $request, AuthenticatorInterface $authenticator, ?Passport $passport, AuthenticationException $exception): ?ResponseInterface
     {
         $response = $authenticator->onAuthenticationFailure($request, $exception, $passport);
         $response = $this->eventDispatcher->dispatch(new AuthenticationFailureEvent($this->name, $authenticator, $passport, $exception, $request, $response))->getResponse();

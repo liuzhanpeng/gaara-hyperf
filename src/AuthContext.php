@@ -18,6 +18,11 @@ use Psr\Http\Message\ResponseInterface;
  */
 class AuthContext
 {
+    /**
+     * @param ServerRequestInterface $request
+     * @param TokenContextInterface $tokenContext
+     * @param GuardResolver $guardResolver
+     */
     public function __construct(
         private ServerRequestInterface $request,
         private TokenContextInterface $tokenContext,
