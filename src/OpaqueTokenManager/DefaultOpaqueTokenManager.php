@@ -66,12 +66,12 @@ class DefaultOpaqueTokenManager implements OpaqueTokenManagerInterface
         }
 
         if ($this->singleSession) {
-            $preAccessToken = $this->cache->get($this->getUserTokenKey($token->getUser()->getIdentifier()));
+            $preAccessToken = $this->cache->get($this->getUserTokenKey($token->getUserIdentifier()));
             if (!is_null($preAccessToken)) {
                 $this->cache->delete($this->getAccessTokenKey($preAccessToken));
             }
 
-            $this->cache->set($this->getUserTokenKey($token->getUser()->getIdentifier()), $accessToken, $this->maxLifetime);
+            $this->cache->set($this->getUserTokenKey($token->getUserIdentifier()), $accessToken, $this->maxLifetime);
         }
 
         $this->cache->set($this->getAccessTokenKey($accessToken), $data, $this->expiresIn);

@@ -114,6 +114,7 @@ class GuardServiceProvider implements ServiceProviderInterface
             requestMatcher: $requestMatcher,
             tokenStorage: $tokenStorage,
             tokenContext: $container->get(TokenContextInterface::class),
+            userProvider: $userProvider,
             authenticators: $authenticators,
             unauthenticatedHandler: $unauthenticatedHandler,
             authorizationChecker: $authorizationChecker,

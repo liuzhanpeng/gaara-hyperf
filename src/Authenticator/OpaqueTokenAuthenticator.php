@@ -9,6 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Exception\UnauthenticatedException;
 use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerInterface;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
+use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 
 /**
  * 不透明令牌认证器
@@ -24,6 +25,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
      * @param AuthenticationFailureHandlerInterface|null $failureHandler
      */
     public function __construct(
+        private UserProviderInterface $userProvider,
         private OpaqueTokenManagerInterface $opaqueTokenManager,
         private AccessTokenExtractorInterface $accessTokenExtractor,
         ?AuthenticationSuccessHandlerInterface $successHandler,
@@ -56,8 +58,8 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
         }
 
         return new Passport(
-            $token->getUser()->getIdentifier(),
-            fn() => $token->getUser(),
+            $token->getUserIdentifier(),
+            $this->userProvider->findByIdentifier(...)
         );
     }
 

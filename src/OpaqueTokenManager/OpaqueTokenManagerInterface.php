@@ -24,16 +24,16 @@ interface OpaqueTokenManagerInterface
     /**
      * 解析一个opaque token 返回一个用户令牌
      *
-     * @param string $tokenStr
+     * @param string $accessToken
      * @return TokenInterface|null
      */
-    public function resolve(string $tokenStr): ?TokenInterface;
+    public function resolve(string $accessToken): ?TokenInterface;
 
     /**
      * 撤销一个opaque token
      *
-     * @param string $tokenStr
+     * @param string $accessToken
      * @return void
      */
-    public function revoke(string $tokenStr): void;
+    public function revoke(string $accessToken): void;
 }

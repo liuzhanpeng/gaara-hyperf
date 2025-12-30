@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Lzpeng\HyperfAuthGuard\RequestMatcher\RequestMatcher;
+use Lzpeng\HyperfAuthGuard\RequestMatcher\DefaultRequestMatcher;
 use Psr\Http\Message\ServerRequestInterface;
 
 describe('RequestMatcher', function () {
@@ -16,7 +16,7 @@ describe('RequestMatcher', function () {
     }
 
     it('matches pattern by regex', function () {
-        $matcher = new RequestMatcher('^/foo/[0-9]+$', '/logout', []);
+        $matcher = new DefaultRequestMatcher('^/foo/[0-9]+$', '/logout', []);
         $request = mockRequest('/foo/123');
         expect($matcher->matchesPattern($request))->toBeTrue();
         $request2 = mockRequest('/foo/abc');
@@ -24,7 +24,7 @@ describe('RequestMatcher', function () {
     });
 
     it('matches logout', function () {
-        $matcher = new RequestMatcher('/api', '/logout', []);
+        $matcher = new DefaultRequestMatcher('/api', '/logout', []);
         $request = mockRequest('/logout');
         expect($matcher->matchesLogout($request))->toBeTrue();
         $request2 = mockRequest('/api/logout');
@@ -32,7 +32,7 @@ describe('RequestMatcher', function () {
     });
 
     it('matches excluded', function () {
-        $matcher = new RequestMatcher('/api', '/logout', ['^/api/ex[0-9]+$', '^/foo.*$']);
+        $matcher = new DefaultRequestMatcher('/api', '/logout', ['^/api/ex[0-9]+$', '^/foo.*$']);
         $request = mockRequest('/api/ex123');
         expect($matcher->matchesExcluded($request))->toBeTrue();
         $request2 = mockRequest('/foobar');
@@ -42,7 +42,7 @@ describe('RequestMatcher', function () {
     });
 
     it('matches pattern with exact match', function () {
-        $matcher = new RequestMatcher('^/api/user$', '/logout', []);
+        $matcher = new DefaultRequestMatcher('^/api/user$', '/logout', []);
         $request = mockRequest('/api/user');
         expect($matcher->matchesPattern($request))->toBeTrue();
         $request2 = mockRequest('/api/user/1');
@@ -50,7 +50,7 @@ describe('RequestMatcher', function () {
     });
 
     it('matches pattern with wildcard', function () {
-        $matcher = new RequestMatcher('^/api/user/.*$', '/logout', []);
+        $matcher = new DefaultRequestMatcher('^/api/user/.*$', '/logout', []);
         $request = mockRequest('/api/user');
         expect($matcher->matchesPattern($request))->toBeFalse();
         $request2 = mockRequest('/api/user/1');

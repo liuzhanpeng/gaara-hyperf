@@ -19,8 +19,8 @@ class AuthenticatedToken extends AbstractToken
     public function __serialize(): array
     {
         return [
-            'guardName' => $this->guardName,
-            'userIdentifier' => $this->userIdentifier,
+            'guard_name' => $this->guardName,
+            'user_identifier' => $this->userIdentifier,
             'attributes' => $this->attributes,
         ];
     }
@@ -31,8 +31,8 @@ class AuthenticatedToken extends AbstractToken
      */
     public function __unserialize(array $data): void
     {
-        $this->guardName = $data['guardName'];
-        $this->userIdentifier = $data['userIdentifier'];
+        $this->guardName = $data['guard_name'];
+        $this->userIdentifier = $data['user_identifier'];
         $this->attributes = $data['attributes'];
     }
 }

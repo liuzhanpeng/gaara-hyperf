@@ -83,7 +83,10 @@ class AuthContext
      */
     public function getUser(): ?UserInterface
     {
-        return $this->getToken()?->getUser();
+        $userIdentifier =  $this->getToken()?->getUserIdentifier();
+        $guard = $this->guardResolver->resolve($this->getToken()->getGuardName());
+
+        return $guard->getUserProvider()->findByIdentifier($userIdentifier);
     }
 
     /**

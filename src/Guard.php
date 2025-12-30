@@ -21,6 +21,7 @@ use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageInterface;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandlerInterface;
 use Lzpeng\HyperfAuthGuard\User\UserInterface;
+use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -37,6 +38,7 @@ class Guard implements GuardInterface
      * @param RequestMatcherInterface $requestMatcher
      * @param TokenStorageInterface $tokenStorage
      * @param TokenContextInterface $tokenContext
+     * @param UserProviderInterface $userProvider
      * @param array<string, AuthenticatorInterface> $authenticators
      * @param UnauthenticatedHandlerInterface $unauthenticatedHandler
      * @param AuthorizationCheckerInterface $authorizationChecker
@@ -48,6 +50,7 @@ class Guard implements GuardInterface
         private RequestMatcherInterface $requestMatcher,
         private TokenStorageInterface $tokenStorage,
         private TokenContextInterface $tokenContext,
+        private UserProviderInterface $userProvider,
         private array $authenticators,
         private UnauthenticatedHandlerInterface $unauthenticatedHandler,
         private AuthorizationCheckerInterface $authorizationChecker,
@@ -63,6 +66,16 @@ class Guard implements GuardInterface
     public function name(): string
     {
         return $this->name;
+    }
+
+    /**
+     * 返回用户提供器
+     *
+     * @return UserProviderInterface
+     */
+    public function getUserProvider(): UserProviderInterface
+    {
+        return $this->userProvider;
     }
 
     /**

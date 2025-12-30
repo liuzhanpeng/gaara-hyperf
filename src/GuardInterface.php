@@ -8,6 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Lzpeng\HyperfAuthGuard\Passport\BadgeInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
 use Lzpeng\HyperfAuthGuard\User\UserInterface;
+use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -23,6 +24,13 @@ interface GuardInterface
      * @return string
      */
     public function name(): string;
+
+    /**
+     * 返回用户提供器
+     *
+     * @return UserProviderInterface
+     */
+    public function getUserProvider(): UserProviderInterface;
 
     /**
      * 判断请求是否需要进行认证
