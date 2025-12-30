@@ -1,50 +1,68 @@
 <?php
 
-use Lzpeng\HyperfAuthGuard\EventListener\IPWhiteListListener;
-use Lzpeng\HyperfAuthGuard\Authenticator\OpaqueTokenResponseHandler;
-
 return [
     'guards' => [
         'admin' => [
             'matcher' => [
-                'type' => 'default',
-                'pattern' => '^/admin/',
-                'logout_path' => '/admin/logout',
-                'exclusions' => [],
+                // 'type' => 'default', // 可选，暂时只支持default和custom，默认default
+                'pattern' => '^/admin/', // type == default时必填，请求路径正则表达式
+                // 'logout_path' => '/admin/logout', // type == default时可选，登出路径
+                // 'exclusions' => [], // type == default时可选，排除的请求路径列表
             ],
 
             'user_provider' => [
-                'type' => 'memory',
-                'users' => [
-                    'admin' => [
-                        'password' => 'admin',
-                    ],
-                ],
+                'type' => 'model', // 支持 memory, model, custom
+                // 'users' => [ // type == memory时必填，内存用户列表
+                //     'admin' => [
+                //         'password' => 'admin',
+                //     ],
+                // ],
+                // 'class' => User::class, // type == model时必填，用户模型类名
+                // 'identifier' => 'username', // type == model时必填，用户模型标识字段
             ],
 
             'authenticators' => [
-                'form_login' => [
-                    'check_path' => '/admin/login',
-                    'failure_path' => '/admin/login',
-                    'csrf_enabled' => true,
-                    'csrf_token_manager' => 'admin',
-                    'csrf_token_param' => '_csrf_token',
-                    'csrf_token_id' => 'authenticate',
+                'form_login' => [ // 内置表单登录认证器
+                    'check_path' => '/admin/login', // 登录表单提交路径
+                    // 'target_path' => '/admin/dashboard', // 登录成功跳转路径
+                    // 'failure_path' => '/admin/login', // 登录失败跳转路径
+                    // 'redirect_enabled' => true, // 是否启用登录成功后的重定向
+                    // 'redirect_param' => 'redirect_to', // 重定向目标路径参数名
+                    // 'username_param' => 'username', // 用户名参数名
+                    // 'password_param' => 'password', // 密码参数名
+                    // 'error_message' => '用户名或密码错误', // 登录失败错误消息; 支持字符串或回调函数; 回调函数参数为 AuthenticationException 实例
+                    // 'csrf_enabled' => true, // 是否启用CSRF保护
+                    // 'csrf_id' => 'authenticate', // CSRF令牌ID
+                    // 'csrf_param' => '_csrf_token', // CSRF令牌参数名
+                    // 'csrf_token_manager' => 'default', // CSRF令牌管理器服务名称
+                    // 'success_handler' => [ // 可选，登录成功处理器配置; 没有参数时可以直接配置类名字符串
+                    //     'class' => CustomSuccessHandler::class,
+                    //     'args' => []
+                    // ],
+                    // 'success_handler' => CustomSuccessHandler::class, // 没有参数时可以直接配置类名字符串
+                    // 'failure_handler' => [ // 可选，登录失败处理器配置
+                    //     'class' => CustomFailureHandler::class,
+                    //     'args' => []
+                    // ],
                 ],
-                'json_login' => [
-                    'check_path' => '/admin/check_login',
-                    'success_handler' => [
-                        'class' => OpaqueTokenResponseHandler::class,
-                        'args' => [
-                            // 'token_manager' => 'admin_opaque_token_manager',
-                            // 'response_template' => '{ "code": 0, "msg": "success", "data": { "access_token": "#ACCESS_TOKEN#"} }',
-                        ],
-                    ],
-                    // 'failure_handler' => CustomFailureHandler::class
+                'json_login' => [ // 内置JSON登录认证器
+                    'check_path' => '/admin/check_login', // JSON登录请求路径
+                    // 'username_param' => 'username', // 用户名字段名
+                    // 'password_param' => 'password', // 密码字段名
+                    // 'success_handler' => [ // 可选，登录成功处理器配置; 无状态认证时一般都需要配置, 用于生成access token返回给客户端
+                    //     'class' => OpaqueTokenResponseHandler::class,
+                    //     'args' => [
+                    //         'token_manager' => 'default',
+                    //         'response_template' => '{ "code": 0, "msg": "success", "data": { "access_token": "#ACCESS_TOKEN#"} }',
+                    //     ],
+                    // ],
+                    // 'failure_handler' => CustomFailureHandler::class // 可选，登录失败处理器配置
                 ],
-                'opaque_token' => [
-                    'token_manager' => 'admin_opaque_token_manager',
-                    'token_extractor' => 'admin_opaque_token_extractor'
+                'opaque_token' => [ // 不透明令牌认证器，用于API无状态认证； 一般配合 JSON登录认证器 使用
+                    // 'token_manager' => 'default', // 可选；不透明令牌管理器服务名称; 默认default
+                    // 'token_extractor' => 'admin_opaque_token_extractor' // 可选; 访问令牌提取器服务名称; 默认default
+                    // 'success_handler' => CustomSuccessHandler::class // 可选，认证成功处理器配置
+                    // 'failure_handler' => CustomFailureHandler::class // 可选，认证失败处理器配置
                 ],
                 'api_key' => [
                     'api_key_param' => 'X-API-KEY',
@@ -130,7 +148,7 @@ return [
         ],
     ],
 
-    'services' => [
+    'services' => [ // 全局服务配置
         'password_hashers' => [
             'admin' => [
                 'type' => 'default',
@@ -152,28 +170,25 @@ return [
                 'prefix' => 'admin'
             ]
         ],
-        'opaque_token_managers' => [
-            'admin_opaque_token_manager' => [
-                'type' => 'default',
-                'prefix' => 'admin',
-                'expires_in' => 60 * 20, // token过期时间，单位秒
-                'max_lifetime' => 60 * 60 * 24, // token最大生命周期，单位秒
-                'token_refresh' => true,
-                'ip_bind_enabled' => false,
-                'user_agent_bind_enabled' => false,
-                'single_session' => true,
-            ]
-        ],
-        'access_token_extractors' => [
-            'admin_opaque_token_extractor' => [
-                'type' => 'header',
-                'param_name' => 'Authorization',
-                'param_type' => 'Bearer',
-
-                // or
-                // 'type' => 'cookie',
-                // 'param_name' => 'access_token',
-            ]
-        ],
+        // 'opaque_token_managers' => [ // 不透明令牌管理器配置; 内置了一个名称为default的管理器(type==default)
+        //     'default' => [ // 不透明令牌管理器名称; 可按实际情况为每个Guard配置不同的管理器
+        //         'type' => 'default', // 支持 default, custom; 默认default
+        //         'prefix' => 'admin', // 存储前缀; 默认default; 多个管理器时必须配置不同的前缀
+        //         'expires_in' => 60 * 20, // token过期时间，单位秒; 必须小于等于 max_lifetime; 默认1200秒
+        //         'max_lifetime' => 60 * 60 * 24, // token最大生命周期，单位秒; 默认86400秒
+        //         'token_refresh' => true, // 是否启用token刷新机制; 默认true
+        //         'ip_bind_enabled' => false, // 是否启用IP绑定; 默认false
+        //         'user_agent_bind_enabled' => false, // 是否启用User-Agent绑定; 默认false
+        //         'single_session' => true, // 是否启用单会话登录; 默认true
+        //         'access_token_length' => 16, // 生成令牌长度; 默认16
+        //     ]
+        // ],
+        // 'access_token_extractors' => [ // 访问令牌提取器配置; 内置了一个名称为default的提取器(type==header)
+        //     'default' => [ // 不透明令牌提取器名称; 可按实际情况为每个Guard配置不同的提取器 
+        //         'type' => 'header', // 支持 header, cookie, custom; 默认header
+        //         'param_name' => 'Authorization', // type == header时可选，默认Authorization; type == cookie时可选，默认access_token
+        //         'param_type' => 'Bearer', // type == header时可选，默认Bearer
+        //     ]
+        // ],
     ],
 ];
