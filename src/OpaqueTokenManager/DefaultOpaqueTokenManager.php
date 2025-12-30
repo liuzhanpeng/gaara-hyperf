@@ -116,7 +116,7 @@ class DefaultOpaqueTokenManager implements OpaqueTokenManagerInterface
         if ($this->singleSession) {
             $data = $this->cache->get($this->getAccessTokenKey($accessToken));
             if (!is_null($data)) {
-                $this->cache->delete($this->getUserTokenKey($data['token']->getUser()->getIdentifier()));
+                $this->cache->delete($this->getUserTokenKey($data['token']->getUserIdentifier()));
             }
         }
 
