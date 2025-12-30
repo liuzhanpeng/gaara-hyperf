@@ -41,6 +41,7 @@ class DefaultOpaqueTokenManager implements OpaqueTokenManagerInterface
         private bool $singleSession,
         private bool $ipBindEnabled,
         private bool $userAgentBindEnabled,
+        private int $accessTokenLength
     ) {}
 
     /**
@@ -48,7 +49,7 @@ class DefaultOpaqueTokenManager implements OpaqueTokenManagerInterface
      */
     public function issue(TokenInterface $token): string
     {
-        $accessToken = bin2hex(random_bytes(32));
+        $accessToken = bin2hex(random_bytes($this->accessTokenLength));
         $time = time();
         $data = [
             'token' => $token,

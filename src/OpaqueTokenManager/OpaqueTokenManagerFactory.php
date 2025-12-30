@@ -44,6 +44,7 @@ class OpaqueTokenManagerFactory
                     'singleSession' => $config['single_session'] ?? true,
                     'ipBindEnabled' => $config['ip_bind_enabled'] ?? false,
                     'userAgentBindEnabled' => $config['user_agent_bind_enabled'] ?? false,
+                    'accessTokenLength' => $config['access_token_length'] ?? 16,
                 ]);
             case 'custom':
                 $customConfig = CustomConfig::from($config);
