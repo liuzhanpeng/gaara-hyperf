@@ -12,11 +12,12 @@ namespace Lzpeng\HyperfAuthGuard\Exception;
 class AuthenticationException extends \Exception
 {
     /**
-     * @param string $userIdentifier 用户标识
+     * @param string $message
+     * @param string $userIdentifier
      */
     public function __construct(
         private string $userIdentifier = '',
-        string $message = ''
+        string $message = '',
     ) {
         parent::__construct($message);
         $this->userIdentifier = $userIdentifier;

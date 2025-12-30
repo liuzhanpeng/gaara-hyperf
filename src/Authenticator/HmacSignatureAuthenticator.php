@@ -58,21 +58,21 @@ class HmacSignatureAuthenticator extends AbstractAuthenticator
         $timestamp = $request->getHeaderLine($this->options['timestamp_param']);
         $nonce = $request->getHeaderLine($this->options['nonce_param']);
         if (empty($apiKey) || empty($signature) || empty($timestamp)) {
-            throw new AuthenticationException('Missing required authentication headers', $apiKey);
+            throw new AuthenticationException($apiKey, 'Missing required authentication headers');
         }
 
         if ($this->options['nonce_enabled'] && empty($nonce)) {
-            throw new AuthenticationException('Missing required nonce header', $apiKey);
+            throw new AuthenticationException($apiKey, 'Missing required nonce header');
         }
 
         if ($timestamp + $this->options['ttl'] < time()) {
-            throw new AuthenticationException('Request signature has expired', $apiKey);
+            throw new AuthenticationException($apiKey, 'Request signature has expired');
         }
 
         if ($this->options['nonce_enabled']) {
             $cacheKey = sprintf('%s:%s', $this->options['nonce_cache_prefix'], md5($apiKey . $nonce));
             if ($this->cache->has($cacheKey)) {
-                throw new AuthenticationException('Nonce has already been used', $apiKey);
+                throw new AuthenticationException($apiKey, 'Nonce has already been used');
             }
 
             $this->cache->set($cacheKey, true, $this->options['ttl']);
@@ -80,11 +80,11 @@ class HmacSignatureAuthenticator extends AbstractAuthenticator
 
         $user = $this->userProvider->findByIdentifier($apiKey);
         if (is_null($user)) {
-            throw new AuthenticationException('Invalid API key', $apiKey);
+            throw new AuthenticationException($apiKey, 'Invalid API key');
         }
 
         if (!$user instanceof PasswordAwareUserInterface) {
-            throw new AuthenticationException('User must implement PasswordAwareUserInterface', $apiKey);
+            throw new AuthenticationException($apiKey, 'User must implement PasswordAwareUserInterface');
         }
 
         $params = array_merge($request->getQueryParams(), $request->getParsedBody() ?? []);
@@ -105,7 +105,7 @@ class HmacSignatureAuthenticator extends AbstractAuthenticator
 
         $computedSignature = hash_hmac($this->options['algo'], $paramStr, $secret);
         if (!hash_equals($computedSignature, $signature)) {
-            throw new AuthenticationException('Invalid request signature', $apiKey);
+            throw new AuthenticationException($apiKey, 'Invalid request signature');
         }
 
         return new Passport(

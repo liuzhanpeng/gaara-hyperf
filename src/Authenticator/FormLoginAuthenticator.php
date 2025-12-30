@@ -61,6 +61,10 @@ class FormLoginAuthenticator extends AbstractAuthenticator
     {
         $credientials = $this->getCredentials($request);
 
+        if ($this->options['csrf_enabled'] && empty($credientials['csrf_token'])) {
+            throw new AuthenticationException($this->options['username_param'], 'CSRF token is missing');
+        }
+
         $passport = new Passport(
             $credientials['username'],
             $this->userProvider->findByIdentifier(...),
@@ -68,10 +72,6 @@ class FormLoginAuthenticator extends AbstractAuthenticator
                 new PasswordBadge($credientials['password']),
             ]
         );
-
-        if ($this->options['csrf_enabled'] && empty($credientials['csrf_token'])) {
-            throw new AuthenticationException('CSRF token is missing', $passport->getUser()->getIdentifier());
-        }
 
         if ($this->options['csrf_enabled']) {
             $passport->addBadge(new CsrfTokenBadge(
@@ -111,7 +111,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
 
         if ($this->session instanceof Session) {
             if (is_callable($this->options['error_message'])) {
-                $msg = call_user_func($this->options['error_message'], $exception);
+                $msg = ($this->options['error_message'])($exception);
             } else {
                 $msg = $this->options['error_message'];
             }

@@ -46,7 +46,7 @@ class APIKeyAuthenticator extends AbstractAuthenticator
     {
         $apiKey = $request->getHeaderLine($this->options['api_key_param']);
         if (empty($apiKey)) {
-            throw new AuthenticationException('API key is missing', $apiKey);
+            throw new AuthenticationException($apiKey, 'API key is missing');
         }
 
         return new Passport(
