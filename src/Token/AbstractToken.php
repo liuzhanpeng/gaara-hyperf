@@ -18,7 +18,7 @@ abstract class AbstractToken implements TokenInterface
      */
     public function __construct(
         protected string $guardName,
-        protected UserInterface $user,
+        protected string $userIdentifier,
         protected array $attributes = []
     ) {}
 
@@ -33,13 +33,13 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
-     * 返回用户
+     * 返回用户标识
      *
-     * @return UserInterface
+     * @return string
      */
-    public function getUser(): UserInterface
+    public function getUserIdentifier(): string
     {
-        return $this->user;
+        return $this->userIdentifier;
     }
 
     /**
@@ -88,7 +88,7 @@ abstract class AbstractToken implements TokenInterface
         return sprintf(
             '%s(user=%s, attributes=%s)',
             static::class,
-            $this->getUser()->getIdentifier(),
+            $this->userIdentifier,
             json_encode($this->attributes)
         );
     }

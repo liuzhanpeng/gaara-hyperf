@@ -58,7 +58,7 @@ class AuthContext
     public function logout(): ResponseInterface
     {
         if (! $this->isAuthenticated()) {
-            throw new AuthenticationException($this->getToken()->getUser()->getIdentifier());
+            throw new AuthenticationException($this->getToken()->getUserIdentifier());
         }
 
         $guard = $this->guardResolver->resolve($this->getToken()->getGuardName());

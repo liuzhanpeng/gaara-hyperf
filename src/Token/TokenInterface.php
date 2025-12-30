@@ -21,11 +21,11 @@ interface TokenInterface
     public function getGuardName(): string;
 
     /**
-     * 返回所属用户
+     * 返回所属用户标识符
      *
-     * @return UserInterface
+     * @return string
      */
-    public function getUser(): UserInterface;
+    public function getUserIdentifier(): string;
 
     /**
      * 是否有属性

@@ -20,7 +20,7 @@ class AuthenticatedToken extends AbstractToken
     {
         return [
             'guardName' => $this->guardName,
-            'user' => $this->user,
+            'userIdentifier' => $this->userIdentifier,
             'attributes' => $this->attributes,
         ];
     }
@@ -32,7 +32,7 @@ class AuthenticatedToken extends AbstractToken
     public function __unserialize(array $data): void
     {
         $this->guardName = $data['guardName'];
-        $this->user = $data['user'];
+        $this->userIdentifier = $data['userIdentifier'];
         $this->attributes = $data['attributes'];
     }
 }

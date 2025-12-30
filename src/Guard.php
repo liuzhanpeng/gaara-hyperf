@@ -192,7 +192,6 @@ class Guard implements GuardInterface
      */
     private function handleAuthenticationSuccess(ServerRequestInterface $request, AuthenticatorInterface $authenticator, Passport $passport, TokenInterface $token): ?ResponseInterface
     {
-        $token->getUser()->eraseCredentials();
         $previousToken = $this->tokenContext->getToken();
 
         $response = $authenticator->onAuthenticationSuccess($request, $token);
