@@ -77,12 +77,43 @@ class X509Authenticator extends AbstractAuthenticator
     private function extractUserIdentifier(ServerRequestInterface $request): ?string
     {
         $identifier = null;
-        if ($request->hasHeader($this->options['email_param'])) {
-            $identifier = $request->getHeaderLine($this->options['email_param']);
-        } elseif ($request->hasHeader($this->options['common_name_param'])) {
-            $identifier = $request->getHeaderLine($this->options['common_name_param']);
+        // 提取SSL_CLIENT_S_DN中，指定identifier_field的值
+        $sslClientSDN = $request->getHeaderLine($this->options['ssl_client_s_dn_param']);
+        if (!empty($sslClientSDN)) {
+            $identifierField = $this->options['identifier_field'];
+
+            // 兼容 email -> emailAddress
+            if (strtolower($identifierField) === 'email') {
+                $identifierField = 'emailAddress';
+            }
+
+            $identifier = $this->extractFieldFromDn($sslClientSDN, $identifierField);
         }
 
         return $identifier;
+    }
+
+    /**
+     * 从 DN 字符串中提取指定字段
+     * 支持格式:
+     * 1. /C=CN/CN=Alice/emailAddress=a@b.com (OpenSSL 旧版)
+     * 2. emailAddress=a@b.com,CN=Alice,C=CN (RFC 2253/4514)
+     *
+     * @param string $dn
+     * @param string $field
+     * @return string|null
+     */
+    private function extractFieldFromDn(string $dn, string $field): ?string
+    {
+        // 匹配 pattern:  /FIELD=xxx  或  ,FIELD=xxx  或  ^FIELD=xxx
+        // 兼容字段名大小写 (i)
+        // 排除分隔符 / 和 ,
+        $pattern = '/(?:^|[\/,])\s*' . preg_quote($field, '/') . '=([^/,]+)/i';
+
+        if (preg_match($pattern, $dn, $matches)) {
+            return trim($matches[1]);
+        }
+
+        return null;
     }
 }

@@ -80,12 +80,9 @@ return [
                     // 'secret_crypto_algo' => 'AES-256-CBC', // secret_crypto_enabled==true必须; 加密算法
                     // 'secret_crypto_key' => 'secret-key', // secret_crypto_enabled==true必须; 加密密钥
                 ],
-                'x509' => [
-                    'verify_mode' => 'strict', // strict, optional
-                    'identifier_field' => 'cn', // cn, serial, fingerprint, subject_dn, email
-                    'check_validity' => true, // 是否检查证书有效期
-                    'allowed_cas' => [], // 允许的CA指纹列表，空表示不限制
-                    'revocation_check' => false, // 是否检查证书撤销状态
+                'x509' => [ // X509证书认证器
+                    // 'ssl_client_s_dn_param' => 'SSL_CLIENT_S_DN', // 存放客户端证书主题信息的服务器参数名
+                    // 'identifier_field' => 'cn', // 用户标识field; 支持: cn, email; 根据实际情况设置
                 ],
                 // 'custom' => [ // 可设置多个自定义认证器；只要实现相关接口就可以了
                 //     [

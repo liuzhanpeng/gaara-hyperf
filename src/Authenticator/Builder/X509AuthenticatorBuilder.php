@@ -9,13 +9,18 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\X509Authenticator;
 
+/**
+ * X509证书认证器
+ * 
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
 class X509AuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
         $options = array_merge([
-            'email_param' => 'SSL_CLIENT_S_DN_Email',
-            'common_name_param' => 'SSL_CLIENT_S_DN_CN',
+            'ssl_client_s_dn_param' => 'SSL_CLIENT_S_DN',
+            'identifier_field' => 'email',
         ], $options);
 
         return new X509Authenticator(
