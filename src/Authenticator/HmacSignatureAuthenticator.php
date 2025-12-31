@@ -65,10 +65,14 @@ class HmacSignatureAuthenticator extends AbstractAuthenticator
             throw new AuthenticationException($apiKey, 'Missing required nonce header');
         }
 
-        if ($timestamp + $this->options['ttl'] < time()) {
-            throw new AuthenticationException($apiKey, 'Request signature has expired');
+        $now = time();
+        $ts = (int) $timestamp;
+        $skew = 300; // 允许 5 分钟的时钟偏差
+        if ($ts < ($now - $this->options['ttl']) || $ts > ($now + $skew)) {
+            throw new AuthenticationException($apiKey, 'Request timestamp is invalid or expired');
         }
 
+        // 防止重放攻击
         if ($this->options['nonce_enabled']) {
             $cacheKey = sprintf('%s:%s', $this->options['nonce_cache_prefix'], md5($apiKey . $nonce));
             if ($this->cache->has($cacheKey)) {
@@ -87,23 +91,41 @@ class HmacSignatureAuthenticator extends AbstractAuthenticator
             throw new AuthenticationException($apiKey, 'User must implement PasswordAwareUserInterface');
         }
 
-        $params = array_merge($request->getQueryParams(), $request->getParsedBody() ?? []);
-        $params = array_merge($params, [
-            $this->options['api_key_param'] => $apiKey,
-            $this->options['timestamp_param'] => $timestamp,
-        ]);
-        if ($this->options['nonce_enabled']) {
-            $params[$this->options['nonce_param']] = $nonce;
+        // 构建待签名字符串
+        // 结构: METHOD \n PATH \n QUERY \n APIKEY \n TIMESTAMP [\n NONCE] \n BODY_HASH
+        $queryParams = $request->getQueryParams();
+        ksort($queryParams);
+        $queryString = http_build_query($queryParams, '', '&', PHP_QUERY_RFC3986);
+
+        $bodyContent = $request->getBody()->getContents();
+        $request->getBody()->rewind();
+        $bodyDigest = hash('sha256', $bodyContent);
+
+        $path = $request->getUri()->getPath();
+        if ($path === '') {
+            $path = '/';
         }
-        ksort($params);
-        $paramStr = http_build_query($params);
+
+        $parts = [
+            strtoupper($request->getMethod()),
+            $path,
+            $queryString,
+            $apiKey,
+            $timestamp,
+        ];
+        if ($this->options['nonce_enabled']) {
+            $parts[] = $nonce;
+        }
+        $parts[] = $bodyDigest;
+        $signStr = implode("\n", $parts);
 
         $secret = $user->getPassword();
         if (!is_null($this->encryptor)) {
             $secret = $this->encryptor->decrypt($secret);
         }
 
-        $computedSignature = hash_hmac($this->options['algo'], $paramStr, $secret);
+        // 验签
+        $computedSignature = base64_encode(hash_hmac($this->options['algo'], $signStr, $secret, true));
         if (!hash_equals($computedSignature, $signature)) {
             throw new AuthenticationException($apiKey, 'Invalid request signature');
         }

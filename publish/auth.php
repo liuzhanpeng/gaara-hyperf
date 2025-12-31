@@ -64,21 +64,21 @@ return [
                     // 'success_handler' => CustomSuccessHandler::class // 可选，认证成功处理器配置
                     // 'failure_handler' => CustomFailureHandler::class // 可选，认证失败处理器配置
                 ],
-                'api_key' => [
-                    'api_key_param' => 'X-API-KEY',
+                'api_key' => [ // API-Key认证器
+                    // 'api_key_param' => 'X-API-KEY', // 请求头中的api key参数名; 默认X-API-KEY; 
                 ],
-                'hmac_signature' => [
-                    'api_key_param' => 'X-API-KEY',
-                    'signature_param' => 'X-SIGNATURE',
-                    'timestamp_param' => 'X-TIMESTAMP',
-                    'nonce_enabled' => true,
-                    'nonce_param' => 'X-NONCE',
-                    // 'nonce_cache_prefix' => 'default',
-                    'ttl' => 60, // 请求签名的有效期，单位秒
-                    'algo' => 'HMAC-SHA256', // 签名算法
-                    // 'secret_crypto_enabled' => true, // 是否启用密钥加密
-                    // 'secret_crypto_algo' => 'AES-256-CBC', // 密钥加密算法
-                    // 'secret_crypto_key' => 'xxx', // base64编码的密钥
+                'hmac_signature' => [ // HMAC签名认证器
+                    // 'api_key_param' => 'X-API-KEY', // 请求头中的api key参数名; 默认X-API-KEY; 
+                    // 'signature_param' => 'X-SIGNATURE', // 请求头中的签名参数名
+                    // 'timestamp_param' => 'X-TIMESTAMP', // 请求头中的时间戳参数名
+                    // 'nonce_enabled' => true, // 是否启用随机字符串; 防止重放攻击
+                    // 'nonce_param' => 'X-NONCE', // nonce_enabled==true必须; 请求头中的随机字符串参数名 
+                    // 'nonce_cache_prefix' => 'default', // nonce_enabled==true必须; 随机字符串缓存前缀
+                    // 'ttl' => 60, // 请求签名的有效期，单位秒
+                    // 'algo' => 'sha256', // 签名算法
+                    // 'secret_crypto_enabled' => false, // 是否启用密钥加密
+                    // 'secret_crypto_algo' => 'AES-256-CBC', // secret_crypto_enabled==true必须; 加密算法
+                    // 'secret_crypto_key' => 'secret-key', // secret_crypto_enabled==true必须; 加密密钥
                 ],
                 'x509' => [
                     'verify_mode' => 'strict', // strict, optional
@@ -87,7 +87,7 @@ return [
                     'allowed_cas' => [], // 允许的CA指纹列表，空表示不限制
                     'revocation_check' => false, // 是否检查证书撤销状态
                 ],
-                // 'custom' => [
+                // 'custom' => [ // 可设置多个自定义认证器；只要实现相关接口就可以了
                 //     [
                 //         'class' => CustomAuthenticator::class,
                 //         'args' => []

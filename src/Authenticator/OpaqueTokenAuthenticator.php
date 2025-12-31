@@ -19,6 +19,7 @@ use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
 class OpaqueTokenAuthenticator extends AbstractAuthenticator
 {
     /**
+     * @param UserProviderInterface $userProvider
      * @param OpaqueTokenManagerInterface $opaqueTokenManager
      * @param AccessTokenExtractorInterface $accessTokenExtractor
      * @param AuthenticationSuccessHandlerInterface|null $successHandler
