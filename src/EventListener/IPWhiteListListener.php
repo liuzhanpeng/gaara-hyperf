@@ -20,7 +20,7 @@ class IPWhiteListListener implements EventSubscriberInterface
 {
     public function __construct(
         private IpResolver $ipResolver,
-        private array $whiteList = []
+        private array|IPWhiteListProviderInterface $whiteList = []
     ) {}
 
     public static function getSubscribedEvents(): array
@@ -32,16 +32,20 @@ class IPWhiteListListener implements EventSubscriberInterface
 
     public function checkPassport(CheckPassportEvent $event): void
     {
+        $whiteList = $this->whiteList instanceof IPWhiteListProviderInterface
+            ? $this->whiteList->getWhiteList()
+            : $this->whiteList;
+
         // 空白名单表示不限制
-        if (empty($this->whiteList)) {
+        if (empty($whiteList)) {
             return;
         }
 
         $passport = $event->getPassport();
         $ip = $this->ipResolver->resolve($event->getRequest());
 
-        if (!$this->isIpAllowed($ip)) {
-            throw new IPNotInWhiteListException($passport->getUser()->getIdentifier(), $ip);
+        if (!$this->isAllowed($ip, $whiteList)) {
+            throw new IPNotInWhiteListException($passport->getUserIdentifier(), $ip);
         }
     }
 
@@ -49,12 +53,13 @@ class IPWhiteListListener implements EventSubscriberInterface
      * 检查IP是否在白名单中
      *
      * @param string $ip
-     * @return bool
+     * @param array $whiteList
+     * @return boolean
      */
-    private function isIpAllowed(string $ip): bool
+    private function isAllowed(string $ip, array $whiteList): bool
     {
-        foreach ($this->whiteList as $allowed) {
-            if ($this->matchesIpRule($ip, $allowed)) {
+        foreach ($whiteList as $allowed) {
+            if ($this->matchesRule($ip, $allowed)) {
                 return true;
             }
         }
@@ -69,7 +74,7 @@ class IPWhiteListListener implements EventSubscriberInterface
      * @param string $rule 规则（单个IP或CIDR格式）
      * @return bool
      */
-    private function matchesIpRule(string $ip, string $rule): bool
+    private function matchesRule(string $ip, string $rule): bool
     {
         // 精确匹配
         if ($ip === $rule) {
@@ -185,7 +190,7 @@ class IPWhiteListListener implements EventSubscriberInterface
     }
 
     /**
-     * 通配符匹配（可选功能）
+     * 通配符匹配
      *
      * @param string $ip
      * @param string $pattern

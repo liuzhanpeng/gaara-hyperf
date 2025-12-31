@@ -25,9 +25,9 @@ class X509AuthenticatorBuilder extends AbstractAuthenticatorBuilder
 
         return new X509Authenticator(
             userProvider: $userProvider,
+            options: $options,
             successHandler: $this->createSuccessHandler($options, $eventDispatcher),
             failureHandler: $this->createFailureHandler($options, $eventDispatcher),
-            options: $options,
         );
     }
 }

@@ -92,81 +92,72 @@ return [
                 // ]
             ],
 
-            'token_storage' => [
-                'type' => 'null',
-
-                // or   
-                // 'type' => 'session',
-                // 'prefix' => 'admin',
+            'token_storage' => [ // Token存储器配置
+                // 'type' => 'null', // 支持 session, null, custom; 默认null
+                // 'prefix' => 'admin', // type == session时必填，存储前缀
             ],
 
-            'unauthenticated_handler' => [
-                'type' => 'redirect',
-                'target_path' => '/login',
-                'redirect_enabled' => true,
-                'redirect_param' => 'redirect_to'
+            'unauthenticated_handler' => [ // 未认证处理器配置
+                // 'type' => 'default', // 支持 default, redirect, custom; 默认default
+                // 'target_path' => '/login', // type == redirect时必填，重定向目标路径
+                // 'redirect_enabled' => true, // type == redirect时可选，是否启用重定向，默认true
+                // 'redirect_param' => 'redirect_to' // type == redirect时可选，重定向目标路径参数名，默认redirect_to
+                // 'class' => CustomUnauthenticatedHandler::class, // type == custom时必填，自定义未认证处理器类名
             ],
-            // 'authorization' => [
-            //     'checker' => [
-            //         'class' => AuthorizationChecker::class,
-            //         'args' => []
-            //     ],
-            //     'access_denied_handler' => [
-            //         'class' => AccessDeniedHandler::class,
-            //         'args' => []
-            //     ],
-            // ],
-            'password_hasher' => 'admin',
+
+            // 'password_hasher' => 'default', // 可选，密码哈希器服务名称；默认default
+
             'login_rate_limiter' => [
                 'type' => 'sliding_window',
                 'limit' => 5,
                 'interval' => 300,
             ],
+
             'listeners' =>  [
-                // CustomListener::class,
                 // [
-                //     'class' => IPWhiteListListener::class,
+                //     'class' => IPWhiteListListener::class, // IP白名单检查监听器
                 //     'args' => [
-                //         'white_list' => [
+                //         'white_list' => [ // 支持静态数组 或 实现IPWhiteListProviderInterface的提供器
                 //             '192.168.1.1',
                 //             '192.168.2.*',
                 //             '172.31.0.0/16',
                 //         ]
                 //     ]
                 // ],
-                [
-                    'class' => EnforcePasswordChangeListener::class,
-                    'args' => [
-                        'password_change_route' => 'admin/password'
-                    ]
-                ]
-
+                // [
+                //     'class' => EnforcePasswordChangeListener::class,
+                //     'args' => [
+                //         'password_change_route' => 'admin/password'
+                //     ]
+                // ]
+                // CustomListener::class,
             ],
+
+            // 'authorization' => [
+            //     'checker' => [ // 可选，授权检查器配置; 默认使用内置的空授权检查器
+            //         'class' => NullAuthorizationChecker::class,
+            //     ],
+            //     'access_denied_handler' => [ // 可选，访问控制拒绝处理器配置; 默认使用内置的处理器
+            //         'class' => DefaultAccessDeniedHandler::class,
+            //     ],
+            // ],
         ],
     ],
 
     'services' => [ // 全局服务配置
-        'password_hashers' => [
-            'admin' => [
-                'type' => 'default',
-                'algo' => PASSWORD_BCRYPT,
-
-                // or
-                // 'type' => 'custom',
-                // 'class' => CustomPasswordHasher::class,
-                // 'args' => []
-            ],
-            // 'api' => [
-            //     'type' => 'default',
-            //     'algo' => PASSWORD_DEFAULT
-            // ]
-        ],
-        'csrf_token_managers' => [
-            'admin' => [
-                'type' => 'session',
-                'prefix' => 'admin'
-            ]
-        ],
+        // 'password_hashers' => [ // 密码哈希器服务配置; 内置了一个名称为default的密码哈希器服务
+        //     'default' => [ // 密码哈希器服务名称
+        //         'type' => 'default', // 支持 default, custom; 默认default
+        //         'algo' => PASSWORD_BCRYPT, // type == default时可选，哈希算法; 默认PASSWORD_BCRYPT
+        //         'class' => CustomPasswordHasher::class, // type == custom时必填，自定义密码哈希器类名
+        //     ]
+        // ],
+        // 'csrf_token_managers' => [ // CSRF令牌管理器配置; 内置了一个名称为default的管理器(type==session)
+        //     'default' => [
+        //         'type' => 'session', // 支持 session, custom; 默认session
+        //         'prefix' => 'default' // 存储前缀; 默认default; 多个管理器时必须配置不同的前缀
+        //     ]
+        // ],
         // 'opaque_token_managers' => [ // 不透明令牌管理器配置; 内置了一个名称为default的管理器(type==default)
         //     'default' => [ // 不透明令牌管理器名称; 可按实际情况为每个Guard配置不同的管理器
         //         'type' => 'default', // 支持 default, custom; 默认default
