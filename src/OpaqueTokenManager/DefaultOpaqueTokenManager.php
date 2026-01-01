@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\OpaqueTokenManager;
 
 use Hyperf\HttpServer\Contract\RequestInterface;
+use Lzpeng\HyperfAuthGuard\IPResolver\IPResolverInterface;
 use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
-use Lzpeng\HyperfAuthGuard\Utils\IpResolver;
 use Psr\SimpleCache\CacheInterface;
 
 /**
@@ -21,7 +21,7 @@ class DefaultOpaqueTokenManager implements OpaqueTokenManagerInterface
     /**
      * @param CacheInterface $cache
      * @param RequestInterface $request
-     * @param IpResolver $ipResolver
+     * @param IPResolverInterface $ipResolver
      * @param string $prefix
      * @param integer $expiresIn
      * @param integer $maxLifetime
@@ -33,7 +33,7 @@ class DefaultOpaqueTokenManager implements OpaqueTokenManagerInterface
     public function __construct(
         private CacheInterface $cache,
         private RequestInterface $request,
-        private IpResolver $ipResolver,
+        private IPResolverInterface $ipResolver,
         private string $prefix,
         private int $expiresIn,
         private int $maxLifetime,

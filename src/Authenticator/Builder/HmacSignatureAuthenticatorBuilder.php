@@ -9,7 +9,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\HmacSignatureAuthenticator;
 use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\Utils\Encryptor;
+use Lzpeng\HyperfAuthGuard\Util\Encryptor;
 use Psr\SimpleCache\CacheInterface;
 
 class HmacSignatureAuthenticatorBuilder extends AbstractAuthenticatorBuilder

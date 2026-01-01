@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Utils;
+namespace Tests\Unit\Util;
 
-use Lzpeng\HyperfAuthGuard\Utils\Encryptor;
+use Lzpeng\HyperfAuthGuard\Util\Encryptor;
 use PHPUnit\Framework\TestCase;
 use InvalidArgumentException;
 use RuntimeException;

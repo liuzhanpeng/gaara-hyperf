@@ -9,12 +9,14 @@ use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorFactory;
 use Lzpeng\HyperfAuthGuard\Config\ConfigLoaderInterface;
 use Lzpeng\HyperfAuthGuard\Config\GuardConfig;
 use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\EventListener\LoginRateLimitListener;
+use Lzpeng\HyperfAuthGuard\Encryptor\Encryptor;
+use Lzpeng\HyperfAuthGuard\Encryptor\EncryptorInterface;
 use Lzpeng\HyperfAuthGuard\EventListener\PasswordBadgeCheckListener;
 use Lzpeng\HyperfAuthGuard\Guard;
 use Lzpeng\HyperfAuthGuard\GuardInterface;
 use Lzpeng\HyperfAuthGuard\GuardResolver;
-use Lzpeng\HyperfAuthGuard\LoginRateLimiter\LoginRateLimiterFactory;
+use Lzpeng\HyperfAuthGuard\IPResolver\IPResolver;
+use Lzpeng\HyperfAuthGuard\IPResolver\IPResolverInterface;
 use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolverInterface;
 use Lzpeng\HyperfAuthGuard\RequestMatcher\RequestMatcherFactory;
 use Lzpeng\HyperfAuthGuard\Token\TokenContext;
@@ -22,7 +24,6 @@ use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
 use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageFactory;
 use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandlerFactory;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderFactory;
-use Lzpeng\HyperfAuthGuard\Utils\IpResolver;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -45,6 +46,10 @@ class GuardServiceProvider implements ServiceProviderInterface
     {
         // 注册内置的令牌上下文
         $container->define(TokenContextInterface::class, fn() => new TokenContext(Constants::TOKEN_CONTEXT_PREFIX));
+
+        // 注册内部使用组件
+        $container->define(IPResolverInterface::class, fn() => new IPResolver());
+        $container->define(EncryptorInterface::class, fn() => new Encryptor());
 
         $config = $container->get(ConfigLoaderInterface::class)->load();
 
@@ -83,10 +88,6 @@ class GuardServiceProvider implements ServiceProviderInterface
         // 注册内置密码验证监听器
         $passwordHasher = $container->get(PasswordHasherResolverInterface::class)->resolve($guardConfig->passwordHasherId());
         $eventDispatcher->addSubscriber(new PasswordBadgeCheckListener($passwordHasher));
-
-        // 注册登录限流监听器
-        $rateLimiter = $container->get(LoginRateLimiterFactory::class)->create($guardConfig->loginRateLimiterConfig());
-        $eventDispatcher->addSubscriber(new LoginRateLimitListener($rateLimiter, $container->get(IpResolver::class)));
 
         $userProvider = $container->get(UserProviderFactory::class)->create($guardConfig->userProviderConfig());
 

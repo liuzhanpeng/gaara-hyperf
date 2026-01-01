@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\Authenticator;
 
+use Lzpeng\HyperfAuthGuard\Encryptor\EncryptorInterface;
 use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
 use Lzpeng\HyperfAuthGuard\Passport\Passport;
 use Lzpeng\HyperfAuthGuard\User\PasswordAwareUserInterface;
 use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
-use Lzpeng\HyperfAuthGuard\Utils\Encryptor;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\SimpleCache\CacheInterface;
 
@@ -22,7 +22,7 @@ class HmacSignatureAuthenticator extends AbstractAuthenticator
     /**
      * @param UserProviderInterface $userProvider
      * @param CacheInterface $cache
-     * @param Encryptor|null $encryptor
+     * @param EncryptorInterface|null $encryptor
      * @param array $options
      * @param AuthenticationSuccessHandlerInterface|null $successHandler
      * @param AuthenticationFailureHandlerInterface|null $failureHandler
@@ -31,7 +31,7 @@ class HmacSignatureAuthenticator extends AbstractAuthenticator
         private UserProviderInterface $userProvider,
         private CacheInterface $cache,
         private array $options,
-        private ?Encryptor $encryptor,
+        private ?EncryptorInterface $encryptor,
         ?AuthenticationSuccessHandlerInterface $successHandler,
         ?AuthenticationFailureHandlerInterface $failureHandler,
     ) {

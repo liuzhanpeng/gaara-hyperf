@@ -2,8 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\EventListener;
+namespace Lzpeng\HyperfAuthGuard\IPWhiteListChecker;
 
+/**
+ * IP白名单提供器
+ * 
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
 interface IPWhiteListProviderInterface
 {
     /**
