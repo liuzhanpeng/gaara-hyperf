@@ -9,7 +9,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
 use Lzpeng\HyperfAuthGuard\Authenticator\HmacSignatureAuthenticator;
 use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\Util\Encryptor;
+use Lzpeng\HyperfAuthGuard\Encryptor\EncryptorFactory;
 use Psr\SimpleCache\CacheInterface;
 
 class HmacSignatureAuthenticatorBuilder extends AbstractAuthenticatorBuilder
@@ -25,20 +25,15 @@ class HmacSignatureAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             'nonce_cache_prefix' => 'default',
             'ttl' => 60,
             'algo' => 'sha256',
-            'secret_crypto_enabled' => false,
+            'secret_encrypto_enabled' => false,
         ], $options);
 
         $options['nonce_cache_prefix'] = sprintf('%s:hmac_nonce:%s', Constants::__PREFIX, $options['nonce_cache_prefix'] ?? 'default');
 
         $encryptor = null;
-        if ($options['secret_crypto_enabled']) {
-            if (empty($options['secret_crypto_key']) || empty($options['secret_crypto_algo'])) {
-                throw new \InvalidArgumentException('Secret crypto key and algo must be provided when secret_crypto_enabled is true');
-            }
-            $encryptor = $this->container->make(Encryptor::class, [
-                'key' => $options['secret_crypto_key'],
-                'algo' => $options['secret_crypto_algo']
-            ]);
+        if ($options['secret_encrypto_enabled']) {
+            $encryptorFactory = $this->container->get(EncryptorFactory::class);
+            $encryptor = $encryptorFactory->create($options['secret_encryptor'] ?? []);
         }
 
         return new HmacSignatureAuthenticator(

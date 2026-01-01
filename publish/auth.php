@@ -76,9 +76,14 @@ return [
                     // 'nonce_cache_prefix' => 'default', // nonce_enabled==true必须; 随机字符串缓存前缀
                     // 'ttl' => 60, // 请求签名的有效期，单位秒
                     // 'algo' => 'sha256', // 签名算法
-                    // 'secret_crypto_enabled' => false, // 是否启用密钥加密
-                    // 'secret_crypto_algo' => 'AES-256-CBC', // secret_crypto_enabled==true必须; 加密算法
-                    // 'secret_crypto_key' => 'secret-key', // secret_crypto_enabled==true必须; 加密密钥
+                    // 'secret_encrypto_enabled' => false, // 是否启用密钥加密
+                    // 'secret_encryptor' => [ // secret_encrypto_enabled==true必须; 加密器配置
+                    //     'type' => 'default', // 支持default, custom
+                    //     'args' => [
+                    //         'algo' => 'AES-256-CBC', // type==default必须; 加密算法
+                    //         'key' => 'secret-key', // type==default必须; 加密密钥
+                    //     ]
+                    // ]
                 ],
                 'x509' => [ // X509证书认证器
                     // 'ssl_client_s_dn_param' => 'SSL_CLIENT_S_DN', // 存放客户端证书主题信息的服务器参数名
@@ -107,21 +112,23 @@ return [
 
             // 'password_hasher' => 'default', // 可选，密码哈希器服务名称；默认default
 
-            'login_rate_limiter' => [
-                'type' => 'sliding_window',
-                'limit' => 5,
-                'interval' => 300,
-            ],
-
             'listeners' =>  [
                 // [
                 //     'class' => IPWhiteListListener::class, // IP白名单检查监听器
                 //     'args' => [
-                //         'white_list' => [ // 支持静态数组 或 实现IPWhiteListProviderInterface的提供器
+                //         'white_list' => [ // 支持静态数组 或 实现IPWhiteListProviderInterface的提供器实例
                 //             '192.168.1.1',
                 //             '192.168.2.*',
                 //             '172.31.0.0/16',
                 //         ]
+                //     ]
+                // ],
+                // [
+                //     'class' => LoginRateLimitListener::class, // 登录限流监听器
+                //     'args' => [
+                //         'type' => 'sliding_window',
+                //         'limit' => 5,
+                //         'interval' => 300
                 //     ]
                 // ],
                 // [

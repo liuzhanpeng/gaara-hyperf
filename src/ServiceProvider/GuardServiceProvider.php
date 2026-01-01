@@ -9,8 +9,6 @@ use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorFactory;
 use Lzpeng\HyperfAuthGuard\Config\ConfigLoaderInterface;
 use Lzpeng\HyperfAuthGuard\Config\GuardConfig;
 use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\Encryptor\Encryptor;
-use Lzpeng\HyperfAuthGuard\Encryptor\EncryptorInterface;
 use Lzpeng\HyperfAuthGuard\EventListener\PasswordBadgeCheckListener;
 use Lzpeng\HyperfAuthGuard\Guard;
 use Lzpeng\HyperfAuthGuard\GuardInterface;
@@ -49,7 +47,6 @@ class GuardServiceProvider implements ServiceProviderInterface
 
         // 注册内部使用组件
         $container->define(IPResolverInterface::class, fn() => new IPResolver());
-        $container->define(EncryptorInterface::class, fn() => new Encryptor());
 
         $config = $container->get(ConfigLoaderInterface::class)->load();
 
