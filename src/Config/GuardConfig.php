@@ -22,7 +22,6 @@ class GuardConfig
      * @param ComponentConfig $unauthenticatedHandlerConfig
      * @param CustomConfig $authorizationCheckerConfig
      * @param CustomConfig $accessDeniedHandlerConfig
-     * @param ComponentConfig $loginRateLimiterConfig
      * @param ListenerConfigCollection $listenerConfigCollection
      * @param string $passwordHasherId
      */
@@ -34,7 +33,6 @@ class GuardConfig
         private ComponentConfig $unauthenticatedHandlerConfig,
         private CustomConfig $authorizationCheckerConfig,
         private CustomConfig $accessDeniedHandlerConfig,
-        private ComponentConfig $loginRateLimiterConfig,
         private ListenerConfigCollection $listenerConfigCollection,
         private string $passwordHasherId
     ) {}
@@ -56,7 +54,6 @@ class GuardConfig
         $accessDeniedHandlerConfig = CustomConfig::from($config['authorization']['access_denied_handler'] ?? [
             'class' => DefaultAccessDeniedHandler::class,
         ]);
-        $loginRateLimiterConfig = ComponentConfig::from($config['login_rate_limiter'] ?? ['type' => 'no_limit']);
         $listenerConfigCollection = ListenerConfigCollection::from($config['listeners'] ?? []);
         $passwordHasherId = $config['password_hasher'] ?? 'default';
 
@@ -68,7 +65,6 @@ class GuardConfig
             $unauthenticatedHandlerConfig,
             $authorizationCheckerConfig,
             $accessDeniedHandlerConfig,
-            $loginRateLimiterConfig,
             $listenerConfigCollection,
             $passwordHasherId,
         );
@@ -142,16 +138,6 @@ class GuardConfig
     public function accessDeniedHandlerConfig(): CustomConfig
     {
         return $this->accessDeniedHandlerConfig;
-    }
-
-    /**
-     * 返回登录限流器配置
-     *
-     * @return ComponentConfig
-     */
-    public function loginRateLimiterConfig(): ComponentConfig
-    {
-        return $this->loginRateLimiterConfig;
     }
 
     /**

@@ -8,8 +8,8 @@ use Lzpeng\HyperfAuthGuard\Event\AuthenticationFailureEvent;
 use Lzpeng\HyperfAuthGuard\Event\AuthenticationSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
 use Lzpeng\HyperfAuthGuard\Exception\TooManyLoginAttemptsException;
+use Lzpeng\HyperfAuthGuard\IPResolver\IPResolverInterface;
 use Lzpeng\HyperfAuthGuard\LoginRateLimiter\LoginRateLimiterInterface;
-use Lzpeng\HyperfAuthGuard\Utils\IpResolver;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -21,7 +21,7 @@ class LoginRateLimitListener implements EventSubscriberInterface
 {
     public function __construct(
         private LoginRateLimiterInterface $loginRateLimiter,
-        private IpResolver $ipResolver,
+        private IPResolverInterface $ipResolver,
     ) {}
 
     public static function getSubscribedEvents()
@@ -58,7 +58,7 @@ class LoginRateLimitListener implements EventSubscriberInterface
         }
 
         $token = $event->getToken();
-        $this->loginRateLimiter->reset($token->getUser()->getIdentifier() . $this->ipResolver->resolve($event->getRequest()));
+        $this->loginRateLimiter->reset($token->getUserIdentifier() . $this->ipResolver->resolve($event->getRequest()));
     }
 
     public function onAuthenticationFailure(AuthenticationFailureEvent $event): void
