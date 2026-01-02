@@ -20,10 +20,10 @@ class LoginRateLimiterFactory
         private ContainerInterface $container,
     ) {}
 
-    public function create(ComponentConfig $config): LoginRateLimiterInterface
+    public function create(array $config): LoginRateLimiterInterface
     {
-        $type = $config->type();
-        $options = $config->options();
+        $type = $config['type'] ?? 'sliding_window';
+        $options = $config['options'] ?? [];
 
         switch ($type) {
             case 'sliding_window':

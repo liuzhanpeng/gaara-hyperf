@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\EventListener;
 
-use Lzpeng\HyperfAuthGuard\Config\ComponentConfig;
 use Lzpeng\HyperfAuthGuard\Event\AuthenticationFailureEvent;
 use Lzpeng\HyperfAuthGuard\Event\AuthenticationSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
@@ -31,11 +30,14 @@ class LoginRateLimitListener implements EventSubscriberInterface
         int $interval = 300,
         string $prefix = 'default'
     ) {
-        $this->loginRateLimiter = $this->loginRateLimiterFactory->create(new ComponentConfig($type, [
-            'limit' => $limit,
-            'interval' => $interval,
-            'prefix' => $prefix,
-        ]));
+        $this->loginRateLimiter = $this->loginRateLimiterFactory->create([
+            'type' => $type,
+            'options' => [
+                'limit' => $limit,
+                'interval' => $interval,
+                'prefix' => $prefix,
+            ]
+        ]);
     }
 
     public static function getSubscribedEvents()

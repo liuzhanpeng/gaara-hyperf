@@ -116,7 +116,7 @@ return [
                 // [
                 //     'class' => IPWhiteListListener::class, // IP白名单检查监听器
                 //     'args' => [
-                //         'white_list' => [ // 支持静态数组 或 实现IPWhiteListProviderInterface的提供器实例
+                //         'white_list' => [ // 支持静态数组 或 实现IPWhiteListProviderInterface的提供器
                 //             '192.168.1.1',
                 //             '192.168.2.*',
                 //             '172.31.0.0/16',
