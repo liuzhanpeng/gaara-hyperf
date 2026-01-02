@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Lzpeng\HyperfAuthGuard\Exception;
 
 /**
- * 重新限制异常
+ * 登录次数限制异常
+ * 
+ * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class TooManyLoginAttemptsException extends AuthenticationException
 {

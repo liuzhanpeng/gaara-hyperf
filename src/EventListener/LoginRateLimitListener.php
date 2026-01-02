@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Lzpeng\HyperfAuthGuard\EventListener;
 
+use Lzpeng\HyperfAuthGuard\Config\ComponentConfig;
 use Lzpeng\HyperfAuthGuard\Event\AuthenticationFailureEvent;
 use Lzpeng\HyperfAuthGuard\Event\AuthenticationSuccessEvent;
 use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
 use Lzpeng\HyperfAuthGuard\Exception\TooManyLoginAttemptsException;
 use Lzpeng\HyperfAuthGuard\IPResolver\IPResolverInterface;
+use Lzpeng\HyperfAuthGuard\LoginRateLimiter\LoginRateLimiterFactory;
 use Lzpeng\HyperfAuthGuard\LoginRateLimiter\LoginRateLimiterInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -19,10 +21,22 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class LoginRateLimitListener implements EventSubscriberInterface
 {
+    private LoginRateLimiterInterface $loginRateLimiter;
+
     public function __construct(
-        private LoginRateLimiterInterface $loginRateLimiter,
+        private LoginRateLimiterFactory $loginRateLimiterFactory,
         private IPResolverInterface $ipResolver,
-    ) {}
+        string $type = 'sliding_window',
+        int $limit = 5,
+        int $interval = 300,
+        string $prefix = 'default'
+    ) {
+        $this->loginRateLimiter = $this->loginRateLimiterFactory->create(new ComponentConfig($type, [
+            'limit' => $limit,
+            'interval' => $interval,
+            'prefix' => $prefix,
+        ]));
+    }
 
     public static function getSubscribedEvents()
     {

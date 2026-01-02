@@ -43,7 +43,7 @@ class LimitResult
     }
 
     /**
-     * 返回可重试时间
+     * 返回可重试时间(多少秒后可以重试)
      *
      * @return int
      */

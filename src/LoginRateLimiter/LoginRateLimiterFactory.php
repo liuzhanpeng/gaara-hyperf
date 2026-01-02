@@ -26,14 +26,19 @@ class LoginRateLimiterFactory
         $options = $config->options();
 
         switch ($type) {
-            case 'no_limit':
-                return new NoLoginRateLimiter();
             case 'sliding_window':
                 return new SlidingWindowLoginRateLimiter(
                     redis: $this->container->get(Redis::class),
                     interval: $options['interval'] ?? 300,
                     limit: $options['limit'] ?? 5,
                     prefix: sprintf('%s:login_rate_limiter:sliding_window:%s', Constants::__PREFIX, $options['prefix'] ?? 'default'),
+                );
+            case 'fixed_window':
+                return new FixedWindowLoginRateLimiter(
+                    redis: $this->container->get(Redis::class),
+                    interval: $options['interval'] ?? 60,
+                    limit: $options['limit'] ?? 10,
+                    prefix: sprintf('%s:login_rate_limiter:fixed_window:%s', Constants::__PREFIX, $options['prefix'] ?? 'default'),
                 );
             default:
                 throw new \InvalidArgumentException("Unsupported rate limiter type: {$type}");

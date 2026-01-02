@@ -6,6 +6,8 @@ namespace Lzpeng\HyperfAuthGuard\Exception;
 
 /**
  * 白名单外IP异常
+ * 
+ * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class IPNotInWhiteListException extends AuthenticationException
 {
