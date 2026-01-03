@@ -88,6 +88,8 @@ class FormLoginAuthenticator extends AbstractAuthenticator
      */
     public function onAuthenticationSuccess(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
     {
+        $this->session->migrate(false);
+
         if (!is_null($this->successHandler)) {
             return $this->successHandler->handle($request, $token);
         }

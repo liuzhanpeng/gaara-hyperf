@@ -20,5 +20,5 @@ An authentication library for hyperf
 - [ ] 2FA
 - [x] IP WhiteList
 - [x] Limiting Login Attempts
-- [ ] Password Expiration
+- [x] Password Expiration
 - [ ] Step-up/Risk-based Authentication
