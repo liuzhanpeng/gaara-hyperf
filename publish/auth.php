@@ -138,6 +138,9 @@ return [
                 //         'warning_days' => 7, // 密码过期前多少天发出警告
                 //     ]
                 // ],
+                // [
+                //     'class' => AuditLogListener::class, // 审计日志监听器
+                // ],
                 // CustomListener::class,
             ],
 
