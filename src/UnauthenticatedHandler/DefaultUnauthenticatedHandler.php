@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\UnauthenticatedHandler;
+namespace GaaraHyperf\UnauthenticatedHandler;
 
-use Lzpeng\HyperfAuthGuard\Exception\UnauthenticatedException;
-use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
+use GaaraHyperf\Exception\UnauthenticatedException;
+use GaaraHyperf\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 

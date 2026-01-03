@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\TokenStorage;
+namespace GaaraHyperf\TokenStorage;
 
 use Hyperf\Contract\SessionInterface;
-use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
+use GaaraHyperf\Token\TokenInterface;
 
 /**
  * 基于Session的TokenStorage实现

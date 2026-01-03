@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Token;
+namespace GaaraHyperf\Token;
 
 /**
  * 用户令牌上下文接口

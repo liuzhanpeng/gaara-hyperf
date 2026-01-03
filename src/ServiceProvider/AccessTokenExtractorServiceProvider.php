@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\ServiceProvider;
+namespace GaaraHyperf\ServiceProvider;
 
 use Hyperf\Contract\ContainerInterface;
-use Lzpeng\HyperfAuthGuard\AccessTokenExtractor\AccessTokenExtractorFactory;
-use Lzpeng\HyperfAuthGuard\AccessTokenExtractor\AccessTokenExtractorResolver;
-use Lzpeng\HyperfAuthGuard\AccessTokenExtractor\AccessTokenExtractorResolverInterface;
-use Lzpeng\HyperfAuthGuard\Config\ConfigLoaderInterface;
-use Lzpeng\HyperfAuthGuard\Constants;
+use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorFactory;
+use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorResolver;
+use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorResolverInterface;
+use GaaraHyperf\Config\ConfigLoaderInterface;
+use GaaraHyperf\Constants;
 
 /**
  * Access Token 提取器服务提供者

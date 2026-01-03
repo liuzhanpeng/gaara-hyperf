@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Passport;
+namespace GaaraHyperf\Passport;
 
-use Lzpeng\HyperfAuthGuard\Exception\UserNotFoundException;
-use Lzpeng\HyperfAuthGuard\User\UserInterface;
+use GaaraHyperf\Exception\UserNotFoundException;
+use GaaraHyperf\User\UserInterface;
 
 /**
  * 认证通行证

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\AccessTokenExtractor;
+namespace GaaraHyperf\AccessTokenExtractor;
 
 /**
  * 访问令牌提取器解析器接口

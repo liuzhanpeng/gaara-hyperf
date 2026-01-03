@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Config;
+namespace GaaraHyperf\Config;
 
 /**
  * 认证器配置

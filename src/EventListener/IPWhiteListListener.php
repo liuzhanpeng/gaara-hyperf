@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\EventListener;
+namespace GaaraHyperf\EventListener;
 
-use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
-use Lzpeng\HyperfAuthGuard\Exception\IPNotInWhiteListException;
-use Lzpeng\HyperfAuthGuard\IPResolver\IPResolverInterface;
-use Lzpeng\HyperfAuthGuard\IPWhiteListChecker\IPWhiteListChecker;
-use Lzpeng\HyperfAuthGuard\IPWhiteListChecker\IPWhiteListProviderInterface;
+use GaaraHyperf\Event\CheckPassportEvent;
+use GaaraHyperf\Exception\IPNotInWhiteListException;
+use GaaraHyperf\IPResolver\IPResolverInterface;
+use GaaraHyperf\IPWhiteListChecker\IPWhiteListChecker;
+use GaaraHyperf\IPWhiteListChecker\IPWhiteListProviderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**

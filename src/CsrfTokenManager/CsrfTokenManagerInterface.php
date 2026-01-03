@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\CsrfTokenManager;
+namespace GaaraHyperf\CsrfTokenManager;
 
 /**
  * CsrfToken管理器接口

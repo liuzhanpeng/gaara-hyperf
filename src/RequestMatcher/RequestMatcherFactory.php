@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\RequestMatcher;
+namespace GaaraHyperf\RequestMatcher;
 
 use Hyperf\Contract\ContainerInterface;
-use Lzpeng\HyperfAuthGuard\Config\ComponentConfig;
-use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
+use GaaraHyperf\Config\ComponentConfig;
+use GaaraHyperf\Config\CustomConfig;
 
 /**
  * 请求匹配器工厂

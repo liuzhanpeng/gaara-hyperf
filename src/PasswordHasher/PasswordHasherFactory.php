@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\PasswordHasher;
+namespace GaaraHyperf\PasswordHasher;
 
 use Hyperf\Contract\ContainerInterface;
-use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
+use GaaraHyperf\Config\CustomConfig;
 
 /**
  * 密码哈希器服务工厂

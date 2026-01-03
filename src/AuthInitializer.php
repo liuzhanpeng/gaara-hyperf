@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard;
+namespace GaaraHyperf;
 
 use Hyperf\Contract\ContainerInterface;
-use Lzpeng\HyperfAuthGuard\ServiceProvider\AccessTokenExtractorServiceProvider;
-use Lzpeng\HyperfAuthGuard\ServiceProvider\ServiceProviderRegisterEvent;
-use Lzpeng\HyperfAuthGuard\ServiceProvider\BuiltInAuthenticatorServiceProvider;
-use Lzpeng\HyperfAuthGuard\ServiceProvider\BuiltInUserProviderServiceProvider;
-use Lzpeng\HyperfAuthGuard\ServiceProvider\CsrfTokenManagerServiceProvider;
-use Lzpeng\HyperfAuthGuard\ServiceProvider\GuardServiceProvider;
-use Lzpeng\HyperfAuthGuard\ServiceProvider\OpaqueTokenManagerServiceProvider;
-use Lzpeng\HyperfAuthGuard\ServiceProvider\PasswordHasherServiceProvider;
-use Lzpeng\HyperfAuthGuard\ServiceProvider\ServiceProviderRegistry;
+use GaaraHyperf\ServiceProvider\AccessTokenExtractorServiceProvider;
+use GaaraHyperf\ServiceProvider\ServiceProviderRegisterEvent;
+use GaaraHyperf\ServiceProvider\BuiltInAuthenticatorServiceProvider;
+use GaaraHyperf\ServiceProvider\BuiltInUserProviderServiceProvider;
+use GaaraHyperf\ServiceProvider\CsrfTokenManagerServiceProvider;
+use GaaraHyperf\ServiceProvider\GuardServiceProvider;
+use GaaraHyperf\ServiceProvider\OpaqueTokenManagerServiceProvider;
+use GaaraHyperf\ServiceProvider\PasswordHasherServiceProvider;
+use GaaraHyperf\ServiceProvider\ServiceProviderRegistry;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 /**

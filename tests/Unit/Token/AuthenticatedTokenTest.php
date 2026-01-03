@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Lzpeng\HyperfAuthGuard\Token\AuthenticatedToken;
-use Lzpeng\HyperfAuthGuard\User\UserInterface;
+use GaaraHyperf\Token\AuthenticatedToken;
+use GaaraHyperf\User\UserInterface;
 
 describe('AuthenticatedToken', function () {
     it('can be instantiated and returns correct guard/user', function () {

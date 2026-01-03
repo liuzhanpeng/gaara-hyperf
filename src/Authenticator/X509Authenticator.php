@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Authenticator;
+namespace GaaraHyperf\Authenticator;
 
-use Lzpeng\HyperfAuthGuard\Exception\UnauthenticatedException;
-use Lzpeng\HyperfAuthGuard\Passport\Passport;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
+use GaaraHyperf\Exception\UnauthenticatedException;
+use GaaraHyperf\Passport\Passport;
+use GaaraHyperf\UserProvider\UserProviderInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**

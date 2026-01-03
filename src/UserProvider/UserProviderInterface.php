@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\UserProvider;
+namespace GaaraHyperf\UserProvider;
 
-use Lzpeng\HyperfAuthGuard\User\UserInterface;
+use GaaraHyperf\User\UserInterface;
 
 /**
  * 用户提供者

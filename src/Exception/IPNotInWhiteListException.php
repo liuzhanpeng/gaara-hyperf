@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Exception;
+namespace GaaraHyperf\Exception;
 
 /**
  * 白名单外IP异常

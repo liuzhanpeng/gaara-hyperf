@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\LoginRateLimiter;
+namespace GaaraHyperf\LoginRateLimiter;
 
 /**
  * 登录限流器接口

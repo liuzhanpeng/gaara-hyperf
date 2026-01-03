@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\EventListener;
+namespace GaaraHyperf\EventListener;
 
-use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
-use Lzpeng\HyperfAuthGuard\Exception\InvalidPasswordException;
-use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
-use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherInterface;
-use Lzpeng\HyperfAuthGuard\User\PasswordAwareUserInterface;
+use GaaraHyperf\Event\CheckPassportEvent;
+use GaaraHyperf\Exception\InvalidPasswordException;
+use GaaraHyperf\Passport\PasswordBadge;
+use GaaraHyperf\PasswordHasher\PasswordHasherInterface;
+use GaaraHyperf\User\PasswordAwareUserInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**

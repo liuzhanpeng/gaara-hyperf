@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Authenticator;
+namespace GaaraHyperf\Authenticator;
 
 use Hyperf\Contract\SessionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Hyperf\Session\Session;
-use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
-use Lzpeng\HyperfAuthGuard\Exception\InvalidPasswordException;
-use Lzpeng\HyperfAuthGuard\Exception\UserNotFoundException;
-use Lzpeng\HyperfAuthGuard\Passport\CsrfTokenBadge;
-use Lzpeng\HyperfAuthGuard\Passport\Passport;
-use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
-use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
+use GaaraHyperf\Exception\AuthenticationException;
+use GaaraHyperf\Exception\InvalidPasswordException;
+use GaaraHyperf\Exception\UserNotFoundException;
+use GaaraHyperf\Passport\CsrfTokenBadge;
+use GaaraHyperf\Passport\Passport;
+use GaaraHyperf\Passport\PasswordBadge;
+use GaaraHyperf\Token\TokenInterface;
+use GaaraHyperf\UserProvider\UserProviderInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**

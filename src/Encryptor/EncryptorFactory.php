@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Encryptor;
+namespace GaaraHyperf\Encryptor;
 
 use Hyperf\Contract\ContainerInterface;
-use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
+use GaaraHyperf\Config\CustomConfig;
 
 /**
  * 加密器工场

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\ServiceProvider;
+namespace GaaraHyperf\ServiceProvider;
 
 use Hyperf\Contract\ContainerInterface;
-use Lzpeng\HyperfAuthGuard\Config\ConfigLoaderInterface;
-use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerFactory;
-use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerResolver;
-use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerResolverInterface;
+use GaaraHyperf\Config\ConfigLoaderInterface;
+use GaaraHyperf\Constants;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerFactory;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerResolver;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerResolverInterface;
 
 /**
  * Opaque Token 管理器服务提供者

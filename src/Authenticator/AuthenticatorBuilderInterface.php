@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Authenticator;
+namespace GaaraHyperf\Authenticator;
 
-use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
+use GaaraHyperf\Authenticator\AuthenticatorInterface;
+use GaaraHyperf\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**

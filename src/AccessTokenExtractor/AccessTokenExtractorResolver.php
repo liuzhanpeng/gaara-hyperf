@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\AccessTokenExtractor;
+namespace GaaraHyperf\AccessTokenExtractor;
 
 use Hyperf\Contract\ContainerInterface;
 

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Config;
+namespace GaaraHyperf\Config;
 
-use Lzpeng\HyperfAuthGuard\Authorization\DefaultAccessDeniedHandler;
-use Lzpeng\HyperfAuthGuard\Authorization\NullAuthorizationChecker;
+use GaaraHyperf\Authorization\DefaultAccessDeniedHandler;
+use GaaraHyperf\Authorization\NullAuthorizationChecker;
 
 /**
  * 认证守卫配置

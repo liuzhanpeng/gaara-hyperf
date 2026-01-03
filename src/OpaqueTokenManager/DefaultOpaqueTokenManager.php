@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\OpaqueTokenManager;
+namespace GaaraHyperf\OpaqueTokenManager;
 
 use Hyperf\HttpServer\Contract\RequestInterface;
-use Lzpeng\HyperfAuthGuard\IPResolver\IPResolverInterface;
-use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
+use GaaraHyperf\IPResolver\IPResolverInterface;
+use GaaraHyperf\Token\TokenInterface;
 use Psr\SimpleCache\CacheInterface;
 
 /**

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\UserProvider\Builder;
+namespace GaaraHyperf\UserProvider\Builder;
 
-use Lzpeng\HyperfAuthGuard\UserProvider\ModelUserProvider;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderBuilderInterface;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
+use GaaraHyperf\UserProvider\ModelUserProvider;
+use GaaraHyperf\UserProvider\UserProviderBuilderInterface;
+use GaaraHyperf\UserProvider\UserProviderInterface;
 
 /**
  * 基于Hyperf内置数据库模型用户提供者构建器

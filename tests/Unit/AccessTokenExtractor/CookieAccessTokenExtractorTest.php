@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Lzpeng\HyperfAuthGuard\AccessTokenExtractor\CookieAccessTokenExtractor;
+use GaaraHyperf\AccessTokenExtractor\CookieAccessTokenExtractor;
 use Hyperf\HttpMessage\Server\Request;
 use Psr\Http\Message\ServerRequestInterface;
 

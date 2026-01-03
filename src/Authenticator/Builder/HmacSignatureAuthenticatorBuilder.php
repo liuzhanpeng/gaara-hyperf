@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Authenticator\Builder;
+namespace GaaraHyperf\Authenticator\Builder;
 
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
+use GaaraHyperf\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
-use Lzpeng\HyperfAuthGuard\Authenticator\HmacSignatureAuthenticator;
-use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\Encryptor\EncryptorFactory;
+use GaaraHyperf\Authenticator\AuthenticatorInterface;
+use GaaraHyperf\Authenticator\HmacSignatureAuthenticator;
+use GaaraHyperf\Constants;
+use GaaraHyperf\Encryptor\EncryptorFactory;
 use Psr\SimpleCache\CacheInterface;
 
 class HmacSignatureAuthenticatorBuilder extends AbstractAuthenticatorBuilder

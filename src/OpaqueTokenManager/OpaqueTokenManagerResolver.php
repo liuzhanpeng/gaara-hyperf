@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\OpaqueTokenManager;
+namespace GaaraHyperf\OpaqueTokenManager;
 
 use Psr\Container\ContainerInterface;
 

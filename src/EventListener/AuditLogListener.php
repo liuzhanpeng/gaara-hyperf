@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\EventListener;
+namespace GaaraHyperf\EventListener;
 
-use Lzpeng\HyperfAuthGuard\Event\AuthenticationFailureEvent;
-use Lzpeng\HyperfAuthGuard\Event\AuthenticationSuccessEvent;
-use Lzpeng\HyperfAuthGuard\IPResolver\IPResolverInterface;
+use GaaraHyperf\Event\AuthenticationFailureEvent;
+use GaaraHyperf\Event\AuthenticationSuccessEvent;
+use GaaraHyperf\IPResolver\IPResolverInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

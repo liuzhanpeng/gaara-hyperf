@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\ServiceProvider;
+namespace GaaraHyperf\ServiceProvider;
 
 use Hyperf\Contract\ContainerInterface;
-use Lzpeng\HyperfAuthGuard\Config\ConfigLoaderInterface;
-use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherFactory;
-use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolver;
-use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolverInterface;
+use GaaraHyperf\Config\ConfigLoaderInterface;
+use GaaraHyperf\Constants;
+use GaaraHyperf\PasswordHasher\PasswordHasherFactory;
+use GaaraHyperf\PasswordHasher\PasswordHasherResolver;
+use GaaraHyperf\PasswordHasher\PasswordHasherResolverInterface;
 
 /**
  * 密码哈希器服务提供者

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\EventListener;
+namespace GaaraHyperf\EventListener;
 
-use Lzpeng\HyperfAuthGuard\Event\AuthenticationSuccessEvent;
-use Lzpeng\HyperfAuthGuard\Exception\PasswordExpiredException;
-use Lzpeng\HyperfAuthGuard\User\PasswordExpirationAwareUserInterface;
+use GaaraHyperf\Event\AuthenticationSuccessEvent;
+use GaaraHyperf\Exception\PasswordExpiredException;
+use GaaraHyperf\User\PasswordExpirationAwareUserInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard;
+namespace GaaraHyperf;
 
-use Lzpeng\HyperfAuthGuard\Config\ConfigLoader;
-use Lzpeng\HyperfAuthGuard\Config\ConfigLoaderInterface;
+use GaaraHyperf\Config\ConfigLoader;
+use GaaraHyperf\Config\ConfigLoaderInterface;
 
 class ConfigProvider
 {

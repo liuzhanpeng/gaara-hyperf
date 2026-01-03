@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\ServiceProvider;
+namespace GaaraHyperf\ServiceProvider;
 
 use Hyperf\Contract\ContainerInterface;
-use Lzpeng\HyperfAuthGuard\UserProvider\Builder\MemoryUserProviderBuilder;
-use Lzpeng\HyperfAuthGuard\UserProvider\Builder\ModelUserProviderBuilder;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderFactory;
+use GaaraHyperf\UserProvider\Builder\MemoryUserProviderBuilder;
+use GaaraHyperf\UserProvider\Builder\ModelUserProviderBuilder;
+use GaaraHyperf\UserProvider\UserProviderFactory;
 
 /**
  * 内置用户提供者服务提供者

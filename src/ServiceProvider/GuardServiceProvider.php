@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\ServiceProvider;
+namespace GaaraHyperf\ServiceProvider;
 
 use Hyperf\Contract\ContainerInterface;
-use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorFactory;
-use Lzpeng\HyperfAuthGuard\Config\ConfigLoaderInterface;
-use Lzpeng\HyperfAuthGuard\Config\GuardConfig;
-use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\EventListener\PasswordBadgeCheckListener;
-use Lzpeng\HyperfAuthGuard\Guard;
-use Lzpeng\HyperfAuthGuard\GuardInterface;
-use Lzpeng\HyperfAuthGuard\GuardResolver;
-use Lzpeng\HyperfAuthGuard\IPResolver\IPResolver;
-use Lzpeng\HyperfAuthGuard\IPResolver\IPResolverInterface;
-use Lzpeng\HyperfAuthGuard\PasswordHasher\PasswordHasherResolverInterface;
-use Lzpeng\HyperfAuthGuard\RequestMatcher\RequestMatcherFactory;
-use Lzpeng\HyperfAuthGuard\Token\TokenContext;
-use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
-use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageFactory;
-use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandlerFactory;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderFactory;
+use GaaraHyperf\Authenticator\AuthenticatorFactory;
+use GaaraHyperf\Config\ConfigLoaderInterface;
+use GaaraHyperf\Config\GuardConfig;
+use GaaraHyperf\Constants;
+use GaaraHyperf\EventListener\PasswordBadgeCheckListener;
+use GaaraHyperf\Guard;
+use GaaraHyperf\GuardInterface;
+use GaaraHyperf\GuardResolver;
+use GaaraHyperf\IPResolver\IPResolver;
+use GaaraHyperf\IPResolver\IPResolverInterface;
+use GaaraHyperf\PasswordHasher\PasswordHasherResolverInterface;
+use GaaraHyperf\RequestMatcher\RequestMatcherFactory;
+use GaaraHyperf\Token\TokenContext;
+use GaaraHyperf\Token\TokenContextInterface;
+use GaaraHyperf\TokenStorage\TokenStorageFactory;
+use GaaraHyperf\UnauthenticatedHandler\UnauthenticatedHandlerFactory;
+use GaaraHyperf\UserProvider\UserProviderFactory;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

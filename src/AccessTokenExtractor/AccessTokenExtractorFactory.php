@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\AccessTokenExtractor;
+namespace GaaraHyperf\AccessTokenExtractor;
 
 use Hyperf\Contract\ContainerInterface;
-use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
+use GaaraHyperf\Config\CustomConfig;
 
 /**
  * 访问令牌提取器工厂

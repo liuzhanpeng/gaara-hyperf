@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Passport;
+namespace GaaraHyperf\Passport;
 
 /**
  * CSRF令牌认证标识

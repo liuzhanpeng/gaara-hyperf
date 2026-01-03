@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\IPResolver;
+namespace GaaraHyperf\IPResolver;
 
 use Psr\Http\Message\ServerRequestInterface;
 

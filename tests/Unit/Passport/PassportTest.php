@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Lzpeng\HyperfAuthGuard\Passport\Passport;
-use Lzpeng\HyperfAuthGuard\User\UserInterface;
-use Lzpeng\HyperfAuthGuard\Passport\BadgeInterface;
-use Lzpeng\HyperfAuthGuard\Exception\UserNotFoundException;
+use GaaraHyperf\Passport\Passport;
+use GaaraHyperf\User\UserInterface;
+use GaaraHyperf\Passport\BadgeInterface;
+use GaaraHyperf\Exception\UserNotFoundException;
 
 describe('Passport', function () {
     function mockUser(string $id = 'u1'): UserInterface

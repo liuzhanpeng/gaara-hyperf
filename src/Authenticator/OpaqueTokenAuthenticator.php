@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Authenticator;
+namespace GaaraHyperf\Authenticator;
 
-use Lzpeng\HyperfAuthGuard\AccessTokenExtractor\AccessTokenExtractorInterface;
+use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Lzpeng\HyperfAuthGuard\Exception\UnauthenticatedException;
-use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerInterface;
-use Lzpeng\HyperfAuthGuard\Passport\Passport;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
+use GaaraHyperf\Exception\UnauthenticatedException;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerInterface;
+use GaaraHyperf\Passport\Passport;
+use GaaraHyperf\UserProvider\UserProviderInterface;
 
 /**
  * 不透明令牌认证器

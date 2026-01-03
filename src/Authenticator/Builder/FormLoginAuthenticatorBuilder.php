@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Authenticator\Builder;
+namespace GaaraHyperf\Authenticator\Builder;
 
 use Hyperf\Contract\SessionInterface;
-use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
-use Lzpeng\HyperfAuthGuard\Authenticator\FormLoginAuthenticator;
-use Lzpeng\HyperfAuthGuard\CsrfTokenManager\CsrfTokenManagerResolverInterface;
-use Lzpeng\HyperfAuthGuard\EventListener\CsrfTokenBadgeCheckListener;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
+use GaaraHyperf\Authenticator\AuthenticatorInterface;
+use GaaraHyperf\Authenticator\FormLoginAuthenticator;
+use GaaraHyperf\CsrfTokenManager\CsrfTokenManagerResolverInterface;
+use GaaraHyperf\EventListener\CsrfTokenBadgeCheckListener;
+use GaaraHyperf\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**

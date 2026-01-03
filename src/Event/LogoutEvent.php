@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Event;
+namespace GaaraHyperf\Event;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
+use GaaraHyperf\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\PasswordHasher;
+namespace GaaraHyperf\PasswordHasher;
 
 /**
  * 密码哈希器解析器接口

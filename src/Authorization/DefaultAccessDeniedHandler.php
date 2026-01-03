@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Authorization;
+namespace GaaraHyperf\Authorization;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Lzpeng\HyperfAuthGuard\Exception\AccessDeniedException;
-use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
+use GaaraHyperf\Exception\AccessDeniedException;
+use GaaraHyperf\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**

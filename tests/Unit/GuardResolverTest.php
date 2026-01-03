@@ -7,14 +7,14 @@ describe('GuardResolver', function () {
             'web' => 'guard.web',
             'api' => 'guard.api',
         ];
-        $this->resolver = new \Lzpeng\HyperfAuthGuard\GuardResolver(
+        $this->resolver = new \GaaraHyperf\GuardResolver(
             $this->guardMap,
             $this->container,
         );
     });
 
     it('resolves guard by name', function () {
-        $webGuard = mock(\Lzpeng\HyperfAuthGuard\GuardInterface::class);
+        $webGuard = mock(\GaaraHyperf\GuardInterface::class);
         $this->container
             ->shouldReceive('get')
             ->with('guard.web')
@@ -30,8 +30,8 @@ describe('GuardResolver', function () {
     });
 
     it('iterates over guards', function () {
-        $webGuard = mock(\Lzpeng\HyperfAuthGuard\GuardInterface::class);
-        $apiGuard = mock(\Lzpeng\HyperfAuthGuard\GuardInterface::class);
+        $webGuard = mock(\GaaraHyperf\GuardInterface::class);
+        $apiGuard = mock(\GaaraHyperf\GuardInterface::class);
         $this->container
             ->shouldReceive('get')
             ->with('guard.web')

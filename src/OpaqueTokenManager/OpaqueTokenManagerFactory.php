@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\OpaqueTokenManager;
+namespace GaaraHyperf\OpaqueTokenManager;
 
 use Hyperf\Contract\ContainerInterface;
-use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
-use Lzpeng\HyperfAuthGuard\Constants;
+use GaaraHyperf\Config\CustomConfig;
+use GaaraHyperf\Constants;
 
 /**
  * OpaqueToken管理器创建工厂

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard;
+namespace GaaraHyperf;
 
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Event\Contract\ListenerInterface;

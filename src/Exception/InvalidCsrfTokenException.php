@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Exception;
+namespace GaaraHyperf\Exception;
 
 /**
  * 无效的CSRF令牌异常

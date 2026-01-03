@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\UnauthenticatedHandler;
+namespace GaaraHyperf\UnauthenticatedHandler;
 
 use Hyperf\Contract\SessionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Hyperf\Session\Session;
-use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
+use GaaraHyperf\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**

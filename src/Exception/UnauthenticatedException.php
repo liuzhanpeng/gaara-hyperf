@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Exception;
+namespace GaaraHyperf\Exception;
 
-use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
+use GaaraHyperf\Token\TokenInterface;
 
 /**
  * 未认证异常

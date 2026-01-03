@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Lzpeng\HyperfAuthGuard\RequestMatcher\DefaultRequestMatcher;
+use GaaraHyperf\RequestMatcher\DefaultRequestMatcher;
 use Psr\Http\Message\ServerRequestInterface;
 
 describe('RequestMatcher', function () {

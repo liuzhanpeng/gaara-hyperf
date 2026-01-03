@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Token;
+namespace GaaraHyperf\Token;
 
 use Hyperf\Context\Context;
 

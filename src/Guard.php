@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard;
+namespace GaaraHyperf;
 
-use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorInterface;
-use Lzpeng\HyperfAuthGuard\Authorization\AccessDeniedHandlerInterface;
-use Lzpeng\HyperfAuthGuard\Authorization\AuthorizationCheckerInterface;
-use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\Event\AuthenticationFailureEvent;
-use Lzpeng\HyperfAuthGuard\Event\AuthenticationSuccessEvent;
-use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
-use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
-use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
-use Lzpeng\HyperfAuthGuard\Passport\Passport;
-use Lzpeng\HyperfAuthGuard\RequestMatcher\RequestMatcherInterface;
-use Lzpeng\HyperfAuthGuard\Token\AuthenticatedToken;
-use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
-use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
-use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageInterface;
-use Lzpeng\HyperfAuthGuard\UnauthenticatedHandler\UnauthenticatedHandlerInterface;
-use Lzpeng\HyperfAuthGuard\User\UserInterface;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
+use GaaraHyperf\Authenticator\AuthenticatorInterface;
+use GaaraHyperf\Authorization\AccessDeniedHandlerInterface;
+use GaaraHyperf\Authorization\AuthorizationCheckerInterface;
+use GaaraHyperf\Constants;
+use GaaraHyperf\Event\AuthenticationFailureEvent;
+use GaaraHyperf\Event\AuthenticationSuccessEvent;
+use GaaraHyperf\Event\CheckPassportEvent;
+use GaaraHyperf\Event\LogoutEvent;
+use GaaraHyperf\Exception\AuthenticationException;
+use GaaraHyperf\Passport\Passport;
+use GaaraHyperf\RequestMatcher\RequestMatcherInterface;
+use GaaraHyperf\Token\AuthenticatedToken;
+use GaaraHyperf\Token\TokenContextInterface;
+use GaaraHyperf\Token\TokenInterface;
+use GaaraHyperf\TokenStorage\TokenStorageInterface;
+use GaaraHyperf\UnauthenticatedHandler\UnauthenticatedHandlerInterface;
+use GaaraHyperf\User\UserInterface;
+use GaaraHyperf\UserProvider\UserProviderInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

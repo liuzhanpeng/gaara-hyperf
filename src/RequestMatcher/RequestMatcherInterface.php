@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\RequestMatcher;
+namespace GaaraHyperf\RequestMatcher;
 
 use Psr\Http\Message\ServerRequestInterface;
 

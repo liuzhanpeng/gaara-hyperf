@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\ServiceProvider;
+namespace GaaraHyperf\ServiceProvider;
 
 use Hyperf\Contract\ContainerInterface;
-use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorFactory;
-use Lzpeng\HyperfAuthGuard\Authenticator\Builder\APIKeyAuthenticatorBuilder;
-use Lzpeng\HyperfAuthGuard\Authenticator\Builder\FormLoginAuthenticatorBuilder;
-use Lzpeng\HyperfAuthGuard\Authenticator\Builder\HmacSignatureAuthenticatorBuilder;
-use Lzpeng\HyperfAuthGuard\Authenticator\Builder\JsonLoginAuthenticatorBuilder;
-use Lzpeng\HyperfAuthGuard\Authenticator\Builder\OpaqueTokenAuthenticatorBuilder;
-use Lzpeng\HyperfAuthGuard\Authenticator\Builder\X509AuthenticatorBuilder;
+use GaaraHyperf\Authenticator\AuthenticatorFactory;
+use GaaraHyperf\Authenticator\Builder\APIKeyAuthenticatorBuilder;
+use GaaraHyperf\Authenticator\Builder\FormLoginAuthenticatorBuilder;
+use GaaraHyperf\Authenticator\Builder\HmacSignatureAuthenticatorBuilder;
+use GaaraHyperf\Authenticator\Builder\JsonLoginAuthenticatorBuilder;
+use GaaraHyperf\Authenticator\Builder\OpaqueTokenAuthenticatorBuilder;
+use GaaraHyperf\Authenticator\Builder\X509AuthenticatorBuilder;
 
 /**
  * 内置认证器服务提供者

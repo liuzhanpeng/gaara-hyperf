@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\CsrfTokenManager;
+namespace GaaraHyperf\CsrfTokenManager;
 
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Contract\SessionInterface;
-use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
-use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\CsrfTokenManager\CsrfTokenManagerInterface;
+use GaaraHyperf\Config\CustomConfig;
+use GaaraHyperf\Constants;
+use GaaraHyperf\CsrfTokenManager\CsrfTokenManagerInterface;
 
 /**
  * CSRF令牌管理器工厂

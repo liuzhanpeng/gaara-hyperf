@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\TokenStorage;
+namespace GaaraHyperf\TokenStorage;
 
 use Hyperf\Contract\ContainerInterface;
-use Lzpeng\HyperfAuthGuard\Config\ComponentConfig;
-use Lzpeng\HyperfAuthGuard\Config\CustomConfig;
-use Lzpeng\HyperfAuthGuard\Constants;
-use Lzpeng\HyperfAuthGuard\TokenStorage\NullTokenStorage;
-use Lzpeng\HyperfAuthGuard\TokenStorage\SessionTokenStorage;
-use Lzpeng\HyperfAuthGuard\TokenStorage\TokenStorageInterface;
+use GaaraHyperf\Config\ComponentConfig;
+use GaaraHyperf\Config\CustomConfig;
+use GaaraHyperf\Constants;
+use GaaraHyperf\TokenStorage\NullTokenStorage;
+use GaaraHyperf\TokenStorage\SessionTokenStorage;
+use GaaraHyperf\TokenStorage\TokenStorageInterface;
 
 /**
  * Token存储器服务工厂

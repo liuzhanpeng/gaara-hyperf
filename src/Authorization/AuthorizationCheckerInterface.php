@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Authorization;
+namespace GaaraHyperf\Authorization;
 
-use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
+use GaaraHyperf\Token\TokenInterface;
 
 /**
  * 授权检查器接口

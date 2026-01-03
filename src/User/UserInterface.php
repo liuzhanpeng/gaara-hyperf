@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\User;
+namespace GaaraHyperf\User;
 
 /**
  * 用户接口

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard;
+namespace GaaraHyperf;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
-use Lzpeng\HyperfAuthGuard\Token\TokenContextInterface;
-use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
-use Lzpeng\HyperfAuthGuard\User\UserInterface;
+use GaaraHyperf\Exception\AuthenticationException;
+use GaaraHyperf\Token\TokenContextInterface;
+use GaaraHyperf\Token\TokenInterface;
+use GaaraHyperf\User\UserInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**

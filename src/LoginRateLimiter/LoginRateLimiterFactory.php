@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\LoginRateLimiter;
+namespace GaaraHyperf\LoginRateLimiter;
 
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Redis\Redis;
-use Lzpeng\HyperfAuthGuard\Config\ComponentConfig;
-use Lzpeng\HyperfAuthGuard\Constants;
+use GaaraHyperf\Config\ComponentConfig;
+use GaaraHyperf\Constants;
 
 /**
  * 登录限流器创建工厂

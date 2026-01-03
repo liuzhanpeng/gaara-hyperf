@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\EventListener;
+namespace GaaraHyperf\EventListener;
 
-use Lzpeng\HyperfAuthGuard\CsrfTokenManager\CsrfToken;
-use Lzpeng\HyperfAuthGuard\CsrfTokenManager\CsrfTokenManagerInterface;
-use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
-use Lzpeng\HyperfAuthGuard\Exception\InvalidCsrfTokenException;
-use Lzpeng\HyperfAuthGuard\Passport\CsrfTokenBadge;
+use GaaraHyperf\CsrfTokenManager\CsrfToken;
+use GaaraHyperf\CsrfTokenManager\CsrfTokenManagerInterface;
+use GaaraHyperf\Event\CheckPassportEvent;
+use GaaraHyperf\Exception\InvalidCsrfTokenException;
+use GaaraHyperf\Passport\CsrfTokenBadge;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**

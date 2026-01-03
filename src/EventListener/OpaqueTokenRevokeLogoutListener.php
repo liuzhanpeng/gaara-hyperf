@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\EventListener;
+namespace GaaraHyperf\EventListener;
 
-use Lzpeng\HyperfAuthGuard\AccessTokenExtractor\AccessTokenExtractorInterface;
-use Lzpeng\HyperfAuthGuard\Event\LogoutEvent;
-use Lzpeng\HyperfAuthGuard\OpaqueTokenManager\OpaqueTokenManagerInterface;
+use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorInterface;
+use GaaraHyperf\Event\LogoutEvent;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**

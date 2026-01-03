@@ -5,7 +5,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Lzpeng\\HyperfAuthGuard\\": "src/"
+            "GaaraHyperf\\": "src/"
         },
         "files": [
             "src/functions.php"
@@ -32,7 +32,7 @@
     },
     "extra": {
         "hyperf": {
-            "config": "Lzpeng\\HyperfAuthGuard\\ConfigProvider"
+            "config": "GaaraHyperf\\ConfigProvider"
         }
     },
     "require-dev": {

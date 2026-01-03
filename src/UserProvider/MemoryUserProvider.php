@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\UserProvider;
+namespace GaaraHyperf\UserProvider;
 
-use Lzpeng\HyperfAuthGuard\User\MemoryUser;
-use Lzpeng\HyperfAuthGuard\User\UserInterface;
+use GaaraHyperf\User\MemoryUser;
+use GaaraHyperf\User\UserInterface;
 
 /**
  * 内存用户提供者

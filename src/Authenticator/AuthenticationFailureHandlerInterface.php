@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Authenticator;
+namespace GaaraHyperf\Authenticator;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
+use GaaraHyperf\Exception\AuthenticationException;
 use Psr\Http\Message\ResponseInterface;
 
 /**

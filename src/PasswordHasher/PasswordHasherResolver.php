@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\PasswordHasher;
+namespace GaaraHyperf\PasswordHasher;
 
 use Psr\Container\ContainerInterface;
 

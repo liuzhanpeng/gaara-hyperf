@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\UserProvider;
+namespace GaaraHyperf\UserProvider;
 
 /**
  * 用户提供者构建器接口

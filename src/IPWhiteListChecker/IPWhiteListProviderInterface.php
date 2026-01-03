@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\IPWhiteListChecker;
+namespace GaaraHyperf\IPWhiteListChecker;
 
 /**
  * IP白名单提供器

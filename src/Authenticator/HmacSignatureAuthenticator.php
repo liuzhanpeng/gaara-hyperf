@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Authenticator;
+namespace GaaraHyperf\Authenticator;
 
-use Lzpeng\HyperfAuthGuard\Encryptor\EncryptorInterface;
-use Lzpeng\HyperfAuthGuard\Exception\AuthenticationException;
-use Lzpeng\HyperfAuthGuard\Passport\Passport;
-use Lzpeng\HyperfAuthGuard\User\PasswordAwareUserInterface;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
+use GaaraHyperf\Encryptor\EncryptorInterface;
+use GaaraHyperf\Exception\AuthenticationException;
+use GaaraHyperf\Passport\Passport;
+use GaaraHyperf\User\PasswordAwareUserInterface;
+use GaaraHyperf\UserProvider\UserProviderInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\SimpleCache\CacheInterface;
 

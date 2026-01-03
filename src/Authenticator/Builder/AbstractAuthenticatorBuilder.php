@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Authenticator\Builder;
+namespace GaaraHyperf\Authenticator\Builder;
 
 use Hyperf\Contract\ContainerInterface;
-use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticationFailureHandlerInterface;
-use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticationSuccessHandlerInterface;
-use Lzpeng\HyperfAuthGuard\Authenticator\AuthenticatorBuilderInterface;
+use GaaraHyperf\Authenticator\AuthenticationFailureHandlerInterface;
+use GaaraHyperf\Authenticator\AuthenticationSuccessHandlerInterface;
+use GaaraHyperf\Authenticator\AuthenticatorBuilderInterface;
 
 /**
  * 抽象认证器构建器

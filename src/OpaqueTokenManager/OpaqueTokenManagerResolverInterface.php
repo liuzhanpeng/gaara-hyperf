@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\OpaqueTokenManager;
+namespace GaaraHyperf\OpaqueTokenManager;
 
 /**
  * OpaqueToken管理器解析器接口

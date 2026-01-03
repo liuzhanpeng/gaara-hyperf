@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\UserProvider\Builder;
+namespace GaaraHyperf\UserProvider\Builder;
 
-use Lzpeng\HyperfAuthGuard\UserProvider\MemoryUserProvider;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderBuilderInterface;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
+use GaaraHyperf\UserProvider\MemoryUserProvider;
+use GaaraHyperf\UserProvider\UserProviderBuilderInterface;
+use GaaraHyperf\UserProvider\UserProviderInterface;
 
 /**
  * 基于内存用户提供者构建器

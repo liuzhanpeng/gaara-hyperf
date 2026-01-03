@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Authenticator;
+namespace GaaraHyperf\Authenticator;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Lzpeng\HyperfAuthGuard\Exception\InvalidPasswordException;
-use Lzpeng\HyperfAuthGuard\Exception\UserNotFoundException;
-use Lzpeng\HyperfAuthGuard\Passport\Passport;
-use Lzpeng\HyperfAuthGuard\Passport\PasswordBadge;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
+use GaaraHyperf\Exception\InvalidPasswordException;
+use GaaraHyperf\Exception\UserNotFoundException;
+use GaaraHyperf\Passport\Passport;
+use GaaraHyperf\Passport\PasswordBadge;
+use GaaraHyperf\UserProvider\UserProviderInterface;
 
 /**
  * JSON登录认证

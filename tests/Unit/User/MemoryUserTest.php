@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Lzpeng\HyperfAuthGuard\User\MemoryUser;
-use Lzpeng\HyperfAuthGuard\User\UserInterface;
-use Lzpeng\HyperfAuthGuard\User\PasswordAwareUserInterface;
+use GaaraHyperf\User\MemoryUser;
+use GaaraHyperf\User\UserInterface;
+use GaaraHyperf\User\PasswordAwareUserInterface;
 
 describe('MemoryUser', function () {
 

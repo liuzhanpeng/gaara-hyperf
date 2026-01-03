@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\Encryptor;
+namespace GaaraHyperf\Encryptor;
 
 /**
  * 数据加密器

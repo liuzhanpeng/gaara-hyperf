@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\EventListener;
+namespace GaaraHyperf\EventListener;
 
-use Lzpeng\HyperfAuthGuard\Event\AuthenticationFailureEvent;
-use Lzpeng\HyperfAuthGuard\Event\AuthenticationSuccessEvent;
-use Lzpeng\HyperfAuthGuard\Event\CheckPassportEvent;
-use Lzpeng\HyperfAuthGuard\Exception\TooManyLoginAttemptsException;
-use Lzpeng\HyperfAuthGuard\IPResolver\IPResolverInterface;
-use Lzpeng\HyperfAuthGuard\LoginRateLimiter\LoginRateLimiterFactory;
-use Lzpeng\HyperfAuthGuard\LoginRateLimiter\LoginRateLimiterInterface;
+use GaaraHyperf\Event\AuthenticationFailureEvent;
+use GaaraHyperf\Event\AuthenticationSuccessEvent;
+use GaaraHyperf\Event\CheckPassportEvent;
+use GaaraHyperf\Exception\TooManyLoginAttemptsException;
+use GaaraHyperf\IPResolver\IPResolverInterface;
+use GaaraHyperf\LoginRateLimiter\LoginRateLimiterFactory;
+use GaaraHyperf\LoginRateLimiter\LoginRateLimiterInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**

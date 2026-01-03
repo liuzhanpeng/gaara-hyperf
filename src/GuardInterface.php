@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard;
+namespace GaaraHyperf;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Lzpeng\HyperfAuthGuard\Passport\BadgeInterface;
-use Lzpeng\HyperfAuthGuard\Token\TokenInterface;
-use Lzpeng\HyperfAuthGuard\User\UserInterface;
-use Lzpeng\HyperfAuthGuard\UserProvider\UserProviderInterface;
+use GaaraHyperf\Passport\BadgeInterface;
+use GaaraHyperf\Token\TokenInterface;
+use GaaraHyperf\User\UserInterface;
+use GaaraHyperf\UserProvider\UserProviderInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**

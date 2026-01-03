@@ -5,7 +5,7 @@ declare(strict_types=1);
 describe('HeaderAccessTokenExtractor', function () {
 
     beforeEach(function () {
-        $this->extractor = new Lzpeng\HyperfAuthGuard\AccessTokenExtractor\HeaderAccessTokenExtractor('Authorization');
+        $this->extractor = new GaaraHyperf\AccessTokenExtractor\HeaderAccessTokenExtractor('Authorization');
         $this->request = mock(Psr\Http\Message\ServerRequestInterface::class);
     });
 

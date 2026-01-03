@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lzpeng\HyperfAuthGuard\User;
+namespace GaaraHyperf\User;
 
 /**
  * 通过密码认证的用户接口
