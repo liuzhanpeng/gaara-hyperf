@@ -12,13 +12,6 @@ namespace Lzpeng\HyperfAuthGuard\User;
 interface PasswordExpirationAwareUserInterface
 {
     /**
-     * 密码是否已过期
-     *
-     * @return boolean
-     */
-    public function isPasswordExpired(): bool;
-
-    /**
      * 返回密码过期时间
      *
      * @return \DateTimeInterface

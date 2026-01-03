@@ -132,11 +132,12 @@ return [
                 //     ]
                 // ],
                 // [
-                //     'class' => EnforcePasswordChangeListener::class,
+                //     'class' => PasswordExpirationListener::class, // 密码过期监听器
                 //     'args' => [
-                //         'password_change_route' => 'admin/password'
+                //         'excluded_paths' => [], // 不检查密码过期的路径列表
+                //         'warning_days' => 7, // 密码过期前多少天发出警告
                 //     ]
-                // ]
+                // ],
                 // CustomListener::class,
             ],
 
