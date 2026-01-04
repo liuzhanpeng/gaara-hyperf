@@ -29,7 +29,6 @@ class JsonLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 
         return new JsonLoginAuthenticator(
             userProvider: $userProvider,
-            response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
             options: $options,
             successHandler: $this->createSuccessHandler($options),
             failureHandler: $this->createFailureHandler($options),
