@@ -183,7 +183,10 @@ class Guard implements GuardInterface
 
             foreach ($passport->getBadges() as $badge) {
                 if (!$badge->isResolved()) {
-                    throw new AuthenticationException($passport->getUser()->getIdentifier(), 'Credential not resolved');
+                    throw new AuthenticationException(
+                        message: 'Credential not resolved',
+                        userIdentifier: $passport->getUser()->getIdentifier(),
+                    );
                 }
             }
 
@@ -207,9 +210,9 @@ class Guard implements GuardInterface
     {
         $previousToken = $this->tokenContext->getToken();
 
-        $response = $authenticator->onAuthenticationSuccess($request, $token);
+        $response = $authenticator->onAuthenticationSuccess($this->name, $request, $token, $passport);
 
-        $authenticationSuccessEvent = $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($this->name, $authenticator, $passport, $token, $request, $response, $previousToken));
+        $authenticationSuccessEvent = $this->eventDispatcher->dispatch(new AuthenticationSuccessEvent($this->name, $authenticator, $token, $passport, $request, $response, $previousToken));
         $token = $authenticationSuccessEvent->getToken();
         $response = $authenticationSuccessEvent->getResponse();
 
@@ -232,8 +235,8 @@ class Guard implements GuardInterface
      */
     private function handleAuthenticationFailure(ServerRequestInterface $request, AuthenticatorInterface $authenticator, ?Passport $passport, AuthenticationException $exception): ?ResponseInterface
     {
-        $response = $authenticator->onAuthenticationFailure($request, $exception, $passport);
-        $response = $this->eventDispatcher->dispatch(new AuthenticationFailureEvent($this->name, $authenticator, $passport, $exception, $request, $response))->getResponse();
+        $response = $authenticator->onAuthenticationFailure($this->name, $request, $exception, $passport);
+        $response = $this->eventDispatcher->dispatch(new AuthenticationFailureEvent($this->name, $authenticator, $exception, $passport, $request, $response))->getResponse();
 
         return $response;
     }

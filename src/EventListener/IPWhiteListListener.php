@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GaaraHyperf\EventListener;
 
 use GaaraHyperf\Event\CheckPassportEvent;
+use GaaraHyperf\Exception\AuthenticationException;
 use GaaraHyperf\Exception\IPNotInWhiteListException;
 use GaaraHyperf\IPResolver\IPResolverInterface;
 use GaaraHyperf\IPWhiteListChecker\IPWhiteListChecker;
@@ -39,7 +40,11 @@ class IPWhiteListListener implements EventSubscriberInterface
         $whiteList = $this->resolveWhiteList();
 
         if (!$this->whiteListChecker->isAllowed($ip, $whiteList)) {
-            throw new IPNotInWhiteListException($passport->getUserIdentifier(), $ip);
+            throw new IPNotInWhiteListException(
+                message: 'IP address not in white list',
+                userIdentifier: $passport->getUserIdentifier(),
+                ip: $ip
+            );
         }
     }
 

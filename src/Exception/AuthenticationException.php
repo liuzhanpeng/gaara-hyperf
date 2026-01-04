@@ -16,11 +16,10 @@ class AuthenticationException extends \Exception
      * @param string $userIdentifier
      */
     public function __construct(
+        string $message,
         private string $userIdentifier = '',
-        string $message = '',
     ) {
         parent::__construct($message);
-        $this->userIdentifier = $userIdentifier;
     }
 
     /**

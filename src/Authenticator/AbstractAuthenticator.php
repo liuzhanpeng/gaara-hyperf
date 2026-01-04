@@ -41,15 +41,17 @@ abstract class AbstractAuthenticator implements AuthenticatorInterface
 
     /**
      * 认证成功处理
-     * 
+     *
+     * @param string $guardName
      * @param ServerRequestInterface $request
      * @param TokenInterface $token
+     * @param Passport $passport
      * @return ResponseInterface|null
      */
-    public function onAuthenticationSuccess(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
+    public function onAuthenticationSuccess(string $guardName, ServerRequestInterface $request, TokenInterface $token, Passport $passport): ?ResponseInterface
     {
         if (!is_null($this->successHandler)) {
-            return $this->successHandler->handle($request, $token);
+            return $this->successHandler->handle($guardName, $request, $token, $passport);
         }
 
         return null;
@@ -58,14 +60,16 @@ abstract class AbstractAuthenticator implements AuthenticatorInterface
     /**
      * 认证失败处理
      *
+     * @param string $guardName
      * @param ServerRequestInterface $request
      * @param AuthenticationException $exception
+     * @param Passport|null $passport
      * @return ResponseInterface|null
      */
-    public function onAuthenticationFailure(ServerRequestInterface $request, AuthenticationException $exception): ?ResponseInterface
+    public function onAuthenticationFailure(string $guardName, ServerRequestInterface $request, AuthenticationException $exception, ?Passport $passport = null): ?ResponseInterface
     {
         if (!is_null($this->failureHandler)) {
-            return $this->failureHandler->handle($request, $exception);
+            return $this->failureHandler->handle($guardName, $request, $exception, $passport);
         }
 
         throw $exception;

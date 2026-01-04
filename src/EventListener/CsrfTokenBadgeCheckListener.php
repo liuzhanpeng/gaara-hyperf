@@ -42,7 +42,10 @@ class CsrfTokenBadgeCheckListener implements EventSubscriberInterface
         $csrfToken = new CsrfToken($badge->getId(), $badge->getToken());
 
         if (!$this->csrfTokenManager->verify($csrfToken)) {
-            throw new InvalidCsrfTokenException($event->getPassport()->getUser()->getIdentifier());
+            throw new InvalidCsrfTokenException(
+                message: 'Invalid CSRF token',
+                userIdentifier: $event->getPassport()->getUser()->getIdentifier(),
+            );
         }
 
         $badge->resolve();

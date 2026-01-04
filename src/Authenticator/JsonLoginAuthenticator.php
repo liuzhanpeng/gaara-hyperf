@@ -82,13 +82,19 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
         $credientials = [];
         $username = $request->getParsedBody()[$this->options['username_param']] ?? '';
         if (!is_string($username) || empty($username)) {
-            throw new UserNotFoundException();
+            throw new UserNotFoundException(
+                message: 'Username is missing',
+                userIdentifier: $username,
+            );
         }
         $credientials['username'] = trim($username);
 
         $password = $request->getParsedBody()[$this->options['password_param']] ?? '';
         if (!is_string($password) || empty($password)) {
-            throw new InvalidPasswordException($username);
+            throw new InvalidPasswordException(
+                message: 'Password is missing',
+                userIdentifier: $credientials['username'],
+            );
         }
         $credientials['password'] = trim($password);
 

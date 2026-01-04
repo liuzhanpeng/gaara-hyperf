@@ -20,8 +20,8 @@ class AuthenticationSuccessEvent
     /**
      * @param string $guardName 认证守卫名称
      * @param AuthenticatorInterface $authenticator 认证器
-     * @param Passport $passport 认证通行证
      * @param TokenInterface $token 认证令牌
+     * @param Passport $passport 认证通行证
      * @param ServerRequestInterface $request 请求对象
      * @param ResponseInterface|null $response 响应对象
      * @param TokenInterface|null $previousToken 上一个认证令牌
@@ -29,8 +29,8 @@ class AuthenticationSuccessEvent
     public function __construct(
         private string $guardName,
         private AuthenticatorInterface $authenticator,
-        private Passport $passport,
         private TokenInterface $token,
+        private Passport $passport,
         private ServerRequestInterface $request,
         private ?ResponseInterface $response,
         private ?TokenInterface $previousToken
@@ -57,16 +57,6 @@ class AuthenticationSuccessEvent
     }
 
     /**
-     * 返回认证通行证
-     *
-     * @return Passport
-     */
-    public function getPassport(): Passport
-    {
-        return $this->passport;
-    }
-
-    /**
      * 返回认证令牌
      * 
      * @return TokenInterface
@@ -85,6 +75,16 @@ class AuthenticationSuccessEvent
     public function setToken(TokenInterface $token): void
     {
         $this->token = $token;
+    }
+
+    /**
+     * 返回认证通行证
+     *
+     * @return Passport
+     */
+    public function getPassport(): Passport
+    {
+        return $this->passport;
     }
 
     /**

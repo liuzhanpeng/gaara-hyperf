@@ -49,20 +49,24 @@ interface AuthenticatorInterface
     /**
      * 认证成功处理函数
      *
+     * @param string $guardName
      * @param ServerRequestInterface $request
      * @param TokenInterface $token
+     * @param Passport $passport
      * @return ResponseInterface|null
      */
-    public function onAuthenticationSuccess(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface;
+    public function onAuthenticationSuccess(string $guardName, ServerRequestInterface $request, TokenInterface $token, Passport $passport): ?ResponseInterface;
 
     /**
      * 认证失败处理函数
      *
+     * @param string $guardName
      * @param ServerRequestInterface $request
      * @param AuthenticationException $exception
+     * @param Passport|null $passport
      * @return ResponseInterface|null
      */
-    public function onAuthenticationFailure(ServerRequestInterface $request, AuthenticationException $exception): ?ResponseInterface;
+    public function onAuthenticationFailure(string $guardName, ServerRequestInterface $request, AuthenticationException $exception, ?Passport $passport = null): ?ResponseInterface;
 
     /**
      * 是否交互式认证

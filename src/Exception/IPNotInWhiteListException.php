@@ -12,10 +12,11 @@ namespace GaaraHyperf\Exception;
 class IPNotInWhiteListException extends AuthenticationException
 {
     public function __construct(
+        string $message,
+        private string $ip,
         string $userIdentifier = '',
-        private string $ip
     ) {
-        parent::__construct($userIdentifier);
+        parent::__construct($message, $userIdentifier);
     }
 
     /**

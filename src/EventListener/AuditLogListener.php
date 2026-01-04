@@ -55,14 +55,13 @@ class AuditLogListener implements EventSubscriberInterface
     public function onAuthenticationFailure(AuthenticationFailureEvent $event): void
     {
         $authenticator = $event->getAuthenticator();
-        $passport = $event->getPassport();
         $request = $event->getRequest();
         $exception = $event->getException();
 
         $this->logger->log(LogLevel::ERROR, 'Authentication failure', [
             'guard' => $event->getGuardName(),
             'authenticator' => get_class($authenticator),
-            'user_identifier' => $passport?->getUserIdentifier(),
+            'user_identifier' => $exception->getUserIdentifier(),
             'request_uri' => (string)$request->getUri(),
             'ip' => $this->ipResolver->resolve($request),
             'user_agent' => $request->getHeaderLine('User-Agent'),

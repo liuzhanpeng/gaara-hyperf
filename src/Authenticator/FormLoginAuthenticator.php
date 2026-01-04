@@ -8,6 +8,7 @@ use Hyperf\Contract\SessionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Hyperf\Session\Session;
 use GaaraHyperf\Exception\AuthenticationException;
+use GaaraHyperf\Exception\InvalidCsrfTokenException;
 use GaaraHyperf\Exception\InvalidPasswordException;
 use GaaraHyperf\Exception\UserNotFoundException;
 use GaaraHyperf\Passport\CsrfTokenBadge;
@@ -62,7 +63,10 @@ class FormLoginAuthenticator extends AbstractAuthenticator
         $credientials = $this->getCredentials($request);
 
         if ($this->options['csrf_enabled'] && empty($credientials['csrf_token'])) {
-            throw new AuthenticationException($this->options['username_param'], 'CSRF token is missing');
+            throw new InvalidCsrfTokenException(
+                message: 'CSRF token is missing',
+                userIdentifier: $this->options['username_param'],
+            );
         }
 
         $passport = new Passport(
@@ -86,12 +90,12 @@ class FormLoginAuthenticator extends AbstractAuthenticator
     /**
      * @inheritDoc
      */
-    public function onAuthenticationSuccess(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
+    public function onAuthenticationSuccess(string $guardName, ServerRequestInterface $request, TokenInterface $token, Passport $passport): ?ResponseInterface
     {
         $this->session->migrate(false);
 
         if (!is_null($this->successHandler)) {
-            return $this->successHandler->handle($request, $token);
+            return $this->successHandler->handle($guardName, $request, $token, $passport);
         }
 
         $redirectTo = $request->getParsedBody()[$this->options['redirect_param']] ?? null;
@@ -105,10 +109,10 @@ class FormLoginAuthenticator extends AbstractAuthenticator
     /**
      * @inheritDoc
      */
-    public function onAuthenticationFailure(ServerRequestInterface $request, AuthenticationException $exception): ?ResponseInterface
+    public function onAuthenticationFailure(string $guardName, ServerRequestInterface $request, AuthenticationException $exception, ?Passport $passport = null): ?ResponseInterface
     {
         if (!is_null($this->failureHandler)) {
-            return $this->failureHandler->handle($request, $exception);
+            return $this->failureHandler->handle($guardName, $request, $exception, $passport);
         }
 
         if ($this->session instanceof Session) {
@@ -143,13 +147,19 @@ class FormLoginAuthenticator extends AbstractAuthenticator
         $credientials = [];
         $username = $request->getParsedBody()[$this->options['username_param']] ?? '';
         if (!is_string($username) || empty($username)) {
-            throw new UserNotFoundException();
+            throw new UserNotFoundException(
+                message: 'Username is missing',
+                userIdentifier: $username,
+            );
         }
         $credientials['username'] = trim($username);
 
         $password = $request->getParsedBody()[$this->options['password_param']] ?? '';
         if (!is_string($password) || empty($password)) {
-            throw new InvalidPasswordException($username);
+            throw new InvalidPasswordException(
+                message: 'Password is missing',
+                userIdentifier: $username
+            );
         }
         $credientials['password'] = trim($password);
 

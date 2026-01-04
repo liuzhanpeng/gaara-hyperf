@@ -13,9 +13,11 @@ use GaaraHyperf\Token\TokenInterface;
  */
 class UnauthenticatedException extends \Exception
 {
-    public function __construct(private ?TokenInterface $token = null)
-    {
-        parent::__construct();
+    public function __construct(
+        string $message = 'Unauthenticated',
+        private ?TokenInterface $token = null
+    ) {
+        parent::__construct($message);
         $this->token = $token;
     }
 

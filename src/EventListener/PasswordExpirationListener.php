@@ -53,7 +53,10 @@ class PasswordExpirationListener implements EventSubscriberInterface
         $expired = $expiresAt <= $now;
 
         if ($expired) {
-            throw new PasswordExpiredException($user->getIdentifier(), 'Your password has expired.');
+            throw new PasswordExpiredException(
+                message: 'Password has expired',
+                userIdentifier: $user->getIdentifier(),
+            );
         }
 
         $daysUntilExpiry = $now->diff($expiresAt)->days;

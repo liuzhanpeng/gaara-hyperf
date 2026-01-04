@@ -63,7 +63,11 @@ class LoginRateLimitListener implements EventSubscriberInterface
 
         $result = $this->loginRateLimiter->check($userIdentifier . $ip);
         if (!$result->isAccepted() || $result->getRemaining() === 0) {
-            throw new TooManyLoginAttemptsException($userIdentifier, $result->getRetryAfter());
+            throw new TooManyLoginAttemptsException(
+                message: 'Too many login attempts. Please try again later.',
+                userIdentifier: $userIdentifier,
+                retryAfter: $result->getRetryAfter()
+            );
         }
     }
 

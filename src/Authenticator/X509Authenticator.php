@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Authenticator;
 
-use GaaraHyperf\Exception\UnauthenticatedException;
+use GaaraHyperf\Exception\InvalidCredentialsException;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\UserProvider\UserProviderInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -46,12 +46,18 @@ class X509Authenticator extends AbstractAuthenticator
     {
         $identifier = $this->extractUserIdentifier($request);
         if (is_null($identifier)) {
-            throw new UnauthenticatedException();
+            throw new InvalidCredentialsException(
+                message: 'User identifier not found in client certificate',
+                userIdentifier: $identifier ?? '',
+            );
         }
 
         $user = $this->userProvider->findByIdentifier($identifier);
         if (is_null($user)) {
-            throw new UnauthenticatedException();
+            throw new InvalidCredentialsException(
+                message: 'User not found',
+                userIdentifier: $identifier,
+            );
         }
 
         return new Passport(

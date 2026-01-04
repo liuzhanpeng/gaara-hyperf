@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace GaaraHyperf;
 
 use Psr\Http\Message\ServerRequestInterface;
-use GaaraHyperf\Exception\AuthenticationException;
+use GaaraHyperf\Exception\UnauthenticatedException;
 use GaaraHyperf\Token\TokenContextInterface;
 use GaaraHyperf\Token\TokenInterface;
 use GaaraHyperf\User\UserInterface;
@@ -60,7 +60,7 @@ class AuthContext
     public function logout(): ResponseInterface
     {
         if (! $this->isAuthenticated()) {
-            throw new AuthenticationException($this->getToken()->getUserIdentifier());
+            throw new UnauthenticatedException();
         }
 
         $guard = $this->guardResolver->resolve($this->getToken()->getGuardName());
