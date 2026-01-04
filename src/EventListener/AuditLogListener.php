@@ -6,6 +6,7 @@ namespace GaaraHyperf\EventListener;
 
 use GaaraHyperf\Event\AuthenticationFailureEvent;
 use GaaraHyperf\Event\AuthenticationSuccessEvent;
+use GaaraHyperf\Event\LogoutEvent;
 use GaaraHyperf\IPResolver\IPResolverInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -30,6 +31,7 @@ class AuditLogListener implements EventSubscriberInterface
         return [
             AuthenticationSuccessEvent::class => 'onAuthenticationSuccess',
             AuthenticationFailureEvent::class => 'onAuthenticationFailure',
+            LogoutEvent::class => 'onLogout',
         ];
     }
 
@@ -66,6 +68,21 @@ class AuditLogListener implements EventSubscriberInterface
             'user_agent' => $request->getHeaderLine('User-Agent'),
             'exception_type' => get_class($exception),
             'exception_message' => $exception->getMessage(),
+            'occurred_at' => date('c'),
+        ]);
+    }
+
+    public function onLogout(LogoutEvent $event): void
+    {
+        $token = $event->getToken();
+        $request = $event->getRequest();
+
+        $this->logger->log(LogLevel::INFO, 'User logout', [
+            'guard' => $token->getGuardName(),
+            'user_identifier' => $token->getUserIdentifier(),
+            'request_uri' => (string)$request->getUri(),
+            'ip' => $this->ipResolver->resolve($request),
+            'user_agent' => $request->getHeaderLine('User-Agent'),
             'occurred_at' => date('c'),
         ]);
     }

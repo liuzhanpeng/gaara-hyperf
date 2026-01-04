@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use GaaraHyperf\AccessTokenExtractor\CookieAccessTokenExtractor;
-use Hyperf\HttpMessage\Server\Request;
 use Psr\Http\Message\ServerRequestInterface;
 
 describe('CookieAccessTokenExtractor', function () {

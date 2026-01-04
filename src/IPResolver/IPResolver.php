@@ -17,9 +17,9 @@ class IPResolver implements IPResolverInterface
      * @param array $headers 自定义要检查的IP头, 按定义顺序检查
      */
     public function __construct(private array $headers = [
-        'x-forwarded-for',
-        'x-real-ip',
-        'cf-connecting-ip'
+        'X-Forwarded-For',
+        'X-Real-IP',
+        'CF-Connecting-IP'
     ]) {}
 
     /**

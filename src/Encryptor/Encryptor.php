@@ -121,6 +121,8 @@ class Encryptor implements EncryptorInterface
      */
     private function getExpectedKeyLength(string $algo): int
     {
+        $algo = strtoupper($algo);
+
         return match ($algo) {
             'AES-128-CBC' => 16,
             'AES-192-CBC' => 24,

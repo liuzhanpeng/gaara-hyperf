@@ -52,7 +52,7 @@ class SessionCsrfTokenManager implements CsrfTokenManagerInterface
      */
     private function generateToken(): string
     {
-        return bin2hex(random_bytes(32));
+        return bin2hex(random_bytes(16));
     }
 
     /**

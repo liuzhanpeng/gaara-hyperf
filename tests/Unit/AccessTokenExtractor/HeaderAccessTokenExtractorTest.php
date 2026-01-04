@@ -5,7 +5,7 @@ declare(strict_types=1);
 describe('HeaderAccessTokenExtractor', function () {
 
     beforeEach(function () {
-        $this->extractor = new GaaraHyperf\AccessTokenExtractor\HeaderAccessTokenExtractor('Authorization');
+        $this->extractor = new GaaraHyperf\AccessTokenExtractor\HeaderAccessTokenExtractor('Authorization', 'Bearer');
         $this->request = mock(Psr\Http\Message\ServerRequestInterface::class);
     });
 
@@ -45,5 +45,19 @@ describe('HeaderAccessTokenExtractor', function () {
 
         $token = $this->extractor->extractAccessToken($this->request);
         expect($token)->toBeNull();
+    });
+
+    it('should extract token without type prefix', function () {
+        $this->extractor = new GaaraHyperf\AccessTokenExtractor\HeaderAccessTokenExtractor('X-Access-Token', '');
+
+        $this->request->shouldReceive('getHeaderLine')
+            ->with('X-Access-Token')
+            ->andReturn('simple_token_456');
+        $this->request->shouldReceive('hasHeader')
+            ->with('X-Access-Token')
+            ->andReturn(true);
+
+        $token = $this->extractor->extractAccessToken($this->request);
+        expect($token)->toBe('simple_token_456');
     });
 });
