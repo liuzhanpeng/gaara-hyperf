@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Authenticator;
 
+use GaaraHyperf\Exception\AuthenticationException;
 use GaaraHyperf\Exception\InvalidCredentialsException;
 use GaaraHyperf\Exception\UserNotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\UserProvider\UserProviderInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * API Key认证器
@@ -59,6 +61,21 @@ class APIKeyAuthenticator extends AbstractAuthenticator
         }
 
         return new Passport($apiKey, fn() => $user);
+    }
+
+    /**
+     * @inheritDoc
+     * @override
+     */
+    public function onAuthenticationFailure(string $guardName, ServerRequestInterface $request, AuthenticationException $exception, ?Passport $passport = null): ?ResponseInterface
+    {
+        if (!is_null($this->failureHandler)) {
+            return $this->failureHandler->handle($guardName, $request, $exception, $passport);
+        }
+
+        // 默认返回401响应
+        $response = new \Hyperf\HttpMessage\Server\Response();
+        return $response->withStatus(401)->withBody(new \Hyperf\HttpMessage\Stream\SwooleStream('Unauthorized'));
     }
 
     /**

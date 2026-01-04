@@ -89,6 +89,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
 
     /**
      * @inheritDoc
+     * @override
      */
     public function onAuthenticationSuccess(string $guardName, ServerRequestInterface $request, TokenInterface $token, Passport $passport): ?ResponseInterface
     {
@@ -108,6 +109,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
 
     /**
      * @inheritDoc
+     * @override
      */
     public function onAuthenticationFailure(string $guardName, ServerRequestInterface $request, AuthenticationException $exception, ?Passport $passport = null): ?ResponseInterface
     {
