@@ -28,7 +28,7 @@
         "hyperf/redis": "^3.1",
         "hyperf/event": "^3.1",
         "hyperf/laminas-mime": "^3.0",
-        "symfony/event-dispatcher": "^6.4"
+        "symfony/event-dispatcher": "^6.4|^7.0|^8.0"
     },
     "extra": {
         "hyperf": {
