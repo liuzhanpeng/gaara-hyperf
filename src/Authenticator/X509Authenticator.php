@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Authenticator;
 
+use GaaraHyperf\Exception\AuthenticationException;
 use GaaraHyperf\Exception\InvalidCredentialsException;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\UserProvider\UserProviderInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -64,6 +66,20 @@ class X509Authenticator extends AbstractAuthenticator
             $user->getIdentifier(),
             fn() => $user,
         );
+    }
+
+    /**
+     * @inheritDoc
+     * @override
+     */
+    public function onAuthenticationFailure(string $guardName, ServerRequestInterface $request, AuthenticationException $exception, ?Passport $passport = null): ?ResponseInterface
+    {
+        if (!is_null($this->failureHandler)) {
+            return $this->failureHandler->handle($guardName, $request, $exception, $passport);
+        }
+
+        $response = new \Hyperf\HttpMessage\Server\Response();
+        return $response->withStatus(401)->withBody(new \Hyperf\HttpMessage\Stream\SwooleStream('Unauthorized'));
     }
 
     /**
