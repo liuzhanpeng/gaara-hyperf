@@ -79,7 +79,7 @@ class X509Authenticator extends AbstractAuthenticator
         }
 
         $response = new \Hyperf\HttpMessage\Server\Response();
-        return $response->withStatus(401)->withBody(new \Hyperf\HttpMessage\Stream\SwooleStream('Unauthorized'));
+        return $response->withStatus(401)->withBody(new \Hyperf\HttpMessage\Stream\SwooleStream($exception->getMessage()));
     }
 
     /**

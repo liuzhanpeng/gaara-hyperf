@@ -75,7 +75,7 @@ class APIKeyAuthenticator extends AbstractAuthenticator
 
         // 默认返回401响应
         $response = new \Hyperf\HttpMessage\Server\Response();
-        return $response->withStatus(401)->withBody(new \Hyperf\HttpMessage\Stream\SwooleStream('Unauthorized'));
+        return $response->withStatus(401)->withBody(new \Hyperf\HttpMessage\Stream\SwooleStream($exception->getMessage()));
     }
 
     /**
