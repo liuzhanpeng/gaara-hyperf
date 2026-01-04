@@ -6,6 +6,10 @@ namespace GaaraHyperf\Authenticator;
 
 use GaaraHyperf\Encryptor\EncryptorInterface;
 use GaaraHyperf\Exception\AuthenticationException;
+use GaaraHyperf\Exception\InvalidCredentialsException;
+use GaaraHyperf\Exception\InvalidSignatureException;
+use GaaraHyperf\Exception\SignatureExpiredException;
+use GaaraHyperf\Exception\UsedNonceException;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\User\PasswordAwareUserInterface;
 use GaaraHyperf\UserProvider\UserProviderInterface;
@@ -58,25 +62,25 @@ class HmacSignatureAuthenticator extends AbstractAuthenticator
         $timestamp = $request->getHeaderLine($this->options['timestamp_param']);
         $nonce = $request->getHeaderLine($this->options['nonce_param']);
         if (empty($apiKey) || empty($signature) || empty($timestamp)) {
-            throw new AuthenticationException($apiKey, 'Missing required authentication headers');
+            throw new InvalidCredentialsException($apiKey, 'Missing required authentication headers');
         }
 
         if ($this->options['nonce_enabled'] && empty($nonce)) {
-            throw new AuthenticationException($apiKey, 'Missing required nonce header');
+            throw new InvalidCredentialsException($apiKey, 'Missing required nonce header');
         }
 
         $now = time();
         $ts = (int) $timestamp;
         $skew = 300; // 允许 5 分钟的时钟偏差
         if ($ts < ($now - $this->options['ttl']) || $ts > ($now + $skew)) {
-            throw new AuthenticationException($apiKey, 'Request timestamp is invalid or expired');
+            throw new SignatureExpiredException($apiKey, 'Request timestamp is invalid or expired');
         }
 
         // 防止重放攻击
         if ($this->options['nonce_enabled']) {
             $cacheKey = sprintf('%s:%s', $this->options['nonce_cache_prefix'], md5($apiKey . $nonce));
             if ($this->cache->has($cacheKey)) {
-                throw new AuthenticationException($apiKey, 'Nonce has already been used');
+                throw new UsedNonceException($apiKey, 'Nonce has already been used');
             }
 
             $this->cache->set($cacheKey, true, $this->options['ttl']);
@@ -84,7 +88,7 @@ class HmacSignatureAuthenticator extends AbstractAuthenticator
 
         $user = $this->userProvider->findByIdentifier($apiKey);
         if (is_null($user)) {
-            throw new AuthenticationException($apiKey, 'Invalid API key');
+            throw new InvalidCredentialsException($apiKey, 'Invalid API key');
         }
 
         if (!$user instanceof PasswordAwareUserInterface) {
@@ -127,7 +131,7 @@ class HmacSignatureAuthenticator extends AbstractAuthenticator
         // 验签
         $computedSignature = base64_encode(hash_hmac($this->options['algo'], $signStr, $secret, true));
         if (!hash_equals($computedSignature, $signature)) {
-            throw new AuthenticationException($apiKey, 'Invalid request signature');
+            throw new InvalidSignatureException($apiKey, 'Invalid request signature');
         }
 
         return new Passport(
