@@ -6,6 +6,7 @@ namespace GaaraHyperf\Authenticator;
 
 use Psr\Http\Message\ServerRequestInterface;
 use GaaraHyperf\Exception\AuthenticationException;
+use GaaraHyperf\Exception\InvalidAPIKeyException;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\UserProvider\UserProviderInterface;
 
@@ -49,10 +50,12 @@ class APIKeyAuthenticator extends AbstractAuthenticator
             throw new AuthenticationException($apiKey, 'API key is missing');
         }
 
-        return new Passport(
-            $apiKey,
-            $this->userProvider->findByIdentifier(...),
-        );
+        $user = $this->userProvider->findByIdentifier($apiKey);
+        if (is_null($user)) {
+            throw new InvalidAPIKeyException($apiKey, 'Invalid API key');
+        }
+
+        return new Passport($apiKey, fn() => $user);
     }
 
     /**
