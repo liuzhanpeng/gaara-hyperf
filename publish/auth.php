@@ -49,6 +49,7 @@ return [
                 //     'check_path' => '/admin/check_login', // JSON登录请求路径
                 //     'username_param' => 'username', // 用户名字段名
                 //     'password_param' => 'password', // 密码字段名
+                //     'error_message' => '用户名或密码错误', // 可选;登录失败错误消息; 支持字符串或回调函数; 回调函数参数为 AuthenticationException 实例
                 //     'success_handler' => [ // 可选，登录成功处理器配置; 无状态认证时一般都需要配置, 用于生成access token返回给客户端
                 //         'class' => OpaqueTokenResponseHandler::class,
                 //         'args' => [
@@ -75,6 +76,7 @@ return [
                 //     'nonce_param' => 'X-NONCE', // nonce_enabled==true必须; 请求头中的随机字符串参数名 
                 //     'nonce_cache_prefix' => 'default', // nonce_enabled==true必须; 缓存前缀
                 //     'ttl' => 60, // 请求签名的有效期，单位秒
+                //     'skew' => 300, // 允许的时间戳偏差，单位秒，默认300秒
                 //     'algo' => 'sha256', // 签名算法
                 //     'secret_encrypto_enabled' => false, // 是否启用密钥加密
                 //     'secret_encryptor' => [ // secret_encrypto_enabled==true必须; 加密器配置

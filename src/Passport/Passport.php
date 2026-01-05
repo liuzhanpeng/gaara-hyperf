@@ -64,7 +64,10 @@ class Passport
         if (is_null($this->user)) {
             $user = ($this->userLoader)($this->userIdentifier);
             if (is_null($user)) {
-                throw new UserNotFoundException($this->userIdentifier);
+                throw new UserNotFoundException(
+                    message: 'User not found',
+                    userIdentifier: $this->userIdentifier
+                );
             }
 
             if (!$user instanceof UserInterface) {

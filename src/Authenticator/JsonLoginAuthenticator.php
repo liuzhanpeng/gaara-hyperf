@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Authenticator;
 
+use GaaraHyperf\Exception\AuthenticationException;
 use Psr\Http\Message\ServerRequestInterface;
 use GaaraHyperf\Exception\InvalidPasswordException;
 use GaaraHyperf\Exception\UserNotFoundException;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\Passport\PasswordBadge;
 use GaaraHyperf\UserProvider\UserProviderInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * JSON登录认证
@@ -61,6 +63,30 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
         );
 
         return $passport;
+    }
+
+    /**
+     * @inheritDoc
+     * @override
+     */
+    public function onAuthenticationFailure(string $guardName, ServerRequestInterface $request, AuthenticationException $exception, ?Passport $passport = null): ?ResponseInterface
+    {
+        if (!is_null($this->failureHandler)) {
+            return $this->failureHandler->handle($guardName, $request, $exception, $passport);
+        }
+
+        if (is_callable($this->options['error_message'])) {
+            $msg = ($this->options['error_message'])($exception);
+        } else {
+            $msg = $this->options['error_message'];
+        }
+
+        $response = new \Hyperf\HttpMessage\Server\Response();
+        return $response->withStatus(200)
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody(new \Hyperf\HttpMessage\Stream\SwooleStream(json_encode([
+                'error' => $msg
+            ], JSON_UNESCAPED_UNICODE)));
     }
 
     /**

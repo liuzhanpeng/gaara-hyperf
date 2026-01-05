@@ -76,7 +76,7 @@ class HmacSignatureAuthenticator extends AbstractAuthenticator
 
         $now = time();
         $ts = (int) $timestamp;
-        $skew = 300; // 允许 5 分钟的时钟偏差
+        $skew = (int) $this->options['skew'];
         if ($ts < ($now - $this->options['ttl']) || $ts > ($now + $skew)) {
             throw new SignatureExpiredException(
                 message: 'Request timestamp is invalid or expired',

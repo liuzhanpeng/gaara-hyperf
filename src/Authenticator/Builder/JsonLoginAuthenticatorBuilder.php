@@ -25,6 +25,7 @@ class JsonLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
         $options = array_merge([
             'username_param' => 'username',
             'password_param' => 'password',
+            'error_message' => '用户名或密码错误',
         ], $options);
 
         return new JsonLoginAuthenticator(
