@@ -73,7 +73,7 @@ return [
                 //     'timestamp_param' => 'X-TIMESTAMP', // 请求头中的时间戳参数名
                 //     'nonce_enabled' => true, // 是否启用随机字符串; 防止重放攻击
                 //     'nonce_param' => 'X-NONCE', // nonce_enabled==true必须; 请求头中的随机字符串参数名 
-                //     'nonce_cache_prefix' => 'default', // nonce_enabled==true必须; 随机字符串缓存前缀
+                //     'nonce_cache_prefix' => 'default', // nonce_enabled==true必须; 缓存前缀
                 //     'ttl' => 60, // 请求签名的有效期，单位秒
                 //     'algo' => 'sha256', // 签名算法
                 //     'secret_encrypto_enabled' => false, // 是否启用密钥加密

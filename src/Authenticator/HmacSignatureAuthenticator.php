@@ -122,7 +122,6 @@ class HmacSignatureAuthenticator extends AbstractAuthenticator
         $queryString = http_build_query($queryParams, '', '&', PHP_QUERY_RFC3986);
 
         $bodyContent = $request->getBody()->getContents();
-        $request->getBody()->rewind();
         $bodyDigest = hash('sha256', $bodyContent);
 
         $path = $request->getUri()->getPath();
@@ -149,7 +148,7 @@ class HmacSignatureAuthenticator extends AbstractAuthenticator
         }
 
         // 验签
-        $computedSignature = base64_encode(hash_hmac($this->options['algo'], $signStr, $secret, true));
+        $computedSignature = hash_hmac($this->options['algo'], $signStr, $secret);
         if (!hash_equals($computedSignature, $signature)) {
             throw new InvalidSignatureException(
                 message: 'Invalid request signature',
