@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace GaaraHyperf;
 
 use Hyperf\Contract\ContainerInterface;
-use GaaraHyperf\ServiceProvider\AccessTokenExtractorServiceProvider;
 use GaaraHyperf\ServiceProvider\ServiceProviderRegisterEvent;
 use GaaraHyperf\ServiceProvider\BuiltInAuthenticatorServiceProvider;
 use GaaraHyperf\ServiceProvider\BuiltInUserProviderServiceProvider;
@@ -46,7 +45,6 @@ class AuthInitializer
             ->register(new PasswordHasherServiceProvider())
             ->register(new CsrfTokenManagerServiceProvider())
             ->register(new OpaqueTokenManagerServiceProvider())
-            ->register(new AccessTokenExtractorServiceProvider())
             ->register(new GuardServiceProvider());
 
         /**

@@ -10,7 +10,7 @@ An authentication library for hyperf
     - [x] IP Binding/UA binding
     - [x] Single session
 - [x] API Key Authentication
-- [x] API Signature Authentication
+- [x] Hmac Signature Authentication
 - [x] X.509 Client Certificates Authentication
 - [ ] Magic Link Authentication
 - [ ] JWT Authentication (with BlackList)

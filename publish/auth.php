@@ -22,29 +22,29 @@ return [
             ],
 
             'authenticators' => [
-                //     'form_login' => [ // 内置表单登录认证器
-                //         'check_path' => '/admin/login', // 必须; 登录表单提交路径
-                //         'target_path' => '/admin/dashboard', // 可选; 登录成功跳转路径
-                //         'failure_path' => '/admin/login', // 可选;登录失败跳转路径
-                //         'redirect_enabled' => true, // 可选;是否启用登录成功后的重定向
-                //         'redirect_param' => 'redirect_to', // 可选;重定向目标路径参数名
-                //         'username_param' => 'username', // 可选;用户名参数名
-                //         'password_param' => 'password', // 可选;密码参数名
-                //         'error_message' => '用户名或密码错误', // 可选;登录失败错误消息; 支持字符串或回调函数; 回调函数参数为 AuthenticationException 实例
-                //         'csrf_enabled' => true, // 可选;是否启用CSRF保护
-                //         'csrf_id' => 'authenticate', // 可选;CSRF令牌ID
-                //         'csrf_param' => '_csrf_token', // 可选;CSRF令牌参数名
-                //         'csrf_token_manager' => 'default', // 可选;CSRF令牌管理器服务名称
-                //         'success_handler' => [ // 可选，登录成功处理器配置; 没有参数时可以直接配置类名字符串
-                //             'class' => CustomSuccessHandler::class,
-                //             'args' => []
-                //         ],
-                //         'success_handler' => CustomSuccessHandler::class, // 可选; 没有参数时可以直接配置类名字符串
-                //         'failure_handler' => [ // 可选，登录失败处理器配置
-                //             'class' => CustomFailureHandler::class,
-                //             'args' => []
-                //         ],
-                //     ],
+                //  'form_login' => [ // 内置表单登录认证器
+                //      'check_path' => '/admin/login', // 必须; 登录表单提交路径
+                //      'target_path' => '/admin/dashboard', // 可选; 登录成功跳转路径
+                //      'failure_path' => '/admin/login', // 可选;登录失败跳转路径
+                //      'redirect_enabled' => true, // 可选;是否启用登录成功后的重定向
+                //      'redirect_param' => 'redirect_to', // 可选;重定向目标路径参数名
+                //      'username_param' => 'username', // 可选;用户名参数名
+                //      'password_param' => 'password', // 可选;密码参数名
+                //      'error_message' => '用户名或密码错误', // 可选;登录失败错误消息; 支持字符串或回调函数; 回调函数参数为 AuthenticationException 实例
+                //      'csrf_enabled' => true, // 可选;是否启用CSRF保护
+                //      'csrf_id' => 'authenticate', // 可选;CSRF令牌ID
+                //      'csrf_param' => '_csrf_token', // 可选;CSRF令牌参数名
+                //      'csrf_token_manager' => 'default', // 可选;CSRF令牌管理器服务名称
+                //      'success_handler' => [ // 可选，登录成功处理器配置; 没有参数时可以直接配置类名字符串
+                //          'class' => CustomSuccessHandler::class,
+                //          'args' => []
+                //      ],
+                //      'success_handler' => CustomSuccessHandler::class, // 可选; 没有参数时可以直接配置类名字符串
+                //      'failure_handler' => [ // 可选，登录失败处理器配置
+                //          'class' => CustomFailureHandler::class,
+                //          'args' => []
+                //      ],
+                //  ],
                 // 'json_login' => [ // 内置JSON登录认证器
                 //     'check_path' => '/admin/check_login', // JSON登录请求路径
                 //     'username_param' => 'username', // 用户名字段名
@@ -61,7 +61,11 @@ return [
                 // ],
                 // 'opaque_token' => [ // 不透明令牌认证器，用于API无状态认证； 一般配合 JSON登录认证器 使用
                 //     'token_manager' => 'default', // 可选；不透明令牌管理器服务名称; 默认default
-                //     'token_extractor' => 'default' // 可选; 访问令牌提取器服务名称; 默认default
+                //     'token_extractor' => [
+                //         'type' => 'header', // 支持 header, cookie, custom; 默认header
+                //         'param_name' => 'Authorization', // type == header时可选，默认Authorization; type == cookie时可选，默认access_token
+                //         'param_type' => 'Bearer', // type == header时可选，默认Bearer
+                //     ],
                 //     'success_handler' => CustomSuccessHandler::class // 可选，认证成功处理器配置
                 //     'failure_handler' => CustomFailureHandler::class // 可选，认证失败处理器配置
                 // ],
@@ -184,13 +188,6 @@ return [
         //         'user_agent_bind_enabled' => false, // 是否启用User-Agent绑定; 默认false
         //         'single_session' => true, // 是否启用单会话登录; 默认true
         //         'access_token_length' => 16, // 生成令牌长度; 默认16
-        //     ]
-        // ],
-        // 'access_token_extractors' => [ // 访问令牌提取器配置; 内置了一个名称为default的提取器(type==header)
-        //     'default' => [ // 不透明令牌提取器名称; 可按实际情况为每个Guard配置不同的提取器 
-        //         'type' => 'header', // 支持 header, cookie, custom; 默认header
-        //         'param_name' => 'Authorization', // type == header时可选，默认Authorization; type == cookie时可选，默认access_token
-        //         'param_type' => 'Bearer', // type == header时可选，默认Bearer
         //     ]
         // ],
     ],
