@@ -30,7 +30,7 @@ class RequestMatcherFactory
                     throw new \InvalidArgumentException('pattern option is required for default request matcher');
                 }
 
-                return $this->container->make(DefaultRequestMatcher::class, [
+                return $this->container->make(RequestMatcher::class, [
                     'pattern' => $options['pattern'],
                     'logoutPath' => $options['logout_path'] ?? null,
                     'exclusions' => $options['exclusions'] ?? [],

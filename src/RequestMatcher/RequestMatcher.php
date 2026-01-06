@@ -11,7 +11,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class DefaultRequestMatcher implements RequestMatcherInterface
+class RequestMatcher implements RequestMatcherInterface
 {
     /**
      * @param string|array $pattern 匹配的路径模式

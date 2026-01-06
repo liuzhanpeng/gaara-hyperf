@@ -36,7 +36,7 @@ class OpaqueTokenManagerFactory
                     throw new \InvalidArgumentException('The expires_in option must be less than or equal to max_lifetime option.');
                 }
 
-                return $this->container->make(DefaultOpaqueTokenManager::class, [
+                return $this->container->make(OpaqueTokenManager::class, [
                     'prefix' => sprintf('%s:opaque_token:%s', Constants::__PREFIX, $config['prefix'] ?? 'default'),
                     'expiresIn' => $expiresIn,
                     'maxLifetime' => $maxLifetime,
