@@ -36,7 +36,7 @@ class AuthenticatorConfigCollection implements \IteratorAggregate
                         throw new \InvalidArgumentException("自定义认证器配置缺少class选项");
                     }
 
-                    $authenticatorConfigCollection[] = new AuthenticatorConfig($customAuthenticatorConfig['class'], $customAuthenticatorConfig['args'] ?? []);
+                    $authenticatorConfigCollection[] = new AuthenticatorConfig($customAuthenticatorConfig['class'], $customAuthenticatorConfig['params'] ?? []);
                 }
             } else {
                 $authenticatorConfigCollection[] = new AuthenticatorConfig($type, $options);

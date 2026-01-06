@@ -38,7 +38,7 @@ class RequestMatcherFactory
             case 'custom':
                 $customConfig = CustomConfig::from($options);
 
-                $requestMatcher = $this->container->make($customConfig->class(), $customConfig->args());
+                $requestMatcher = $this->container->make($customConfig->class(), $customConfig->params());
                 if (!$requestMatcher instanceof RequestMatcherInterface) {
                     throw new \InvalidArgumentException(sprintf('Request Matcher "%s" must implement %s', $customConfig->class(), RequestMatcherInterface::class));
                 }

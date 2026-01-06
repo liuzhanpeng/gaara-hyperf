@@ -29,9 +29,9 @@ class AuditLogListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            AuthenticationSuccessEvent::class => 'onAuthenticationSuccess',
-            AuthenticationFailureEvent::class => 'onAuthenticationFailure',
-            LogoutEvent::class => 'onLogout',
+            AuthenticationSuccessEvent::class => ['onAuthenticationSuccess', -100],
+            AuthenticationFailureEvent::class => ['onAuthenticationFailure', -100],
+            LogoutEvent::class => ['onLogout', -100],
         ];
     }
 

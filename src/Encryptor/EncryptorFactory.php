@@ -33,7 +33,7 @@ class EncryptorFactory
             case 'custom':
                 $customConfig = CustomConfig::from($config);
 
-                $encryptor = $this->container->get($customConfig->class(), $customConfig->args());
+                $encryptor = $this->container->make($customConfig->class(), $customConfig->params());
                 if (!$encryptor instanceof EncryptorInterface) {
                     throw new \LogicException(sprintf('The custom Encryptor must implement %s.', EncryptorInterface::class));
                 }

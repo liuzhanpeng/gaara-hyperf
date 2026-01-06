@@ -13,11 +13,11 @@ class CustomConfig
 {
     /**
      * @param string $class 扩展类名
-     * @param array $args 参数
+     * @param array $params 参数
      */
     public function __construct(
         private string $class,
-        private array $args
+        private array $params
     ) {}
 
     /**
@@ -34,15 +34,7 @@ class CustomConfig
             throw new \InvalidArgumentException('class is required');
         }
 
-        $args = $config['args'] ?? [];
-        if (count($args) > 0) {
-            $args = array_combine(
-                array_map(fn($key) => lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))), array_keys($args)),
-                $args
-            );
-        }
-
-        return new self($config['class'], $args);
+        return new self($config['class'], $config['params'] ?? []);
     }
 
     /**
@@ -60,8 +52,8 @@ class CustomConfig
      *
      * @return array
      */
-    public function args(): array
+    public function params(): array
     {
-        return $this->args;
+        return $this->params;
     }
 }

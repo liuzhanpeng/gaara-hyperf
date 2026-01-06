@@ -38,17 +38,17 @@ abstract class AbstractAuthenticatorBuilder implements AuthenticatorBuilderInter
             ];
         }
 
-        $args = $options['success_handler']['args'] ?? [];
-        if (count($args) > 0) {
-            $args = array_combine(
-                array_map(fn($key) => lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))), array_keys($args)),
-                $args
+        $params = $options['success_handler']['params'] ?? [];
+        if (count($params) > 0) {
+            $params = array_combine(
+                array_map(fn($key) => lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))), array_keys($params)),
+                $params
             );
         }
 
         $successHandler = $this->container->make(
             $options['success_handler']['class'],
-            $args
+            $params
         );
 
         if (!$successHandler instanceof AuthenticationSuccessHandlerInterface) {
@@ -76,17 +76,17 @@ abstract class AbstractAuthenticatorBuilder implements AuthenticatorBuilderInter
             ];
         }
 
-        $args = $options['failure_handler']['args'] ?? [];
-        if (count($args) > 0) {
-            $args = array_combine(
-                array_map(fn($key) => lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))), array_keys($args)),
-                $args
+        $params = $options['failure_handler']['params'] ?? [];
+        if (count($params) > 0) {
+            $params = array_combine(
+                array_map(fn($key) => lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))), array_keys($params)),
+                $params
             );
         }
 
         $failureHandler = $this->container->make(
             $options['failure_handler']['class'],
-            $args
+            $params
         );
 
         if (!$failureHandler instanceof AuthenticationFailureHandlerInterface) {

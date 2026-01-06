@@ -42,7 +42,7 @@ class TokenStorageFactory
             case 'custom':
                 $customConfig = CustomConfig::from($options);
 
-                $tokenStorage = $this->container->make($customConfig->class(), $customConfig->args());
+                $tokenStorage = $this->container->make($customConfig->class(), $customConfig->params());
                 if (!$tokenStorage instanceof TokenStorageInterface) {
                     throw new \LogicException(sprintf('Token storage "%s" must implement %s', $customConfig->class(), TokenStorageInterface::class));
                 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\RateLimiter;
 
+use GaaraHyperf\Config\ComponentConfig;
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Redis\Redis;
 use GaaraHyperf\Constants;
@@ -19,20 +20,31 @@ class RateLimiterFactory
         private ContainerInterface $container,
     ) {}
 
-    public function create(array $config): RateLimiterInterface
+    public function create(ComponentConfig $config): RateLimiterInterface
     {
-        $type = $config['type'] ?? 'sliding_window';
-        $options = $config['options'] ?? [];
+        $type = $config->type();
+        $options = $config->options();
 
         switch ($type) {
             case 'sliding_window':
+                $options = array_merge([
+                    'limit' => 5,
+                    'interval' => 300,
+                    'prefix' => 'default',
+                ], $options);
+
                 return new SlidingWindowRateLimiter(
                     redis: $this->container->get(Redis::class),
-                    interval: $options['interval'] ?? 300,
-                    limit: $options['limit'] ?? 5,
+                    interval: $options['interval'],
+                    limit: $options['limit'],
                     prefix: sprintf('%s:login_rate_limiter:sliding_window:%s', Constants::__PREFIX, $options['prefix'] ?? 'default'),
                 );
             case 'token_bucket':
+                $options = array_merge([
+                    'limit' => 10,
+                    'rate' => 1.0,
+                    'prefix' => 'default',
+                ], $options);
                 return new TokenBucketRateLimiter(
                     redis: $this->container->get(Redis::class),
                     limit: $options['limit'] ?? 10,
@@ -40,10 +52,16 @@ class RateLimiterFactory
                     prefix: sprintf('%s:login_rate_limiter:token_bucket:%s', Constants::__PREFIX, $options['prefix'] ?? 'default'),
                 );
             case 'fixed_window':
+                $options = array_merge([
+                    'limit' => 5,
+                    'interval' => 300,
+                    'prefix' => 'default',
+                ], $options);
+
                 return new FixedWindowRateLimiter(
                     redis: $this->container->get(Redis::class),
-                    interval: $options['interval'] ?? 60,
-                    limit: $options['limit'] ?? 10,
+                    interval: $options['interval'],
+                    limit: $options['limit'],
                     prefix: sprintf('%s:login_rate_limiter:fixed_window:%s', Constants::__PREFIX, $options['prefix'] ?? 'default'),
                 );
             default:

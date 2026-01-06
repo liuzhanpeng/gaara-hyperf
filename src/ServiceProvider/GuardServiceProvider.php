@@ -75,10 +75,10 @@ class GuardServiceProvider implements ServiceProviderInterface
         $unauthenticatedHandler = $container->get(UnauthenticatedHandlerFactory::class)->create($guardConfig->unauthenticatedHandlerConfig());
 
         $authorizationCheckerConfig = $guardConfig->authorizationCheckerConfig();
-        $authorizationChecker = $container->make($authorizationCheckerConfig->class(), $authorizationCheckerConfig->args());
+        $authorizationChecker = $container->make($authorizationCheckerConfig->class(), $authorizationCheckerConfig->params());
 
         $accessDeniedHandlerConfig = $guardConfig->accessDeniedHandlerConfig();
-        $accessDeniedHandler = $container->make($accessDeniedHandlerConfig->class(), $accessDeniedHandlerConfig->args());
+        $accessDeniedHandler = $container->make($accessDeniedHandlerConfig->class(), $accessDeniedHandlerConfig->params());
 
         $eventDispatcher = new EventDispatcher();
 
@@ -99,7 +99,7 @@ class GuardServiceProvider implements ServiceProviderInterface
 
         // 注册自定义监听器
         foreach ($guardConfig->listenerConfigCollection() as $listenerConfig) {
-            $listener = $container->make($listenerConfig->class(), $listenerConfig->args());
+            $listener = $container->make($listenerConfig->class(), ['params' => $listenerConfig->params()]); // 将多个参数组合成一个参数，以支持可变参数构造函数
             if (!$listener instanceof EventSubscriberInterface) {
                 throw new \InvalidArgumentException(sprintf('Listener "%s" must implement EventSubscriberInterface.', $listenerConfig->class()));
             }

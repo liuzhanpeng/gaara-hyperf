@@ -37,7 +37,7 @@ class UnauthenticatedHandlerFactory
             case 'custom':
                 $customConfig = CustomConfig::from($options);
 
-                $unauthenticatedHandler = $this->container->make($customConfig->class(), $customConfig->args());
+                $unauthenticatedHandler = $this->container->make($customConfig->class(), $customConfig->params());
                 if (!$unauthenticatedHandler instanceof UnauthenticatedHandlerInterface) {
                     throw new \InvalidArgumentException(sprintf('Unauthenticated Handler "%s" must implement %s', $customConfig->class(), UnauthenticatedHandlerInterface::class));
                 }

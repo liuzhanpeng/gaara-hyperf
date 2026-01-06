@@ -37,12 +37,12 @@ return [
                 //      'csrf_token_manager' => 'default', // 可选;CSRF令牌管理器服务名称
                 //      'success_handler' => [ // 可选，登录成功处理器配置; 没有参数时可以直接配置类名字符串
                 //          'class' => CustomSuccessHandler::class,
-                //          'args' => []
+                //          'params' => []
                 //      ],
                 //      'success_handler' => CustomSuccessHandler::class, // 可选; 没有参数时可以直接配置类名字符串
                 //      'failure_handler' => [ // 可选，登录失败处理器配置
                 //          'class' => CustomFailureHandler::class,
-                //          'args' => []
+                //          'params' => []
                 //      ],
                 //  ],
                 // 'json_login' => [ // 内置JSON登录认证器
@@ -52,7 +52,7 @@ return [
                 //     'error_message' => '用户名或密码错误', // 可选;登录失败错误消息; 支持字符串或回调函数; 回调函数参数为 AuthenticationException 实例
                 //     'success_handler' => [ // 可选，登录成功处理器配置; 无状态认证时一般都需要配置, 用于生成access token返回给客户端
                 //         'class' => OpaqueTokenResponseHandler::class,
-                //         'args' => [
+                //         'params' => [
                 //             'token_manager' => 'default',
                 //             'response_template' => '{ "code": 0, "msg": "success", "data": { "access_token": "#ACCESS_TOKEN#"} }',
                 //         ],
@@ -72,7 +72,7 @@ return [
                 // 'api_key' => [ // API-Key认证器
                 //     'api_key_param' => 'X-API-KEY', // 请求头中的api key参数名; 默认X-API-KEY; 
                 // ],
-                // 'hmac_signature' => [ // HMAC签名认证器
+                // 'hmac' => [ // HMAC签名认证器
                 //     'api_key_param' => 'X-API-KEY', // 请求头中的api key参数名; 默认X-API-KEY; 
                 //     'signature_param' => 'X-SIGNATURE', // 请求头中的签名参数名
                 //     'timestamp_param' => 'X-TIMESTAMP', // 请求头中的时间戳参数名
@@ -85,10 +85,8 @@ return [
                 //     'secret_encrypto_enabled' => false, // 是否启用密钥加密
                 //     'secret_encryptor' => [ // secret_encrypto_enabled==true必须; 加密器配置
                 //         'type' => 'default', // 支持default, custom
-                //         'args' => [
-                //             'algo' => 'AES-256-CBC', // type==default必须; 加密算法
-                //             'key' => 'secret-key', // type==default必须; 加密密钥
-                //         ]
+                //         'algo' => 'AES-256-CBC', // type==default必须; 加密算法
+                //         'key' => 'secret-key', // type==default必须; 加密密钥
                 //     ]
                 // ],
                 // 'x509' => [ // X509证书认证器
@@ -98,7 +96,7 @@ return [
                 // 'custom' => [ // 可设置多个自定义认证器；只要实现相关接口就可以了
                 //     [
                 //         'class' => CustomAuthenticator::class,
-                //         'args' => []
+                //         'params' => []
                 //     ]
                 // ]
             ],
@@ -123,7 +121,7 @@ return [
             'listeners' =>  [
                 // [
                 //     'class' => IPWhiteListListener::class, // IP白名单检查监听器
-                //     'args' => [
+                //     'params' => [
                 //         'white_list' => [ // 支持静态数组 或 实现IPWhiteListProviderInterface的提供器
                 //             '192.168.1.1',
                 //             '192.168.2.*',
@@ -133,15 +131,17 @@ return [
                 // ],
                 // [
                 //     'class' => LoginAttemptLimitListener::class, // 登录尝试限制监听器
-                //     'args' => [
+                //     'params' => [
                 //         'type' => 'sliding_window', // 限流器类型，支持 token_bucket, sliding_window, fixed_window
+                //         'prefix' => 'default',
                 //         'limit' => 5,
-                //         'interval' => 300
+                //         'interval' => 300, // type == sliding_window或fixed_window时必填，时间窗口大小，单位秒
+                //         // 'rate' => 1.0, // type == token_bucket时, 每秒生成的令牌数
                 //     ]
                 // ],
                 // [
                 //     'class' => PasswordExpirationListener::class, // 密码过期监听器
-                //     'args' => [
+                //     'params' => [
                 //         'excluded_paths' => [], // 不检查密码过期的路径列表
                 //         'warning_days' => 7, // 密码过期前多少天发出警告
                 //     ]

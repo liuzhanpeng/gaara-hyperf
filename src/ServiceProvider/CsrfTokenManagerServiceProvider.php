@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\ServiceProvider;
 
+use GaaraHyperf\Config\ComponentConfig;
 use Hyperf\Contract\ContainerInterface;
 use GaaraHyperf\Config\ConfigLoaderInterface;
 use GaaraHyperf\Constants;
@@ -32,7 +33,7 @@ class CsrfTokenManagerServiceProvider implements ServiceProviderInterface
         $csrfTokenManagerMap = [];
         foreach ($csrfTokenManagerConfig as $name => $config) {
             $csrfTokenManagerMap[$name] = sprintf('%s.%s', Constants::CSRF_TOKEN_MANAGER_PREFIX, $name);
-            $container->define($csrfTokenManagerMap[$name], fn() => $container->get(CsrfTokenManagerFactory::class)->create($config));
+            $container->define($csrfTokenManagerMap[$name], fn() => $container->get(CsrfTokenManagerFactory::class)->create(ComponentConfig::from($config)));
         }
 
         $container->define(CsrfTokenManagerResolverInterface::class, fn() => new CsrfTokenManagerResolver($csrfTokenManagerMap, $container));

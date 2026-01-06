@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GaaraHyperf\Authenticator;
 
 use GaaraHyperf\Exception\AuthenticationException;
+use GaaraHyperf\Exception\InvalidCredentialsException;
 use Psr\Http\Message\ServerRequestInterface;
 use GaaraHyperf\Exception\InvalidPasswordException;
 use GaaraHyperf\Exception\UserNotFoundException;
@@ -78,14 +79,18 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
         if (is_callable($this->options['error_message'])) {
             $msg = ($this->options['error_message'])($exception);
         } else {
-            $msg = $this->options['error_message'];
+            if ($exception instanceof InvalidCredentialsException) {
+                $msg = $this->options['error_message'];
+            } else {
+                $msg = $exception->getMessage();
+            }
         }
 
         $response = new \Hyperf\HttpMessage\Server\Response();
         return $response->withStatus(200)
             ->withHeader('Content-Type', 'application/json')
             ->withBody(new \Hyperf\HttpMessage\Stream\SwooleStream(json_encode([
-                'error' => $msg
+                'error' => $msg,
             ], JSON_UNESCAPED_UNICODE)));
     }
 

@@ -7,12 +7,12 @@ namespace GaaraHyperf\Authenticator\Builder;
 use GaaraHyperf\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use GaaraHyperf\Authenticator\AuthenticatorInterface;
-use GaaraHyperf\Authenticator\HmacSignatureAuthenticator;
+use GaaraHyperf\Authenticator\HmacAuthenticator;
 use GaaraHyperf\Constants;
 use GaaraHyperf\Encryptor\EncryptorFactory;
 use Psr\SimpleCache\CacheInterface;
 
-class HmacSignatureAuthenticatorBuilder extends AbstractAuthenticatorBuilder
+class HmacAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
@@ -37,7 +37,7 @@ class HmacSignatureAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             $encryptor = $encryptorFactory->create($options['secret_encryptor'] ?? []);
         }
 
-        return new HmacSignatureAuthenticator(
+        return new HmacAuthenticator(
             userProvider: $userProvider,
             cache: $this->container->get(CacheInterface::class),
             options: $options,

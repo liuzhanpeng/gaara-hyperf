@@ -8,7 +8,7 @@ use Hyperf\Contract\ContainerInterface;
 use GaaraHyperf\Authenticator\AuthenticatorFactory;
 use GaaraHyperf\Authenticator\Builder\APIKeyAuthenticatorBuilder;
 use GaaraHyperf\Authenticator\Builder\FormLoginAuthenticatorBuilder;
-use GaaraHyperf\Authenticator\Builder\HmacSignatureAuthenticatorBuilder;
+use GaaraHyperf\Authenticator\Builder\HmacAuthenticatorBuilder;
 use GaaraHyperf\Authenticator\Builder\JsonLoginAuthenticatorBuilder;
 use GaaraHyperf\Authenticator\Builder\OpaqueTokenAuthenticatorBuilder;
 use GaaraHyperf\Authenticator\Builder\X509AuthenticatorBuilder;
@@ -29,7 +29,7 @@ class BuiltInAuthenticatorServiceProvider implements ServiceProviderInterface
         $authenticatorFactory->registerBuilder('form_login', FormLoginAuthenticatorBuilder::class);
         $authenticatorFactory->registerBuilder('json_login', JsonLoginAuthenticatorBuilder::class);
         $authenticatorFactory->registerBuilder('api_key', APIKeyAuthenticatorBuilder::class);
-        $authenticatorFactory->registerBuilder('hmac_signature', HmacSignatureAuthenticatorBuilder::class);
+        $authenticatorFactory->registerBuilder('hmac_signature', HmacAuthenticatorBuilder::class);
         $authenticatorFactory->registerBuilder('opaque_token', OpaqueTokenAuthenticatorBuilder::class);
         $authenticatorFactory->registerBuilder('x509', X509AuthenticatorBuilder::class);
     }

@@ -29,7 +29,7 @@ class PasswordHasherFactory
             case 'custom':
                 $customConfig = CustomConfig::from($config);
 
-                $passwordHasher = $this->container->make($customConfig->class(), $customConfig->args());
+                $passwordHasher = $this->container->make($customConfig->class(), $customConfig->params());
                 if (!$passwordHasher instanceof PasswordHasherInterface) {
                     throw new \LogicException('Custom PasswordHasher class must be an instance of PasswordHasherInterface');
                 }

@@ -23,7 +23,7 @@ use Psr\SimpleCache\CacheInterface;
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class HmacSignatureAuthenticator extends AbstractAuthenticator
+class HmacAuthenticator extends AbstractAuthenticator
 {
     /**
      * @param UserProviderInterface $userProvider

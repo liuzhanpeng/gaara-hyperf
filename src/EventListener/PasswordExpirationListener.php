@@ -16,14 +16,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class PasswordExpirationListener implements EventSubscriberInterface
 {
-    /**
-     * @param array $excludedPaths 不检查密码过期的路径
-     * @param integer $warningDays 密码过期前多少天发出警告
-     */
+    private array $excludedPaths; //  不检查密码过期的路径
+    private int $warningDays; // 密码过期前多少天发出警告
+
     public function __construct(
-        private array $excludedPaths = [],
-        private int $warningDays = 7,
-    ) {}
+        private array $params,
+    ) {
+        $this->excludedPaths = $params['excluded_paths'] ?? [];
+        $this->warningDays = $params['warning_days'] ?? 7;
+    }
 
     public static function getSubscribedEvents()
     {

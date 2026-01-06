@@ -46,7 +46,7 @@ class UserProviderFactory
         } elseif ($type === 'custom') {
             $customConfig = CustomConfig::from($options);
 
-            $userProvider = $this->container->make($customConfig->class(), $customConfig->args());
+            $userProvider = $this->container->make($customConfig->class(), $customConfig->params());
             if (!$userProvider instanceof UserProviderInterface) {
                 throw new \LogicException("The custom user provider must implement the UserProviderInterface.");
             }

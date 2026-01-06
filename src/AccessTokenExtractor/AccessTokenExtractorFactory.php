@@ -36,7 +36,7 @@ class AccessTokenExtractorFactory
             case 'custom':
                 $customConfig = CustomConfig::from($config);
 
-                $accessTokenExtractor = $this->container->get($customConfig->class(), $customConfig->args());
+                $accessTokenExtractor = $this->container->make($customConfig->class(), $customConfig->params());
                 if (!$accessTokenExtractor instanceof AccessTokenExtractorInterface) {
                     throw new \LogicException(sprintf('The custom AccessTokenExtractor must implement %s.', AccessTokenExtractorInterface::class));
                 }
