@@ -57,21 +57,12 @@ class SlidingWindowRateLimiter implements RateLimiterInterface
             if current_count < limit then
                 -- 直接使用时间戳作为member
                 redis.call("ZADD", key, now, tostring(now))
-                -- 仅当窗口中没有元素时(即首次创建时)，才设置过期时间，防止key永不过期
-                if current_count == 0 then
-                    redis.call("EXPIRE", key, interval)
-                end
+                -- 每次成功添加都刷新过期时间，确保key不会意外过期
+                redis.call("EXPIRE", key, interval)
                 return {1, limit - current_count - 1, 0}
             else
-                -- 获取最早的请求时间
-                local earliest = redis.call("ZRANGE", key, 0, 0, "WITHSCORES")
-                local retry_after = 0
-                if #earliest > 0 then
-                    local earliest_time = tonumber(earliest[2])
-                    local reset_time = earliest_time + interval
-                    retry_after = math.max(0, math.ceil(reset_time - now))
-                end
-                return {0, 0, retry_after}
+                -- 对于滑动窗口，精确计算retry_after比较复杂，通常返回0
+                return {0, 0, 0}
             end
         ';
 
