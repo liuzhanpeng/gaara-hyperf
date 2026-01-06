@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\CsrfTokenManager;
 
-use GaaraHyperf\Config\ComponentConfig;
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Contract\SessionInterface;
 use GaaraHyperf\Config\CustomConfig;
@@ -22,19 +21,19 @@ class CsrfTokenManagerFactory
         private ContainerInterface $container,
     ) {}
 
-    public function create(ComponentConfig $config): CsrfTokenManagerInterface
+    public function create(array $config): CsrfTokenManagerInterface
     {
-        $type = $config->type();
-        $options = $config->options();
+        $type = $config['type'] ?? 'session';
+        unset($config['type']);
 
         switch ($type) {
             case 'session':
                 return $this->container->make(SessionCsrfTokenManager::class, [
-                    'prefix' => sprintf('%s.csrf_token.%s', Constants::__PREFIX, $options['prefix'] ?? 'default'),
+                    'prefix' => sprintf('%s.csrf_token.%s', Constants::__PREFIX, $config['prefix'] ?? 'default'),
                     'session' => $this->container->get(SessionInterface::class),
                 ]);
             case 'custom':
-                $customConfig = CustomConfig::from($options);
+                $customConfig = CustomConfig::from($config);
 
                 $csrfTokenManager = $this->container->make($customConfig->class(), $customConfig->params());
                 if (!$csrfTokenManager instanceof CsrfTokenManagerInterface) {

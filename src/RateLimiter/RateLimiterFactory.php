@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\RateLimiter;
 
-use GaaraHyperf\Config\ComponentConfig;
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Redis\Redis;
 use GaaraHyperf\Constants;
@@ -20,10 +19,10 @@ class RateLimiterFactory
         private ContainerInterface $container,
     ) {}
 
-    public function create(ComponentConfig $config): RateLimiterInterface
+    public function create(array $config): RateLimiterInterface
     {
-        $type = $config->type();
-        $options = $config->options();
+        $type = $config['type'] ?? 'sliding_window';
+        $options = $config['options'] ?? [];
 
         switch ($type) {
             case 'sliding_window':

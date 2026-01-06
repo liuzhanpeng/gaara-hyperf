@@ -49,7 +49,7 @@ class OpaqueTokenManagerFactory
             case 'custom':
                 $customConfig = CustomConfig::from($config);
 
-                $opaqueTokenManager = $this->container->get($customConfig->class(), $customConfig->params());
+                $opaqueTokenManager = $this->container->make($customConfig->class(), $customConfig->params());
                 if (!$opaqueTokenManager instanceof OpaqueTokenManagerInterface) {
                     throw new \LogicException(sprintf('The custom OpaqueTokenManager must implement %s.', OpaqueTokenManagerInterface::class));
                 }

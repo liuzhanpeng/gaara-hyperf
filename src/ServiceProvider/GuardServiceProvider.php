@@ -99,7 +99,7 @@ class GuardServiceProvider implements ServiceProviderInterface
 
         // 注册自定义监听器
         foreach ($guardConfig->listenerConfigCollection() as $listenerConfig) {
-            $listener = $container->make($listenerConfig->class(), ['params' => $listenerConfig->params()]); // 将多个参数组合成一个参数，以支持可变参数构造函数
+            $listener = $container->make($listenerConfig->class(), $listenerConfig->params());
             if (!$listener instanceof EventSubscriberInterface) {
                 throw new \InvalidArgumentException(sprintf('Listener "%s" must implement EventSubscriberInterface.', $listenerConfig->class()));
             }

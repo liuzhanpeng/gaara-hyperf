@@ -18,15 +18,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class IPWhiteListListener implements EventSubscriberInterface
 {
-    private array|string|IPWhiteListProviderInterface $whiteList;
-
     public function __construct(
         private IPResolverInterface $ipResolver,
         private IPWhiteListChecker $whiteListChecker,
-        private $params,
-    ) {
-        $this->whiteList = $params['white_list'] ?? [];
-    }
+        private array|string|IPWhiteListProviderInterface $whiteList = []
+    ) {}
 
     public static function getSubscribedEvents(): array
     {

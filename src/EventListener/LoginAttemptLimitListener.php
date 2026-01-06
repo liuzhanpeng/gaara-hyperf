@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\EventListener;
 
-use GaaraHyperf\Config\ComponentConfig;
-use GaaraHyperf\Event\AuthenticationFailureEvent;
 use GaaraHyperf\Event\AuthenticationSuccessEvent;
 use GaaraHyperf\Event\CheckPassportEvent;
 use GaaraHyperf\Exception\TooManyLoginAttemptsException;
@@ -26,9 +24,13 @@ class LoginAttemptLimitListener implements EventSubscriberInterface
     public function __construct(
         private RateLimiterFactory $rateLimiterFactory,
         private IPResolverInterface $ipResolver,
-        array $params,
+        string $type = 'sliding_window',
+        array $options = [],
     ) {
-        $this->rateLimiter = $this->rateLimiterFactory->create(ComponentConfig::from($params, 'sliding_window'));
+        $this->rateLimiter = $this->rateLimiterFactory->create([
+            'type' => $type,
+            'options' => $options
+        ]);
     }
 
     public static function getSubscribedEvents()
@@ -52,7 +54,6 @@ class LoginAttemptLimitListener implements EventSubscriberInterface
         $ip = $this->ipResolver->resolve($request);
 
         $result = $this->rateLimiter->attempt($userIdentifier . $ip);
-        var_dump($result);
         if (!$result->isAccepted()) {
             throw new TooManyLoginAttemptsException(
                 message: 'Too many login attempts. Please try again later.',

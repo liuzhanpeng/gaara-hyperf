@@ -133,10 +133,12 @@ return [
                 //     'class' => LoginAttemptLimitListener::class, // 登录尝试限制监听器
                 //     'params' => [
                 //         'type' => 'sliding_window', // 限流器类型，支持 token_bucket, sliding_window, fixed_window
-                //         'prefix' => 'default',
-                //         'limit' => 5,
-                //         'interval' => 300, // type == sliding_window或fixed_window时必填，时间窗口大小，单位秒
-                //         // 'rate' => 1.0, // type == token_bucket时, 每秒生成的令牌数
+                //         'options' => [
+                //              'prefix' => 'default',
+                //              'limit' => 5,
+                //              'interval' => 300, // type == sliding_window或fixed_window时必填，时间窗口大小，单位秒
+                //              // 'rate' => 1.0, // type == token_bucket时, 每秒生成的令牌数
+                //         ]
                 //     ]
                 // ],
                 // [
