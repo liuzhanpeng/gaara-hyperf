@@ -57,7 +57,7 @@ return [
                 //             'response_template' => '{ "code": 0, "msg": "success", "data": { "access_token": "#ACCESS_TOKEN#"} }',
                 //         ],
                 //     ],
-                //     'failure_handler' => CustomFailureHandler::class // 可选，登录失败处理器配置
+                //     'failure_handler' => CustomFailureHandler::class // 可选，登录失败处理器配置; 如果不配置，默认返回 200 状态码和错误消息的 JSON 响应：{error: "error_message"}
                 // ],
                 // 'opaque_token' => [ // 不透明令牌认证器，用于API无状态认证； 一般配合 JSON登录认证器 使用
                 //     'token_manager' => 'default', // 可选；不透明令牌管理器服务名称; 默认default
@@ -132,9 +132,9 @@ return [
                 //     ]
                 // ],
                 // [
-                //     'class' => LoginRateLimitListener::class, // 登录限流监听器
+                //     'class' => LoginAttemptLimitListener::class, // 登录尝试限制监听器
                 //     'args' => [
-                //         'type' => 'sliding_window',
+                //         'type' => 'sliding_window', // 限流器类型，支持 token_bucket, sliding_window, fixed_window
                 //         'limit' => 5,
                 //         'interval' => 300
                 //     ]

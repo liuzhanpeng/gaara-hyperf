@@ -15,9 +15,9 @@ An authentication library for hyperf
 - [ ] Magic Link Authentication
 - [ ] JWT Authentication (with BlackList)
 - [ ] OAuth 2.0/OpenID Connect
-- [ ] TOTP Authentication
 - [ ] WebAuthn Authentication
 - [ ] 2FA
+    - [ ] TOTP Authentication
 - [x] IP WhiteList
 - [x] Limiting Login Attempts
 - [x] Password Expiration

@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace GaaraHyperf\LoginRateLimiter;
+namespace GaaraHyperf\RateLimiter;
 
 use Hyperf\Redis\Redis;
 
 /**
- * 固定窗口登录限流器
+ * 固定窗口限流器
  * 
- * 依赖于Redis实现，使用固定窗口算法
+ * 依赖于Redis实现
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class FixedWindowLoginRateLimiter implements LoginRateLimiterInterface
+class FixedWindowRateLimiter implements RateLimiterInterface
 {
     /**
      * @param Redis $redis
@@ -64,51 +64,6 @@ class FixedWindowLoginRateLimiter implements LoginRateLimiterInterface
         $result = $this->redis->eval(
             $script,
             [$redisKey, $this->limit, $this->interval],
-            1
-        );
-
-        return new LimitResult(
-            $result[0] === 1,
-            (int) $result[1],
-            (int) $result[2]
-        );
-    }
-
-    /**
-     * 检查限流状态但不消费次数
-     *
-     * @param string $key 限流key
-     * @return LimitResult
-     */
-    public function check(string $key): LimitResult
-    {
-        $redisKey = $this->getKey($key);
-
-        // 使用Lua脚本检查状态但不消费
-        $script = '
-            local key = KEYS[1]
-            local limit = tonumber(ARGV[1])
-
-            -- 获取当前计数
-            local current_count = redis.call("GET", key)
-            if not current_count then
-                current_count = 0
-            end
-
-            current_count = tonumber(current_count)
-
-            if current_count < limit then
-                return {1, limit - current_count, 0}
-            else
-                -- 获取剩余过期时间
-                local ttl = redis.call("TTL", key)
-                return {0, 0, ttl > 0 and ttl or 0}
-            end
-        ';
-
-        $result = $this->redis->eval(
-            $script,
-            [$redisKey, $this->limit],
             1
         );
 

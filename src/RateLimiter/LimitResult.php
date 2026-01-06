@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace GaaraHyperf\LoginRateLimiter;
+namespace GaaraHyperf\RateLimiter;
 
 /**
  * 限流结果

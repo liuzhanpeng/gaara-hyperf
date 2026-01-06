@@ -4,33 +4,32 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\EventListener;
 
-use GaaraHyperf\Event\AuthenticationFailureEvent;
 use GaaraHyperf\Event\AuthenticationSuccessEvent;
 use GaaraHyperf\Event\CheckPassportEvent;
 use GaaraHyperf\Exception\TooManyLoginAttemptsException;
 use GaaraHyperf\IPResolver\IPResolverInterface;
-use GaaraHyperf\LoginRateLimiter\LoginRateLimiterFactory;
-use GaaraHyperf\LoginRateLimiter\LoginRateLimiterInterface;
+use GaaraHyperf\RateLimiter\RateLimiterFactory;
+use GaaraHyperf\RateLimiter\RateLimiterInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * 登录限流监听器
+ * 登录尝试限制监听器
  * 
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
-class LoginRateLimitListener implements EventSubscriberInterface
+class LoginAttemptLimitListener implements EventSubscriberInterface
 {
-    private LoginRateLimiterInterface $loginRateLimiter;
+    private RateLimiterInterface $rateLimiter;
 
     public function __construct(
-        private LoginRateLimiterFactory $loginRateLimiterFactory,
+        private RateLimiterFactory $rateLimiterFactory,
         private IPResolverInterface $ipResolver,
         string $type = 'sliding_window',
         int $limit = 5,
         int $interval = 300,
         string $prefix = 'default'
     ) {
-        $this->loginRateLimiter = $this->loginRateLimiterFactory->create([
+        $this->rateLimiter = $this->rateLimiterFactory->create([
             'type' => $type,
             'options' => [
                 'limit' => $limit,
@@ -45,7 +44,6 @@ class LoginRateLimitListener implements EventSubscriberInterface
         return [
             CheckPassportEvent::class => 'checkPassport',
             AuthenticationSuccessEvent::class => 'onAuthenticationSuccess',
-            AuthenticationFailureEvent::class => 'onAuthenticationFailure',
         ];
     }
 
@@ -61,7 +59,7 @@ class LoginRateLimitListener implements EventSubscriberInterface
         $userIdentifier = $passport->getUserIdentifier();
         $ip = $this->ipResolver->resolve($request);
 
-        $result = $this->loginRateLimiter->check($userIdentifier . $ip);
+        $result = $this->rateLimiter->attempt($userIdentifier . $ip);
         if (!$result->isAccepted() || $result->getRemaining() === 0) {
             throw new TooManyLoginAttemptsException(
                 message: 'Too many login attempts. Please try again later.',
@@ -78,16 +76,9 @@ class LoginRateLimitListener implements EventSubscriberInterface
         }
 
         $token = $event->getToken();
-        $this->loginRateLimiter->reset($token->getUserIdentifier() . $this->ipResolver->resolve($event->getRequest()));
-    }
+        $userIdentifier = $token->getUserIdentifier();
+        $ip = $this->ipResolver->resolve($event->getRequest());
 
-    public function onAuthenticationFailure(AuthenticationFailureEvent $event): void
-    {
-        if (!$event->getAuthenticator()->isInteractive()) {
-            return;
-        }
-
-        $exception = $event->getException();
-        $this->loginRateLimiter->attempt($exception->getUserIdentifier() . $this->ipResolver->resolve($event->getRequest()));
+        $this->rateLimiter->reset($userIdentifier . $ip);
     }
 }
