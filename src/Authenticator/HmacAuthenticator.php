@@ -76,8 +76,8 @@ class HmacAuthenticator extends AbstractAuthenticator
 
         $now = time();
         $ts = (int) $timestamp;
-        $skew = (int) $this->options['skew'];
-        if ($ts < ($now - $this->options['ttl']) || $ts > ($now + $skew)) {
+        $leeway = (int) $this->options['leeway'];
+        if ($ts < ($now - $this->options['ttl']) || $ts > ($now + $leeway)) {
             throw new SignatureExpiredException(
                 message: 'Request timestamp is invalid or expired',
                 timestamp: $ts,

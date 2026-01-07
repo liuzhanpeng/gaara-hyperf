@@ -24,7 +24,7 @@ class HmacAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             'nonce_param' => 'X-NONCE',
             'nonce_cache_prefix' => 'default',
             'ttl' => 60,
-            'skew' => 300,
+            'leeway' => 300,
             'algo' => 'sha256',
             'secret_encrypto_enabled' => false,
         ], $options);
