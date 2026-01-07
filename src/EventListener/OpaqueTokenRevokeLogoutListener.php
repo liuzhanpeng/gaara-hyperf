@@ -34,7 +34,7 @@ class OpaqueTokenRevokeLogoutListener implements EventSubscriberInterface
             return;
         }
 
-        $accessToken = $this->accessTokenExtractor->extractAccessToken($event->getRequest());
+        $accessToken = $this->accessTokenExtractor->extract($event->getRequest());
         if (is_null($accessToken)) {
             return;
         }

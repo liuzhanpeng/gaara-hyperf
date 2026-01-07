@@ -19,7 +19,7 @@ describe('CookieAccessTokenExtractor', function () {
                 'access_token' => 'valid_token_123',
             ]);
 
-        $token = $this->extractor->extractAccessToken($this->request);
+        $token = $this->extractor->extract($this->request);
         expect($token)->toBe('valid_token_123');
     });
 
@@ -27,7 +27,7 @@ describe('CookieAccessTokenExtractor', function () {
         $this->request->shouldReceive('getCookieParams')
             ->andReturn([]);
 
-        $token = $this->extractor->extractAccessToken($this->request);
+        $token = $this->extractor->extract($this->request);
         expect($token)->toBeNull();
     });
 
@@ -37,7 +37,7 @@ describe('CookieAccessTokenExtractor', function () {
                 'access_token' => 'invalid token!',
             ]);
 
-        $token = $this->extractor->extractAccessToken($this->request);
+        $token = $this->extractor->extract($this->request);
         expect($token)->toBeNull();
     });
 });

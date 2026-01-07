@@ -18,7 +18,7 @@ describe('HeaderAccessTokenExtractor', function () {
             ->with('Authorization')
             ->andReturn(true);
 
-        $token = $this->extractor->extractAccessToken($this->request);
+        $token = $this->extractor->extract($this->request);
         expect($token)->toBe('valid_token_123');
     });
 
@@ -30,7 +30,7 @@ describe('HeaderAccessTokenExtractor', function () {
             ->with('Authorization')
             ->andReturn(false);
 
-        $token = $this->extractor->extractAccessToken($this->request);
+        $token = $this->extractor->extract($this->request);
         expect($token)->toBeNull();
     });
 
@@ -43,7 +43,7 @@ describe('HeaderAccessTokenExtractor', function () {
             ->with('Authorization')
             ->andReturn(true);
 
-        $token = $this->extractor->extractAccessToken($this->request);
+        $token = $this->extractor->extract($this->request);
         expect($token)->toBeNull();
     });
 
@@ -57,7 +57,7 @@ describe('HeaderAccessTokenExtractor', function () {
             ->with('X-Access-Token')
             ->andReturn(true);
 
-        $token = $this->extractor->extractAccessToken($this->request);
+        $token = $this->extractor->extract($this->request);
         expect($token)->toBe('simple_token_456');
     });
 });

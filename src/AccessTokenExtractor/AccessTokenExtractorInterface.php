@@ -19,5 +19,5 @@ interface AccessTokenExtractorInterface
      * @param ServerRequestInterface $request
      * @return string|null
      */
-    public function extractAccessToken(ServerRequestInterface $request): ?string;
+    public function extract(ServerRequestInterface $request): ?string;
 }

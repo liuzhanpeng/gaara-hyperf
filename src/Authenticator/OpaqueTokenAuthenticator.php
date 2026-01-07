@@ -41,7 +41,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
      */
     public function supports(ServerRequestInterface $request): bool
     {
-        return $this->accessTokenExtractor->extractAccessToken($request) !== null;
+        return $this->accessTokenExtractor->extract($request) !== null;
     }
 
     /**
@@ -49,7 +49,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
      */
     public function authenticate(ServerRequestInterface $request): Passport
     {
-        $accessToken = $this->accessTokenExtractor->extractAccessToken($request);
+        $accessToken = $this->accessTokenExtractor->extract($request);
         if (is_null($accessToken)) {
             throw new InvalidCredentialsException('Access token is missing');
         }

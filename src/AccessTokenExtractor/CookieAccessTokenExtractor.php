@@ -23,7 +23,7 @@ class CookieAccessTokenExtractor implements AccessTokenExtractorInterface
     /**
      * @inheritDoc
      */
-    public function extractAccessToken(ServerRequestInterface $request): ?string
+    public function extract(ServerRequestInterface $request): ?string
     {
         $cookies = $request->getCookieParams();
 

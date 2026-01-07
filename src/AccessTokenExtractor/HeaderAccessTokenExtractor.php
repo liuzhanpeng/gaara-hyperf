@@ -25,7 +25,7 @@ class HeaderAccessTokenExtractor implements AccessTokenExtractorInterface
     /**
      * @inheritDoc
      */
-    public function extractAccessToken(ServerRequestInterface $request): ?string
+    public function extract(ServerRequestInterface $request): ?string
     {
         if (!$request->hasHeader($this->paramName) || !\is_string($header = $request->getHeaderLine($this->paramName))) {
             return null;
