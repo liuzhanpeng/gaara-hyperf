@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Token;
 
-use GaaraHyperf\User\UserInterface;
-
 /**
  * 抽象令牌
  * 

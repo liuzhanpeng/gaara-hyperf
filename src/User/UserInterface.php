@@ -17,11 +17,4 @@ interface UserInterface
      * @return string
      */
     public function getIdentifier(): string;
-
-    /**
-     * 清除令牌中的敏感信息
-     *
-     * @return void
-     */
-    public function eraseCredentials(): void;
 }
