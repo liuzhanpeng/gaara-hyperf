@@ -54,7 +54,7 @@ return [
                 //         'class' => OpaqueTokenResponseHandler::class,
                 //         'params' => [
                 //             'token_manager' => 'default',
-                //             'response_template' => '{ "code": 0, "msg": "success", "data": { "access_token": "#ACCESS_TOKEN#"} }',
+                //             'response_template' => '{"access_token": "#ACCESS_TOKEN#"}',
                 //         ],
                 //     ],
                 //     'failure_handler' => CustomFailureHandler::class // 可选，登录失败处理器配置; 如果不配置，默认返回 200 状态码和错误消息的 JSON 响应：{error: "error_message"}

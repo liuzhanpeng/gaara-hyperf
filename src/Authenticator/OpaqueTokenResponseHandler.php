@@ -28,18 +28,13 @@ class OpaqueTokenResponseHandler implements AuthenticationSuccessHandlerInterfac
     {
         $accessToken = $this->opaqueTokenManagerResolver->resolve($this->tokenManager)->issue($token);
 
-        if (!is_null($this->responseTemplate)) {
-            if (!is_string($this->responseTemplate) || !is_array(json_decode($this->responseTemplate, true))) {
-                throw new \InvalidArgumentException('Response template must be a valid JSON string');
-            }
-
-            $responseData = json_decode(str_replace('#ACCESS_TOKEN#', (string)$accessToken, $this->responseTemplate), true);
-
-            return $this->response->json($responseData);
+        $template = $this->responseTemplate ?? '{"access_token": "#ACCESS_TOKEN#"}';
+        if (!is_string($template) || !is_array(json_decode($template, true))) {
+            throw new \InvalidArgumentException('Response template must be a valid JSON string');
         }
 
-        return $this->response->json([
-            'access_token' => $accessToken,
-        ]);
+        $responseData = json_decode(str_replace('#ACCESS_TOKEN#', (string)$accessToken, $template), true);
+
+        return $this->response->json($responseData);
     }
 }
