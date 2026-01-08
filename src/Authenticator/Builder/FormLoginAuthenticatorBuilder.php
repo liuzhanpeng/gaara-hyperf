@@ -25,7 +25,7 @@ class FormLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             throw new \InvalidArgumentException('The "check_path" option must be set.');
         }
 
-        $options = array_merge([
+        $options = array_replace_recursive([
             'target_path' => '/',
             'failure_path' => '/login',
             'redirect_enabled' => true,

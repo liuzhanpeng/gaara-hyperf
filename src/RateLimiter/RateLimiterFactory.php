@@ -26,7 +26,7 @@ class RateLimiterFactory
 
         switch ($type) {
             case 'sliding_window':
-                $options = array_merge([
+                $options = array_replace_recursive([
                     'limit' => 5,
                     'interval' => 300,
                     'prefix' => 'default',
@@ -39,7 +39,7 @@ class RateLimiterFactory
                     prefix: sprintf('%s:login_rate_limiter:sliding_window:%s', Constants::__PREFIX, $options['prefix'] ?? 'default'),
                 );
             case 'token_bucket':
-                $options = array_merge([
+                $options = array_replace_recursive([
                     'limit' => 10,
                     'rate' => 1.0,
                     'prefix' => 'default',
@@ -51,7 +51,7 @@ class RateLimiterFactory
                     prefix: sprintf('%s:login_rate_limiter:token_bucket:%s', Constants::__PREFIX, $options['prefix'] ?? 'default'),
                 );
             case 'fixed_window':
-                $options = array_merge([
+                $options = array_replace_recursive([
                     'limit' => 5,
                     'interval' => 300,
                     'prefix' => 'default',

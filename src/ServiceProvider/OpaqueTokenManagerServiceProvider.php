@@ -22,7 +22,7 @@ class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
     {
         $config = $container->get(ConfigLoaderInterface::class)->load();
 
-        $opaqueTokenManagerConfig = array_merge([
+        $opaqueTokenManagerConfig = array_replace_recursive([
             'default' => [
                 'type' => 'default',
                 'prefix' => 'default',

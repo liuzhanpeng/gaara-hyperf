@@ -37,11 +37,6 @@ class MemoryUser implements UserInterface, PasswordAwareUserInterface, \Serializ
         return $this->password;
     }
 
-    public function eraseCredentials(): void
-    {
-        $this->password = '';
-    }
-
     public function __serialize(): array
     {
         return [$this->username, $this->password];

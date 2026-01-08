@@ -26,7 +26,7 @@ class RedirectUnauthenticatedHandler implements UnauthenticatedHandlerInterface
             throw new \InvalidArgumentException('target_path is required');
         }
 
-        $this->options = array_merge([
+        $this->options = array_replace_recursive([
             'redirect_enabled' => true,
             'redirect_param' => 'redirect_to',
             'authentication_error_param' => 'authentication_error',

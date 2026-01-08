@@ -22,7 +22,7 @@ class PasswordHasherServiceProvider implements ServiceProviderInterface
     {
         $config = $container->get(ConfigLoaderInterface::class)->load();
 
-        $passwordHasherConfig = array_merge([
+        $passwordHasherConfig = array_replace_recursive([
             'default' => [
                 'type' => 'default',
                 'algo' => PASSWORD_DEFAULT,

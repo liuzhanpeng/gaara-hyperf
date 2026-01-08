@@ -18,7 +18,7 @@ class APIKeyAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
-        $options = array_merge([
+        $options = array_replace_recursive([
             'api_key_param' => 'X-API-KEY',
         ], $options);
 

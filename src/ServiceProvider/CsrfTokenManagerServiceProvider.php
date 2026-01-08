@@ -22,7 +22,7 @@ class CsrfTokenManagerServiceProvider implements ServiceProviderInterface
     {
         $config = $container->get(ConfigLoaderInterface::class)->load();
 
-        $csrfTokenManagerConfig = array_merge([
+        $csrfTokenManagerConfig = array_replace_recursive([
             'default' => [
                 'type' => 'session',
                 'prefix' => 'default',

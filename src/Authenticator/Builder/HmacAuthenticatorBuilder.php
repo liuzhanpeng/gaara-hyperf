@@ -16,7 +16,7 @@ class HmacAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
-        $options = array_merge([
+        $options = array_replace_recursive([
             'api_key_param' => 'X-API-KEY',
             'signature_param' => 'X-SIGNATURE',
             'timestamp_param' => 'X-TIMESTAMP',
