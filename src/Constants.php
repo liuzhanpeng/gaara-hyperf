@@ -11,7 +11,7 @@ namespace GaaraHyperf;
  */
 final class Constants
 {
-    public const __PREFIX = '__auth';
+    public const __PREFIX = 'gaara_auth';
 
     public const TOKEN_CONTEXT_PREFIX = self::__PREFIX . '.token_context';
 
