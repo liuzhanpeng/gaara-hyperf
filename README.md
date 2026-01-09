@@ -13,7 +13,7 @@ An authentication library for hyperf
 - [x] Hmac Signature Authentication
 - [x] X.509 Client Certificates Authentication
 - [ ] Magic Link Authentication
-- [ ] JWT Authentication (with BlackList)
+- [x] JWT Authentication
 - [ ] OAuth 2.0/OpenID Connect
 - [ ] WebAuthn Authentication
 - [ ] 2FA
