@@ -33,6 +33,10 @@ class AccessTokenExtractorFactory
                 return $this->container->make(CookieAccessTokenExtractor::class, [
                     'paramName' => $config['param_name'] ?? 'access_token',
                 ]);
+            case 'body':
+                return $this->container->make(BodyAccessTokenExtractor::class, [
+                    'paramName' => $config['param_name'] ?? 'access_token',
+                ]);
             case 'custom':
                 $customConfig = CustomConfig::from($config);
 
