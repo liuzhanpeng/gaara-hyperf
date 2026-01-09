@@ -66,12 +66,12 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
         }
 
         if ($this->singleSession) {
-            $preAccessToken = $this->cache->get($this->getUserTokenKey($token->getUserIdentifier()));
+            $preAccessToken = $this->cache->get($this->getUserKey($token->getUserIdentifier()));
             if (!is_null($preAccessToken)) {
                 $this->cache->delete($this->getAccessTokenKey($preAccessToken));
             }
 
-            $this->cache->set($this->getUserTokenKey($token->getUserIdentifier()), $accessToken, $this->maxLifetime);
+            $this->cache->set($this->getUserKey($token->getUserIdentifier()), $accessToken, $this->maxLifetime);
         }
 
         $this->cache->set($this->getAccessTokenKey($accessToken), $data, $this->expiresIn);
@@ -116,7 +116,7 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
         if ($this->singleSession) {
             $data = $this->cache->get($this->getAccessTokenKey($accessToken));
             if (!is_null($data)) {
-                $this->cache->delete($this->getUserTokenKey($data['token']->getUserIdentifier()));
+                $this->cache->delete($this->getUserKey($data['token']->getUserIdentifier()));
             }
         }
 
@@ -135,12 +135,12 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
     }
 
     /**
-     * 返回用户Token键
+     * 返回用户键
      *
      * @param string $identifier
      * @return string
      */
-    private function getUserTokenKey(string $identifier): string
+    private function getUserKey(string $identifier): string
     {
         return sprintf('%s:user:%s', $this->prefix, $identifier);
     }
