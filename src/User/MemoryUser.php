@@ -4,8 +4,19 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\User;
 
+/**
+ * 基于内存的用户
+ * 
+ * 用于测试或简单场景
+ * 
+ * @author lzpeng <liuzhanpeng@gmail.com>
+ */
 class MemoryUser implements UserInterface, PasswordAwareUserInterface, \Serializable
 {
+    /**
+     * @param string $username
+     * @param string $password
+     */
     public function __construct(
         private string $username,
         private string $password,
@@ -37,11 +48,19 @@ class MemoryUser implements UserInterface, PasswordAwareUserInterface, \Serializ
         return $this->password;
     }
 
+    /**
+     * @return array
+     */
     public function __serialize(): array
     {
         return [$this->username, $this->password];
     }
 
+    /**
+     *
+     * @param array $data
+     * @return void
+     */
     public function __unserialize(array $data): void
     {
         [$this->username, $this->password] = $data;

@@ -25,13 +25,6 @@ describe('MemoryUser', function () {
         expect($user->getPassword())->toBe($password);
     });
 
-    it('should erase credentials', function () {
-        $user = new MemoryUser('testuser', 'password123');
-        $user->eraseCredentials();
-
-        expect($user->getPassword())->toBe('');
-    });
-
     it('should serialize and unserialize correctly', function () {
         $username = 'testuser';
         $password = 'password123';

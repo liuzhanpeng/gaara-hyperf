@@ -26,16 +26,16 @@ class AccessTokenExtractorFactory
         switch ($type) {
             case 'header':
                 return $this->container->make(HeaderAccessTokenExtractor::class, [
-                    'paramName' => $config['param_name'] ?? 'Authorization',
-                    'paramType' => $config['param_type'] ?? 'Bearer',
+                    'field' => $config['field'] ?? 'Authorization',
+                    'scheme' => $config['scheme'] ?? 'Bearer',
                 ]);
             case 'cookie':
                 return $this->container->make(CookieAccessTokenExtractor::class, [
-                    'paramName' => $config['param_name'] ?? 'access_token',
+                    'field' => $config['field'] ?? 'access_token',
                 ]);
             case 'body':
                 return $this->container->make(BodyAccessTokenExtractor::class, [
-                    'paramName' => $config['param_name'] ?? 'access_token',
+                    'field' => $config['field'] ?? 'access_token',
                 ]);
             case 'custom':
                 $customConfig = CustomConfig::from($config);

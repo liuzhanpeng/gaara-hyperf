@@ -49,9 +49,9 @@ class HmacAuthenticator extends AbstractAuthenticator
      */
     public function supports(ServerRequestInterface $request): bool
     {
-        return !empty($request->getHeaderLine($this->options['api_key_param']))
-            && !empty($request->getHeaderLine($this->options['signature_param']))
-            && !empty($request->getHeaderLine($this->options['timestamp_param']));
+        return !empty($request->getHeaderLine($this->options['api_key_field']))
+            && !empty($request->getHeaderLine($this->options['signature_field']))
+            && !empty($request->getHeaderLine($this->options['timestamp_field']));
     }
 
     /**
@@ -59,10 +59,10 @@ class HmacAuthenticator extends AbstractAuthenticator
      */
     public function authenticate(ServerRequestInterface $request): Passport
     {
-        $apiKey = $request->getHeaderLine($this->options['api_key_param']);
-        $signature = $request->getHeaderLine($this->options['signature_param']);
-        $timestamp = $request->getHeaderLine($this->options['timestamp_param']);
-        $nonce = $request->getHeaderLine($this->options['nonce_param']);
+        $apiKey = $request->getHeaderLine($this->options['api_key_field']);
+        $signature = $request->getHeaderLine($this->options['signature_field']);
+        $timestamp = $request->getHeaderLine($this->options['timestamp_field']);
+        $nonce = $request->getHeaderLine($this->options['nonce_field']);
         if (empty($apiKey) || empty($signature) || empty($timestamp)) {
             throw new InvalidCredentialsException('Missing required authentication headers');
         }

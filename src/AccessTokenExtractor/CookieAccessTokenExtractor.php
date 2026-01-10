@@ -14,10 +14,10 @@ use Psr\Http\Message\ServerRequestInterface;
 class CookieAccessTokenExtractor implements AccessTokenExtractorInterface
 {
     /**
-     * @param string $param Cookie 名称
+     * @param string $field Cookie 名称
      */
     public function __construct(
-        private string $paramName = 'access_token',
+        private string $field,
     ) {}
 
     /**
@@ -26,11 +26,11 @@ class CookieAccessTokenExtractor implements AccessTokenExtractorInterface
     public function extract(ServerRequestInterface $request): ?string
     {
         $cookies = $request->getCookieParams();
-        if (!isset($cookies[$this->paramName])) {
+        if (!isset($cookies[$this->field])) {
             return null;
         }
 
-        $token = $cookies[$this->paramName];
+        $token = $cookies[$this->field];
         if (!\is_string($token) || empty($token)) {
             return null;
         }

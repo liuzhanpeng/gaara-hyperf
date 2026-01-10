@@ -29,13 +29,13 @@ class FormLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             'target_path' => '/',
             'failure_path' => '/login',
             'redirect_enabled' => true,
-            'redirect_param' => 'redirect_to',
-            'username_param' => 'username',
-            'password_param' => 'password',
+            'redirect_field' => 'redirect_to',
+            'username_field' => 'username',
+            'password_field' => 'password',
             'error_message' => '用户名或密码错误',
             'csrf_enabled' => true,
             'csrf_id' => 'authenticate',
-            'csrf_param' => '_csrf_token',
+            'csrf_field' => '_csrf_token',
             'csrf_token_manager' => 'default',
         ], $options);
 

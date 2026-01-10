@@ -37,7 +37,7 @@ class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
 
         $opaqueTokenManagerMap = [];
         foreach ($opaqueTokenManagerConfig as $name => $config) {
-            $opaqueTokenManagerMap[$name] = sprintf('%s.%s', Constants::OPAQUE_TOKEN_MANAGER_PREFIX, $name);
+            $opaqueTokenManagerMap[$name] = sprintf('%s.opaque_token_manager.%s', Constants::__PREFIX, $name);
             $container->define($opaqueTokenManagerMap[$name], fn() => $container->get(OpaqueTokenManagerFactory::class)->create($config));
         }
 

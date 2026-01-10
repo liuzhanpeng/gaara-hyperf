@@ -17,17 +17,10 @@ class Encryptor implements EncryptorInterface
      */
     public function __construct(private string $key, private string $algo = 'AES-256-CBC')
     {
-        $decodedKey = base64_decode($key, true);
-        if ($decodedKey === false) {
-            throw new \InvalidArgumentException('Invalid base64 key provided');
-        }
-
         $expectedKeyLength = $this->getExpectedKeyLength($this->algo);
-        if (strlen($decodedKey) !== $expectedKeyLength) {
+        if (strlen($key) !== $expectedKeyLength) {
             throw new \InvalidArgumentException("Key length must be " . $expectedKeyLength . " bytes");
         }
-
-        $this->key = $decodedKey;
     }
 
     /**

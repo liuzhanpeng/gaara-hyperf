@@ -17,11 +17,11 @@ class HmacAuthenticatorBuilder extends AbstractAuthenticatorBuilder
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
         $options = array_replace_recursive([
-            'api_key_param' => 'X-API-KEY',
-            'signature_param' => 'X-SIGNATURE',
-            'timestamp_param' => 'X-TIMESTAMP',
+            'api_key_field' => 'X-API-KEY',
+            'signature_field' => 'X-SIGNATURE',
+            'timestamp_field' => 'X-TIMESTAMP',
             'nonce_enabled' => true,
-            'nonce_param' => 'X-NONCE',
+            'nonce_field' => 'X-NONCE',
             'nonce_cache_prefix' => 'default',
             'ttl' => 60,
             'leeway' => 300,

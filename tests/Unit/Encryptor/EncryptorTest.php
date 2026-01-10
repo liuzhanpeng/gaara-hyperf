@@ -5,7 +5,7 @@ declare(strict_types=1);
 describe('Encryptor', function () {
     beforeEach(function () {
         $this->encryptor = new GaaraHyperf\Encryptor\Encryptor(
-            base64_encode('my_secret_key_123456789012345678'), // 32 bytes key for AES-256
+            'my_secret_key_123456789012345678', // 32 bytes key for AES-256
             'aes-256-cbc'
         );
     });

@@ -30,21 +30,15 @@ class OpaqueTokenManagerFactory
 
         switch ($type) {
             case 'default':
-                $expiresIn = $config['expires_in'] ?? 60 * 20;
-                $maxLifetime = $config['max_lifetime'] ?? 60 * 60 * 24;
-                if ($expiresIn > $maxLifetime) {
-                    throw new \InvalidArgumentException('The expires_in option must be less than or equal to max_lifetime option.');
-                }
-
                 return $this->container->make(OpaqueTokenManager::class, [
                     'prefix' => sprintf('%s:opaque_token:%s', Constants::__PREFIX, $config['prefix'] ?? 'default'),
-                    'expiresIn' => $expiresIn,
-                    'maxLifetime' => $maxLifetime,
+                    'expiresIn' => $config['expires_in'] ?? 60 * 20,
+                    'maxLifetime' => $config['max_lifetime'] ?? 60 * 60 * 24,
                     'tokenRefresh' => $config['token_refresh'] ?? true,
                     'singleSession' => $config['single_session'] ?? true,
                     'ipBindEnabled' => $config['ip_bind_enabled'] ?? false,
                     'userAgentBindEnabled' => $config['user_agent_bind_enabled'] ?? false,
-                    'accessTokenLength' => $config['access_token_length'] ?? 16,
+                    'accessTokenLength' => $config['access_token_length'] ?? 64,
                 ]);
             case 'custom':
                 $customConfig = CustomConfig::from($config);

@@ -14,12 +14,12 @@ use Psr\Http\Message\ServerRequestInterface;
 class HeaderAccessTokenExtractor implements AccessTokenExtractorInterface
 {
     /**
-     * @param string $param
-     * @param string $type
+     * @param string $field
+     * @param string $scheme
      */
     public function __construct(
-        private string $paramName = 'Authorization',
-        private string $paramType = 'Bearer',
+        private string $field,
+        private string $scheme,
     ) {}
 
     /**
@@ -27,14 +27,14 @@ class HeaderAccessTokenExtractor implements AccessTokenExtractorInterface
      */
     public function extract(ServerRequestInterface $request): ?string
     {
-        if (!$request->hasHeader($this->paramName) || !\is_string($header = $request->getHeaderLine($this->paramName))) {
+        if (!$request->hasHeader($this->field) || !\is_string($header = $request->getHeaderLine($this->field))) {
             return null;
         }
 
 
         $regex = \sprintf(
             '/^%s([a-zA-Z0-9\-_\+~\/\.]+=*)$/',
-            '' === $this->paramType ? '' : preg_quote($this->paramType) . '\s+'
+            '' === $this->scheme ? '' : preg_quote($this->scheme) . '\s+'
         );
 
         if (preg_match($regex, $header, $matches)) {

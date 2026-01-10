@@ -14,10 +14,10 @@ use Psr\Http\Message\ServerRequestInterface;
 class BodyAccessTokenExtractor implements AccessTokenExtractorInterface
 {
     /**
-     * @param string $param Body 参数名称
+     * @param string $field Body 参数名称
      */
     public function __construct(
-        private string $paramName = 'access_token',
+        private string $field,
     ) {}
 
     /**
@@ -26,11 +26,11 @@ class BodyAccessTokenExtractor implements AccessTokenExtractorInterface
     public function extract(ServerRequestInterface $request): ?string
     {
         $parsedBody = $request->getParsedBody();
-        if (!is_array($parsedBody) || !isset($parsedBody[$this->paramName])) {
+        if (!is_array($parsedBody) || !isset($parsedBody[$this->field])) {
             return null;
         }
 
-        $token = $parsedBody[$this->paramName];
+        $token = $parsedBody[$this->field];
         if (!\is_string($token) || empty($token)) {
             return null;
         }

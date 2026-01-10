@@ -23,8 +23,8 @@ class JsonLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
         }
 
         $options = array_replace_recursive([
-            'username_param' => 'username',
-            'password_param' => 'password',
+            'username_field' => 'username',
+            'password_field' => 'password',
             'error_message' => '用户名或密码错误',
         ], $options);
 

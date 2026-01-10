@@ -19,12 +19,12 @@ class APIKeyAuthenticatorBuilder extends AbstractAuthenticatorBuilder
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
         $options = array_replace_recursive([
-            'api_key_param' => 'X-API-KEY',
+            'api_key_field' => 'X-API-KEY',
         ], $options);
 
         return new APIKeyAuthenticator(
+            apiKeyField: $options['api_key_field'],
             userProvider: $userProvider,
-            options: $options,
             successHandler: $this->createSuccessHandler($options),
             failureHandler: $this->createFailureHandler($options),
         );

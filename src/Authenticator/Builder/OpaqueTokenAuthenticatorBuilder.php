@@ -25,8 +25,8 @@ class OpaqueTokenAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             'token_manager' => 'default',
             'token_extractor' => [
                 'type' => 'header',
-                'param_name' => 'Authorization',
-                'param_type' => 'Bearer',
+                'field' => 'Authorization',
+                'scheme' => 'Bearer',
             ],
         ], $options);
 

@@ -42,14 +42,22 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
         private bool $ipBindEnabled,
         private bool $userAgentBindEnabled,
         private int $accessTokenLength
-    ) {}
+    ) {
+        if ($this->accessTokenLength < 16) {
+            throw new \InvalidArgumentException('Access token length must be at least 16 characters.');
+        }
+
+        if ($expiresIn > $maxLifetime) {
+            throw new \InvalidArgumentException('The expires_in option must be less than or equal to max_lifetime option.');
+        }
+    }
 
     /**
      * @inheritDoc
      */
     public function issue(TokenInterface $token): string
     {
-        $accessToken = bin2hex(random_bytes($this->accessTokenLength));
+        $accessToken = bin2hex(random_bytes($this->accessTokenLength / 2));
         $time = time();
         $data = [
             'token' => $token,

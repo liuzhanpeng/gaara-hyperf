@@ -65,7 +65,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
         if ($this->options['csrf_enabled'] && empty($credientials['csrf_token'])) {
             throw new InvalidCsrfTokenException(
                 message: 'CSRF token is missing',
-                userIdentifier: $this->options['username_param'],
+                userIdentifier: $this->options['username_field'],
             );
         }
 
@@ -99,7 +99,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
             return $this->successHandler->handle($guardName, $request, $token, $passport);
         }
 
-        $redirectTo = $request->getParsedBody()[$this->options['redirect_param']] ?? null;
+        $redirectTo = $request->getParsedBody()[$this->options['redirect_field']] ?? null;
         if ($this->options['redirect_enabled'] && !is_null($redirectTo)) {
             return $this->response->redirect(urldecode($redirectTo));
         }
@@ -147,7 +147,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
     private function getCredentials(ServerRequestInterface $request): array
     {
         $credientials = [];
-        $username = $request->getParsedBody()[$this->options['username_param']] ?? '';
+        $username = $request->getParsedBody()[$this->options['username_field']] ?? '';
         if (!is_string($username) || empty($username)) {
             throw new UserNotFoundException(
                 message: 'Username is missing',
@@ -156,7 +156,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
         }
         $credientials['username'] = trim($username);
 
-        $password = $request->getParsedBody()[$this->options['password_param']] ?? '';
+        $password = $request->getParsedBody()[$this->options['password_field']] ?? '';
         if (!is_string($password) || empty($password)) {
             throw new InvalidPasswordException(
                 message: 'Password is missing',
@@ -165,7 +165,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
         }
         $credientials['password'] = trim($password);
 
-        $credientials['csrf_token'] = $request->getParsedBody()[$this->options['csrf_param']] ?? '';
+        $credientials['csrf_token'] = $request->getParsedBody()[$this->options['csrf_field']] ?? '';
 
         return $credientials;
     }

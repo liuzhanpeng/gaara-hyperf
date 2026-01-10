@@ -23,17 +23,34 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
 {
     /**
      * @param UserProviderInterface $userProvider
-     * @param array $options
      * @param AuthenticationSuccessHandlerInterface|null $successHandler
      * @param AuthenticationFailureHandlerInterface|null $failureHandler
      */
     public function __construct(
+        private string $checkPath,
+        private string $usernameField,
+        private string $passwordField,
+        private string|\Closure $errorMessage,
         private UserProviderInterface $userProvider,
-        private array $options,
         ?AuthenticationSuccessHandlerInterface $successHandler,
         ?AuthenticationFailureHandlerInterface $failureHandler,
     ) {
         parent::__construct($successHandler, $failureHandler);
+        if (empty($this->checkPath)) {
+            throw new \InvalidArgumentException('The "check_path" option must not be empty.');
+        }
+
+        if (empty($this->usernameField)) {
+            throw new \InvalidArgumentException('The "username_field" option must not be empty.');
+        }
+
+        if (empty($this->passwordField)) {
+            throw new \InvalidArgumentException('The "password_field" option must not be empty.');
+        }
+
+        if (empty($this->errorMessage)) {
+            throw new \InvalidArgumentException('The "error_message" option must not be empty.');
+        }
     }
 
     /**
@@ -44,7 +61,7 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
         $contentType = strtolower($request->getHeaderLine('Content-Type'));
 
         return str_starts_with($contentType, 'application/json')
-            && $request->getUri()->getPath() === $this->options['check_path']
+            && $request->getUri()->getPath() === $this->checkPath
             && $request->getMethod() === 'POST';
     }
 
@@ -76,11 +93,11 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
             return $this->failureHandler->handle($guardName, $request, $exception, $passport);
         }
 
-        if (is_callable($this->options['error_message'])) {
-            $msg = ($this->options['error_message'])($exception);
+        if (is_callable($this->errorMessage)) {
+            $msg = ($this->errorMessage)($exception);
         } else {
             if ($exception instanceof InvalidCredentialsException) {
-                $msg = $this->options['error_message'];
+                $msg = $this->errorMessage;
             } else {
                 $msg = $exception->getMessage();
             }
@@ -111,7 +128,7 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
     private function getCredentials(ServerRequestInterface $request): array
     {
         $credientials = [];
-        $username = $request->getParsedBody()[$this->options['username_param']] ?? '';
+        $username = $request->getParsedBody()[$this->usernameField] ?? '';
         if (!is_string($username) || empty($username)) {
             throw new UserNotFoundException(
                 message: 'Username is missing',
@@ -120,7 +137,7 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
         }
         $credientials['username'] = trim($username);
 
-        $password = $request->getParsedBody()[$this->options['password_param']] ?? '';
+        $password = $request->getParsedBody()[$this->passwordField] ?? '';
         if (!is_string($password) || empty($password)) {
             throw new InvalidPasswordException(
                 message: 'Password is missing',

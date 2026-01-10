@@ -20,7 +20,15 @@ class ModelUserProvider implements UserProviderInterface
     public function __construct(
         private string $class,
         private string $identifier
-    ) {}
+    ) {
+        if (empty($this->class) || !class_exists($this->class)) {
+            throw new \InvalidArgumentException("The model class '{$this->class}' does not exist.");
+        }
+
+        if (empty($this->identifier)) {
+            throw new \InvalidArgumentException("The identifier field name cannot be empty.");
+        }
+    }
 
     /**
      * @inheritDoc

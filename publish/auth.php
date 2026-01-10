@@ -27,13 +27,13 @@ return [
                 //      'target_path' => '/admin/dashboard', // 可选; 登录成功跳转路径
                 //      'failure_path' => '/admin/login', // 可选;登录失败跳转路径
                 //      'redirect_enabled' => true, // 可选;是否启用登录成功后的重定向
-                //      'redirect_param' => 'redirect_to', // 可选;重定向目标路径参数名
-                //      'username_param' => 'username', // 可选;用户名参数名
-                //      'password_param' => 'password', // 可选;密码参数名
+                //      'redirect_field' => 'redirect_to', // 可选;重定向目标路径参数名
+                //      'username_field' => 'username', // 可选;用户名参数名
+                //      'password_field' => 'password', // 可选;密码参数名
                 //      'error_message' => '用户名或密码错误', // 可选;登录失败错误消息; 支持字符串或回调函数; 回调函数参数为 AuthenticationException 实例
                 //      'csrf_enabled' => true, // 可选;是否启用CSRF保护
                 //      'csrf_id' => 'authenticate', // 可选;CSRF令牌ID
-                //      'csrf_param' => '_csrf_token', // 可选;CSRF令牌参数名
+                //      'csrf_field' => '_csrf_token', // 可选;CSRF令牌参数名
                 //      'csrf_token_manager' => 'default', // 可选;CSRF令牌管理器服务名称
                 //      'success_handler' => [ // 可选，登录成功处理器配置; 没有参数时可以直接配置类名字符串
                 //          'class' => CustomSuccessHandler::class,
@@ -47,8 +47,8 @@ return [
                 //  ],
                 // 'json_login' => [ // 内置JSON登录认证器
                 //     'check_path' => '/admin/check_login', // JSON登录请求路径
-                //     'username_param' => 'username', // 用户名字段名
-                //     'password_param' => 'password', // 密码字段名
+                //     'username_field' => 'username', // 用户名字段名
+                //     'password_field' => 'password', // 密码字段名
                 //     'error_message' => '用户名或密码错误', // 可选;登录失败错误消息; 支持字符串或回调函数; 回调函数参数为 AuthenticationException 实例
                 //     'success_handler' => [ // 可选，登录成功处理器配置; 无状态认证时一般都需要配置, 用于生成access token返回给客户端
                 //         'class' => OpaqueTokenResponseHandler::class,
@@ -63,21 +63,21 @@ return [
                 //     'token_manager' => 'default', // 可选；不透明令牌管理器服务名称; 默认default
                 //     'token_extractor' => [
                 //         'type' => 'header', // 支持 header, cookie, custom; 默认header
-                //         'param_name' => 'Authorization', // type == header时可选，默认Authorization; type == cookie时可选，默认access_token
-                //         'param_type' => 'Bearer', // type == header时可选，默认Bearer
+                //         'field' => 'Authorization', // type == header时可选，默认Authorization; type == cookie时可选，默认access_token
+                //         'scheme' => 'Bearer', // type == header时可选，默认Bearer
                 //     ],
                 //     'success_handler' => CustomSuccessHandler::class // 可选，认证成功处理器配置
                 //     'failure_handler' => CustomFailureHandler::class // 可选，认证失败处理器配置
                 // ],
                 // 'api_key' => [ // API-Key认证器
-                //     'api_key_param' => 'X-API-KEY', // 请求头中的api key参数名; 默认X-API-KEY; 
+                //     'api_key_field' => 'X-API-KEY', // 请求头中的api key参数名; 默认X-API-KEY; 
                 // ],
                 // 'hmac' => [ // HMAC签名认证器
-                //     'api_key_param' => 'X-API-KEY', // 请求头中的api key参数名; 默认X-API-KEY; 
-                //     'signature_param' => 'X-SIGNATURE', // 请求头中的签名参数名
-                //     'timestamp_param' => 'X-TIMESTAMP', // 请求头中的时间戳参数名
+                //     'api_key_field' => 'X-API-KEY', // 请求头中的api key参数名; 默认X-API-KEY; 
+                //     'signature_field' => 'X-SIGNATURE', // 请求头中的签名参数名
+                //     'timestamp_field' => 'X-TIMESTAMP', // 请求头中的时间戳参数名
                 //     'nonce_enabled' => true, // 是否启用随机字符串; 防止重放攻击
-                //     'nonce_param' => 'X-NONCE', // nonce_enabled==true必须; 请求头中的随机字符串参数名 
+                //     'nonce_field' => 'X-NONCE', // nonce_enabled==true必须; 请求头中的随机字符串参数名 
                 //     'nonce_cache_prefix' => 'default', // nonce_enabled==true必须; 缓存前缀
                 //     'ttl' => 60, // 请求签名的有效期，单位秒
                 //     'leeway' => 300, // 允许的时间戳偏差，单位秒，默认300秒
@@ -90,7 +90,7 @@ return [
                 //     ]
                 // ],
                 // 'x509' => [ // X509证书认证器
-                //     'ssl_client_s_dn_param' => 'SSL_CLIENT_S_DN', // 存放客户端证书主题信息的服务器参数名
+                //     'ssl_client_s_dn_field' => 'SSL_CLIENT_S_DN', // 存放客户端证书主题信息的服务器参数名
                 //     'identifier_field' => 'cn', // 用户标识field; 支持: cn, email; 根据实际情况设置
                 // ],
                 // 'custom' => [ // 可设置多个自定义认证器；只要实现相关接口就可以了
@@ -110,9 +110,9 @@ return [
             //     'type' => 'default', // 支持 default, redirect, custom; 默认default
             //     'target_path' => '/login', // type == redirect时必填，重定向目标路径
             //     'redirect_enabled' => true, // type == redirect时可选，是否启用重定向，默认true
-            //     'redirect_param' => 'redirect_to' // type == redirect时可选，重定向目标路径参数名，默认redirect_to
-            //     'authentication_error_param' => 'authentication_error', // type == redirect时可选，存放认证错误消息的session键名，默认authentication_error
-            //     'authentication_error_message' => '未认证或已登出，请重新登录', // type == redirect时可选，认证错误消息，默认'未认证或已登出
+            //     'redirect_field' => 'redirect_to' // type == redirect时可选，重定向目标路径参数名，默认redirect_to
+            //     'error_field' => 'authentication_error', // type == redirect时可选，存放认证错误消息的session键名，默认authentication_error
+            //     'error_message' => '未认证或已登出，请重新登录', // type == redirect时可选，认证错误消息，默认'未认证或已登出
             //     'class' => CustomUnauthenticatedHandler::class, // type == custom时必填，自定义未认证处理器类名
             // ],
 

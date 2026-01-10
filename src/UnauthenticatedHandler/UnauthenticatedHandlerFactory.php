@@ -32,7 +32,11 @@ class UnauthenticatedHandlerFactory
                 return new DefaultUnauthenticatedHandler();
             case 'redirect':
                 return $this->container->make(RedirectUnauthenticatedHandler::class, [
-                    'options' => $options
+                    'targetPath' => $options['target_path'] ?? '',
+                    'redirectEnabled' => $options['redirect_enabled'] ?? true,
+                    'redirectField' => $options['redirect_field'] ?? 'redirect_to',
+                    'errorField' => $options['error_field'] ?? 'authentication_error',
+                    'errorMessage' => $options['error_message'] ?? '未认证或已登出，请重新登录',
                 ]);
             case 'custom':
                 $customConfig = CustomConfig::from($options);

@@ -24,6 +24,6 @@ class MemoryUserProviderBuilder implements UserProviderBuilderInterface
             throw new \InvalidArgumentException('The "users" option must be configured for the memory user provider');
         }
 
-        return new MemoryUserProvider($options['users']);
+        return new MemoryUserProvider($options['users'] ?? []);
     }
 }

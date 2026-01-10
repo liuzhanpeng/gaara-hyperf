@@ -19,18 +19,28 @@ use Psr\Http\Message\ServerRequestInterface;
 class X509Authenticator extends AbstractAuthenticator
 {
     /**
+     * @param string $sslClientSDNField
+     * @param string $identifierField
      * @param UserProviderInterface $userProvider
-     * @param array $options
      * @param AuthenticationSuccessHandlerInterface|null $successHandler
      * @param AuthenticationFailureHandlerInterface|null $failureHandler
      */
     public function __construct(
+        private string $sslClientSDNField,
+        private string $identifierField,
         private UserProviderInterface $userProvider,
-        private array $options,
         ?AuthenticationSuccessHandlerInterface $successHandler,
         ?AuthenticationFailureHandlerInterface $failureHandler,
     ) {
         parent::__construct($successHandler, $failureHandler);
+
+        if (empty($this->sslClientSDNField)) {
+            throw new \InvalidArgumentException('ssl_client_s_dn_field cannot be empty');
+        }
+
+        if (empty($this->identifierField)) {
+            throw new \InvalidArgumentException('identifier_field cannot be empty');
+        }
     }
 
     /**
@@ -100,9 +110,9 @@ class X509Authenticator extends AbstractAuthenticator
     {
         $identifier = null;
         // 提取SSL_CLIENT_S_DN中，指定identifier_field的值
-        $sslClientSDN = $request->getHeaderLine($this->options['ssl_client_s_dn_param']);
+        $sslClientSDN = $request->getHeaderLine($this->sslClientSDNField);
         if (!empty($sslClientSDN)) {
-            $identifierField = $this->options['identifier_field'];
+            $identifierField = $this->identifierField;
 
             // 兼容 email -> emailAddress
             if (strtolower($identifierField) === 'email') {

@@ -20,18 +20,22 @@ use Psr\Http\Message\ResponseInterface;
 class APIKeyAuthenticator extends AbstractAuthenticator
 {
     /**
+     * @param string $apiKeyField
      * @param UserProviderInterface $userProvider
-     * @param array $options
      * @param AuthenticationSuccessHandlerInterface|null $successHandler
      * @param AuthenticationFailureHandlerInterface|null $failureHandler
      */
     public function __construct(
+        private string $apiKeyField,
         private UserProviderInterface $userProvider,
-        private array $options,
         ?AuthenticationSuccessHandlerInterface $successHandler,
         ?AuthenticationFailureHandlerInterface $failureHandler,
     ) {
         parent::__construct($successHandler, $failureHandler);
+
+        if (empty($this->apiKeyField)) {
+            throw new \InvalidArgumentException('apiKeyField cannot be empty');
+        }
     }
 
     /**
@@ -39,7 +43,7 @@ class APIKeyAuthenticator extends AbstractAuthenticator
      */
     public function supports(ServerRequestInterface $request): bool
     {
-        return !empty($request->getHeaderLine($this->options['api_key_param']));
+        return !empty($request->getHeaderLine($this->apiKeyField));
     }
 
     /**
@@ -47,7 +51,7 @@ class APIKeyAuthenticator extends AbstractAuthenticator
      */
     public function authenticate(ServerRequestInterface $request): Passport
     {
-        $apiKey = $request->getHeaderLine($this->options['api_key_param']);
+        $apiKey = $request->getHeaderLine($this->apiKeyField);
         if (empty($apiKey)) {
             throw new InvalidCredentialsException('API key is missing');
         }
