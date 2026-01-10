@@ -32,8 +32,8 @@ class OpaqueTokenManagerFactory
             case 'default':
                 return $this->container->make(OpaqueTokenManager::class, [
                     'prefix' => sprintf('%s:opaque_token:%s', Constants::__PREFIX, $config['prefix'] ?? 'default'),
-                    'expiresIn' => $config['expires_in'] ?? 60 * 20,
-                    'maxLifetime' => $config['max_lifetime'] ?? 60 * 60 * 24,
+                    'ttl' => $config['ttl'] ?? 60 * 20,
+                    'maxTtl' => $config['max_ttl'] ?? 60 * 60 * 24,
                     'tokenRefresh' => $config['token_refresh'] ?? true,
                     'singleSession' => $config['single_session'] ?? true,
                     'ipBindEnabled' => $config['ip_bind_enabled'] ?? false,

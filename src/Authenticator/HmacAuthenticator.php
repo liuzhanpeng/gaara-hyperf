@@ -26,17 +26,33 @@ use Psr\SimpleCache\CacheInterface;
 class HmacAuthenticator extends AbstractAuthenticator
 {
     /**
+     * @param string $apiKeyField
+     * @param string $signatureField
+     * @param string $timestampField
+     * @param bool $nonceEnabled
+     * @param string $nonceField
+     * @param string $nonceCachePrefix
+     * @param integer $ttl
+     * @param integer $leeway
+     * @param string $algo
      * @param UserProviderInterface $userProvider
      * @param CacheInterface $cache
      * @param EncryptorInterface|null $encryptor
-     * @param array $options
      * @param AuthenticationSuccessHandlerInterface|null $successHandler
      * @param AuthenticationFailureHandlerInterface|null $failureHandler
      */
     public function __construct(
+        private string $apiKeyField,
+        private string $signatureField,
+        private string $timestampField,
+        private bool $nonceEnabled,
+        private string $nonceField,
+        private string $nonceCachePrefix,
+        private int $ttl,
+        private int $leeway,
+        private string $algo,
         private UserProviderInterface $userProvider,
         private CacheInterface $cache,
-        private array $options,
         private ?EncryptorInterface $encryptor,
         ?AuthenticationSuccessHandlerInterface $successHandler,
         ?AuthenticationFailureHandlerInterface $failureHandler,
@@ -49,9 +65,9 @@ class HmacAuthenticator extends AbstractAuthenticator
      */
     public function supports(ServerRequestInterface $request): bool
     {
-        return !empty($request->getHeaderLine($this->options['api_key_field']))
-            && !empty($request->getHeaderLine($this->options['signature_field']))
-            && !empty($request->getHeaderLine($this->options['timestamp_field']));
+        return !empty($request->getHeaderLine($this->apiKeyField))
+            && !empty($request->getHeaderLine($this->signatureField))
+            && !empty($request->getHeaderLine($this->timestampField));
     }
 
     /**
@@ -59,15 +75,15 @@ class HmacAuthenticator extends AbstractAuthenticator
      */
     public function authenticate(ServerRequestInterface $request): Passport
     {
-        $apiKey = $request->getHeaderLine($this->options['api_key_field']);
-        $signature = $request->getHeaderLine($this->options['signature_field']);
-        $timestamp = $request->getHeaderLine($this->options['timestamp_field']);
-        $nonce = $request->getHeaderLine($this->options['nonce_field']);
+        $apiKey = $request->getHeaderLine($this->apiKeyField);
+        $signature = $request->getHeaderLine($this->signatureField);
+        $timestamp = $request->getHeaderLine($this->timestampField);
+        $nonce = $request->getHeaderLine($this->nonceField);
         if (empty($apiKey) || empty($signature) || empty($timestamp)) {
             throw new InvalidCredentialsException('Missing required authentication headers');
         }
 
-        if ($this->options['nonce_enabled'] && empty($nonce)) {
+        if ($this->nonceEnabled && empty($nonce)) {
             throw new InvalidCredentialsException(
                 message: 'Missing required nonce header',
                 userIdentifier: $apiKey,
@@ -76,8 +92,8 @@ class HmacAuthenticator extends AbstractAuthenticator
 
         $now = time();
         $ts = (int) $timestamp;
-        $leeway = (int) $this->options['leeway'];
-        if ($ts < ($now - $this->options['ttl']) || $ts > ($now + $leeway)) {
+        $leeway = (int) $this->leeway;
+        if ($ts < ($now - $this->ttl) || $ts > ($now + $leeway)) {
             throw new SignatureExpiredException(
                 message: 'Request timestamp is invalid or expired',
                 timestamp: $ts,
@@ -87,8 +103,8 @@ class HmacAuthenticator extends AbstractAuthenticator
         }
 
         // 防止重放攻击
-        if ($this->options['nonce_enabled']) {
-            $cacheKey = sprintf('%s:%s', $this->options['nonce_cache_prefix'], md5($apiKey . $nonce));
+        if ($this->nonceEnabled) {
+            $cacheKey = sprintf('%s:%s', $this->nonceCachePrefix, md5($apiKey . $nonce));
             if ($this->cache->has($cacheKey)) {
                 throw new UsedNonceException(
                     message: 'Nonce has already been used',
@@ -97,7 +113,7 @@ class HmacAuthenticator extends AbstractAuthenticator
                 );
             }
 
-            $this->cache->set($cacheKey, true, $this->options['ttl']);
+            $this->cache->set($cacheKey, true, $this->ttl);
         }
 
         $user = $this->userProvider->findByIdentifier($apiKey);
@@ -136,7 +152,7 @@ class HmacAuthenticator extends AbstractAuthenticator
             $apiKey,
             $timestamp,
         ];
-        if ($this->options['nonce_enabled']) {
+        if ($this->nonceEnabled) {
             $parts[] = $nonce;
         }
         $parts[] = $bodyDigest;
@@ -148,7 +164,7 @@ class HmacAuthenticator extends AbstractAuthenticator
         }
 
         // 验签
-        $computedSignature = hash_hmac($this->options['algo'], $signStr, $secret);
+        $computedSignature = hash_hmac($this->algo, $signStr, $secret);
         if (!hash_equals($computedSignature, $signature)) {
             throw new InvalidSignatureException(
                 message: 'Invalid request signature',

@@ -21,18 +21,13 @@ class OpaqueTokenAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
-        $options = array_replace_recursive([
-            'token_manager' => 'default',
-            'token_extractor' => [
-                'type' => 'header',
-                'field' => 'Authorization',
-                'scheme' => 'Bearer',
-            ],
-        ], $options);
-
-        $opaqueTokenManager = $this->container->get(OpaqueTokenManagerResolverInterface::class)->resolve($options['token_manager']);
+        $opaqueTokenManager = $this->container->get(OpaqueTokenManagerResolverInterface::class)->resolve($options['token_manager'] ?? 'default');
         $accessTokenExtractorFactory = $this->container->get(AccessTokenExtractorFactory::class);
-        $accessTokenExtractor = $accessTokenExtractorFactory->create($options['token_extractor']);
+        $accessTokenExtractor = $accessTokenExtractorFactory->create($options['token_extractor'] ?? [
+            'type' => 'header',
+            'field' => 'Authorization',
+            'scheme' => 'Bearer',
+        ]);
         $eventDispatcher->addSubscriber(new OpaqueTokenRevokeLogoutListener($opaqueTokenManager, $accessTokenExtractor));
 
         return new OpaqueTokenAuthenticator(

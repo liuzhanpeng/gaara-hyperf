@@ -28,22 +28,45 @@ use Psr\Http\Message\ResponseInterface;
 class FormLoginAuthenticator extends AbstractAuthenticator
 {
     /**
+     * @param string $checkPath
+     * @param string $usernameField
+     * @param string $passwordField
+     * @param bool $csrfEnabled
+     * @param string $csrfField
+     * @param string $csrfId
+     * @param bool $redirectEnabled
+     * @param string $redirectField
+     * @param string $targetPath
+     * @param string $failurePath
+     * @param string|callable $errorMessage
      * @param UserProviderInterface $userProvider
      * @param \Hyperf\HttpServer\Contract\ResponseInterface $response
      * @param SessionInterface $session
-     * @param array $options
      * @param AuthenticationSuccessHandlerInterface|null $successHandler
      * @param AuthenticationFailureHandlerInterface|null $failureHandler
      */
     public function __construct(
+        private string $checkPath,
+        private string $targetPath,
+        private string $failurePath,
+        private string $usernameField,
+        private string $passwordField,
+        private bool $redirectEnabled,
+        private string $redirectField,
+        private bool $csrfEnabled,
+        private string $csrfField,
+        private string $csrfId,
+        private string|\Closure $errorMessage,
         private UserProviderInterface $userProvider,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
         private SessionInterface $session,
-        private array $options,
         ?AuthenticationSuccessHandlerInterface $successHandler,
         ?AuthenticationFailureHandlerInterface $failureHandler,
     ) {
         parent::__construct($successHandler, $failureHandler);
+        if (empty($this->checkPath)) {
+            throw new \InvalidArgumentException('The "check_path" option must be set.');
+        }
     }
 
     /**
@@ -51,7 +74,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
      */
     public function supports(ServerRequestInterface $request): bool
     {
-        return $request->getUri()->getPath() === $this->options['check_path']
+        return $request->getUri()->getPath() === $this->checkPath
             && $request->getMethod() === 'POST';
     }
 
@@ -62,10 +85,10 @@ class FormLoginAuthenticator extends AbstractAuthenticator
     {
         $credientials = $this->getCredentials($request);
 
-        if ($this->options['csrf_enabled'] && empty($credientials['csrf_token'])) {
+        if ($this->csrfEnabled && empty($credientials['csrf_token'])) {
             throw new InvalidCsrfTokenException(
                 message: 'CSRF token is missing',
-                userIdentifier: $this->options['username_field'],
+                userIdentifier: $this->usernameField,
             );
         }
 
@@ -77,9 +100,9 @@ class FormLoginAuthenticator extends AbstractAuthenticator
             ]
         );
 
-        if ($this->options['csrf_enabled']) {
+        if ($this->csrfEnabled) {
             $passport->addBadge(new CsrfTokenBadge(
-                $this->options['csrf_id'],
+                $this->csrfId,
                 $credientials['csrf_token']
             ));
         }
@@ -99,12 +122,12 @@ class FormLoginAuthenticator extends AbstractAuthenticator
             return $this->successHandler->handle($guardName, $request, $token, $passport);
         }
 
-        $redirectTo = $request->getParsedBody()[$this->options['redirect_field']] ?? null;
-        if ($this->options['redirect_enabled'] && !is_null($redirectTo)) {
+        $redirectTo = $request->getParsedBody()[$this->redirectField] ?? null;
+        if ($this->redirectEnabled && !is_null($redirectTo)) {
             return $this->response->redirect(urldecode($redirectTo));
         }
 
-        return $this->response->redirect($this->options['target_path']);
+        return $this->response->redirect($this->targetPath);
     }
 
     /**
@@ -118,16 +141,16 @@ class FormLoginAuthenticator extends AbstractAuthenticator
         }
 
         if ($this->session instanceof Session) {
-            if (is_callable($this->options['error_message'])) {
-                $msg = ($this->options['error_message'])($exception);
+            if (is_callable($this->errorMessage)) {
+                $msg = ($this->errorMessage)($exception);
             } else {
-                $msg = $this->options['error_message'];
+                $msg = $this->errorMessage;
             }
 
             $this->session->flash('authentication_error', $msg);
         }
 
-        return $this->response->redirect($this->options['failure_path']);
+        return $this->response->redirect($this->failurePath);
     }
 
     /**
@@ -147,7 +170,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
     private function getCredentials(ServerRequestInterface $request): array
     {
         $credientials = [];
-        $username = $request->getParsedBody()[$this->options['username_field']] ?? '';
+        $username = $request->getParsedBody()[$this->usernameField] ?? '';
         if (!is_string($username) || empty($username)) {
             throw new UserNotFoundException(
                 message: 'Username is missing',
@@ -156,7 +179,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
         }
         $credientials['username'] = trim($username);
 
-        $password = $request->getParsedBody()[$this->options['password_field']] ?? '';
+        $password = $request->getParsedBody()[$this->passwordField] ?? '';
         if (!is_string($password) || empty($password)) {
             throw new InvalidPasswordException(
                 message: 'Password is missing',
@@ -165,7 +188,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
         }
         $credientials['password'] = trim($password);
 
-        $credientials['csrf_token'] = $request->getParsedBody()[$this->options['csrf_field']] ?? '';
+        $credientials['csrf_token'] = $request->getParsedBody()[$this->csrfField] ?? '';
 
         return $credientials;
     }

@@ -183,8 +183,8 @@ return [
         //     'default' => [ // 不透明令牌管理器名称; 可按实际情况为每个Guard配置不同的管理器
         //         'type' => 'default', // 支持 default, custom; 默认default
         //         'prefix' => 'admin', // 存储前缀; 默认default; 多个管理器时必须配置不同的前缀
-        //         'expires_in' => 60 * 20, // token过期时间，单位秒; 必须小于等于 max_lifetime; 默认1200秒
-        //         'max_lifetime' => 60 * 60 * 24, // token最大生命周期，单位秒; 默认86400秒
+        //         'ttl' => 60 * 20, // token过期时间，单位秒; 必须小于等于 max_lifetime; 默认1200秒
+        //         'max_ttl' => 60 * 60 * 24, // token最大生命周期，单位秒; 默认86400秒
         //         'token_refresh' => true, // 是否启用token刷新机制; 默认true
         //         'ip_bind_enabled' => false, // 是否启用IP绑定; 默认false
         //         'user_agent_bind_enabled' => false, // 是否启用User-Agent绑定; 默认false

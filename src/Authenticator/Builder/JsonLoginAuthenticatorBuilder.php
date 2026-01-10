@@ -22,15 +22,12 @@ class JsonLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             throw new \InvalidArgumentException('The "check_path" option must be set.');
         }
 
-        $options = array_replace_recursive([
-            'username_field' => 'username',
-            'password_field' => 'password',
-            'error_message' => '用户名或密码错误',
-        ], $options);
-
         return new JsonLoginAuthenticator(
+            checkPath: $options['check_path'],
+            usernameField: $options['username_field'] ?? 'username',
+            passwordField: $options['password_field'] ?? 'password',
+            errorMessage: $options['error_message'] ?? '用户名或密码错误',
             userProvider: $userProvider,
-            options: $options,
             successHandler: $this->createSuccessHandler($options),
             failureHandler: $this->createFailureHandler($options),
         );

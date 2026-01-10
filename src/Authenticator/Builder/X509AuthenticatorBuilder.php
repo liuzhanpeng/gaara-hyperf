@@ -18,14 +18,9 @@ class X509AuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
-        $options = array_replace_recursive([
-            'ssl_client_s_dn_field' => 'SSL_CLIENT_S_DN',
-            'identifier_field' => 'email',
-        ], $options);
-
         return new X509Authenticator(
-            sslClientSDNField: $options['ssl_client_s_dn_field'],
-            identifierField: $options['identifier_field'],
+            sslClientSDNField: $options['ssl_client_s_dn_field'] ?? 'SSL_CLIENT_S_DN',
+            identifierField: $options['identifier_field'] ?? 'email',
             userProvider: $userProvider,
             successHandler: $this->createSuccessHandler($options, $eventDispatcher),
             failureHandler: $this->createFailureHandler($options, $eventDispatcher),

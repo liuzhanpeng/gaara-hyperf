@@ -23,8 +23,8 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
      * @param RequestInterface $request
      * @param IPResolverInterface $ipResolver
      * @param string $prefix
-     * @param integer $expiresIn
-     * @param integer $maxLifetime
+     * @param integer $ttl
+     * @param integer $maxTtl
      * @param boolean $tokenRefresh
      * @param boolean $singleSession
      * @param boolean $ipBindEnabled
@@ -35,8 +35,8 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
         private RequestInterface $request,
         private IPResolverInterface $ipResolver,
         private string $prefix,
-        private int $expiresIn,
-        private int $maxLifetime,
+        private int $ttl,
+        private int $maxTtl,
         private bool $tokenRefresh,
         private bool $singleSession,
         private bool $ipBindEnabled,
@@ -47,8 +47,8 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
             throw new \InvalidArgumentException('Access token length must be at least 16 characters.');
         }
 
-        if ($expiresIn > $maxLifetime) {
-            throw new \InvalidArgumentException('The expires_in option must be less than or equal to max_lifetime option.');
+        if ($this->ttl > $this->maxTtl) {
+            throw new \InvalidArgumentException('The ttl option must be less than or equal to max_ttl option.');
         }
     }
 
@@ -62,7 +62,7 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
         $data = [
             'token' => $token,
             'issued_at' => $time,
-            'expires_at' => $time + $this->maxLifetime,
+            'expires_at' => $time + $this->maxTtl,
         ];
 
         if ($this->ipBindEnabled) {
@@ -79,10 +79,10 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
                 $this->cache->delete($this->getAccessTokenKey($preAccessToken));
             }
 
-            $this->cache->set($this->getUserKey($token->getUserIdentifier()), $accessToken, $this->maxLifetime);
+            $this->cache->set($this->getUserKey($token->getUserIdentifier()), $accessToken, $this->maxTtl);
         }
 
-        $this->cache->set($this->getAccessTokenKey($accessToken), $data, $this->expiresIn);
+        $this->cache->set($this->getAccessTokenKey($accessToken), $data, $this->ttl);
 
         return $accessToken;
     }
@@ -110,7 +110,7 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
         }
 
         if ($this->tokenRefresh) {
-            $this->cache->set($this->getAccessTokenKey($accessToken), $data, $this->expiresIn);
+            $this->cache->set($this->getAccessTokenKey($accessToken), $data, $this->ttl);
         }
 
         return $data['token'];

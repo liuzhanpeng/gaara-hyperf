@@ -22,6 +22,10 @@ use Psr\Http\Message\ResponseInterface;
 class JsonLoginAuthenticator extends AbstractAuthenticator
 {
     /**
+     * @param string $checkPath
+     * @param string $usernameField
+     * @param string $passwordField
+     * @param string|\Closure $errorMessage
      * @param UserProviderInterface $userProvider
      * @param AuthenticationSuccessHandlerInterface|null $successHandler
      * @param AuthenticationFailureHandlerInterface|null $failureHandler

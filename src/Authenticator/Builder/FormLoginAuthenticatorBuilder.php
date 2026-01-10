@@ -25,30 +25,26 @@ class FormLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             throw new \InvalidArgumentException('The "check_path" option must be set.');
         }
 
-        $options = array_replace_recursive([
-            'target_path' => '/',
-            'failure_path' => '/login',
-            'redirect_enabled' => true,
-            'redirect_field' => 'redirect_to',
-            'username_field' => 'username',
-            'password_field' => 'password',
-            'error_message' => '用户名或密码错误',
-            'csrf_enabled' => true,
-            'csrf_id' => 'authenticate',
-            'csrf_field' => '_csrf_token',
-            'csrf_token_manager' => 'default',
-        ], $options);
-
-        if ($options['csrf_enabled']) {
-            $csrfTokenManager = $this->container->get(CsrfTokenManagerResolverInterface::class)->resolve($options['csrf_token_manager']);
+        if (isset($options['csrf_enabled']) && $options['csrf_enabled']) {
+            $csrfTokenManager = $this->container->get(CsrfTokenManagerResolverInterface::class)->resolve($options['csrf_token_manager'] ?? 'default');
             $eventDispatcher->addSubscriber(new CsrfTokenBadgeCheckListener($csrfTokenManager));
         }
 
         return new FormLoginAuthenticator(
+            checkPath: $options['check_path'],
+            targetPath: $options['target_path'] ?? '/',
+            failurePath: $options['failure_path'] ?? '/',
+            usernameField: $options['username_field'] ?? 'username',
+            passwordField: $options['password_field'] ?? 'password',
+            redirectEnabled: $options['redirect_enabled'] ?? true,
+            redirectField: $options['redirect_field'] ?? 'redirect_to',
+            csrfEnabled: $options['csrf_enabled'] ?? true,
+            csrfField: $options['csrf_field'] ?? '_csrf_token',
+            csrfId: $options['csrf_id'] ?? 'authenticate',
+            errorMessage: $options['error_message'] ?? '用户名或密码错误',
             userProvider: $userProvider,
             response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
             session: $this->container->get(SessionInterface::class),
-            options: $options,
             successHandler: $this->createSuccessHandler($options),
             failureHandler: $this->createFailureHandler($options),
         );

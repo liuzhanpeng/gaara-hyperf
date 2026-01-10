@@ -26,8 +26,8 @@ class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
             'default' => [
                 'type' => 'default',
                 'prefix' => 'default',
-                'expires_in' => 60 * 20,
-                'max_lifetime' => 60 * 60 * 24,
+                'ttl' => 60 * 20,
+                'max_ttl' => 60 * 60 * 24,
                 'token_refresh' => true,
                 'single_session' => true,
                 'ip_bind_enabled' => false,
