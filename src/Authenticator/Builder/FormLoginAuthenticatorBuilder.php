@@ -25,7 +25,9 @@ class FormLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             throw new \InvalidArgumentException('The "check_path" option must be set.');
         }
 
-        if (isset($options['csrf_enabled']) && $options['csrf_enabled']) {
+        $csrfEnabled = $options['csrf_enabled'] ?? true;
+
+        if ($csrfEnabled) {
             $csrfTokenManager = $this->container->get(CsrfTokenManagerResolverInterface::class)->resolve($options['csrf_token_manager'] ?? 'default');
             $eventDispatcher->addSubscriber(new CsrfTokenBadgeCheckListener($csrfTokenManager));
         }
@@ -38,7 +40,7 @@ class FormLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             passwordField: $options['password_field'] ?? 'password',
             redirectEnabled: $options['redirect_enabled'] ?? true,
             redirectField: $options['redirect_field'] ?? 'redirect_to',
-            csrfEnabled: $options['csrf_enabled'] ?? true,
+            csrfEnabled: $csrfEnabled,
             csrfField: $options['csrf_field'] ?? '_csrf_token',
             csrfId: $options['csrf_id'] ?? 'authenticate',
             errorMessage: $options['error_message'] ?? '用户名或密码错误',

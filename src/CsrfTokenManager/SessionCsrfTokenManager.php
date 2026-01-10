@@ -40,9 +40,12 @@ class SessionCsrfTokenManager implements CsrfTokenManagerInterface
      */
     public function verify(CsrfToken $token): bool
     {
-        return $token->getValue() === $this->session->get(
-            $this->getKey($token->getId())
-        );
+        $key = $this->getKey($token->getId());
+        $tokenValue = $this->session->get($key);
+
+        $this->session->remove($key);
+
+        return $token->getValue() === $tokenValue;
     }
 
     /**
