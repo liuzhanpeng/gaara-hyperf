@@ -189,7 +189,7 @@ return [
         //         'ip_bind_enabled' => false, // 是否启用IP绑定; 默认false
         //         'user_agent_bind_enabled' => false, // 是否启用User-Agent绑定; 默认false
         //         'single_session' => true, // 是否启用单会话登录; 默认true
-        //         'access_token_length' => 16, // 生成令牌长度; 默认16
+        //         'access_token_length' => 64, // 生成令牌长度; 默认64
         //     ]
         // ],
     ],
