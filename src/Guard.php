@@ -175,7 +175,7 @@ class Guard implements GuardInterface
     {
         try {
             if ($passport === null) {
-                $passport = $authenticator->authenticate($request, $this->name);
+                $passport = $authenticator->authenticate($request);
             }
 
             $checkPassportEvent = new CheckPassportEvent($this->name, $authenticator, $passport, $request);
