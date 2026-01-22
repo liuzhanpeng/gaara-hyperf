@@ -29,9 +29,9 @@ class OpaqueTokenResponseHandler implements AuthenticationSuccessHandlerInterfac
         $accessToken = $this->opaqueTokenManagerResolver->resolve($this->tokenManager)->issue($token);
 
         $template = str_replace(
-            '#ACCESS_TOKEN#',
-            $accessToken,
-            $this->responseTemplate ?? '{"access_token": "#ACCESS_TOKEN#"}',
+            ['#ACCESS_TOKEN#', '#USER_IDENTIFIER#'],
+            [$accessToken, $token->getUserIdentifier()],
+            $this->responseTemplate ?? '{"user_identifier": "#USER_IDENTIFIER#", "access_token": "#ACCESS_TOKEN#"}',
         );
 
         if (!is_string($template) || !is_array(json_decode($template, true))) {
