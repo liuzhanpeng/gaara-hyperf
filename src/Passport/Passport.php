@@ -29,6 +29,13 @@ class Passport
     private \Closure $userLoader;
 
     /**
+     * 保存上下文信息的属性集合
+     * 
+     * @var array
+     */
+    private array $attributes = [];
+
+    /**
      * @param string $userIdentifier 用户标识
      * @param callable $userLoader 用户加载器
      * @param BadgeInterface[] $badges 认证标识集合
@@ -110,5 +117,39 @@ class Passport
     public function getBadges(): array
     {
         return $this->badges;
+    }
+
+    /**
+     * 设置上下文信息属性
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return void
+     */
+    public function setAttribute(string $name, mixed $value): void
+    {
+        $this->attributes[$name] = $value;
+    }
+
+    /**
+     * 获取上下文信息属性
+     *
+     * @param string $name
+     * @param mixed $default
+     * @return mixed
+     */
+    public function getAttribute(string $name, mixed $default = null): mixed
+    {
+        return $this->attributes[$name] ?? $default;
+    }
+
+    /**
+     * 获取上下文信息属性集合
+     *
+     * @return array
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes;
     }
 }
