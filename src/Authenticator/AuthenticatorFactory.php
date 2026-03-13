@@ -48,16 +48,17 @@ class AuthenticatorFactory
         if (isset($this->builders[$type])) {
             $builder = $this->container->get($this->builders[$type]);
             return $builder->create($options, $userProvider, $eventDispatcher);
-        } elseif ($type === 'custom') {
-            $builder = $this->container->make($type, $options);
-            if (!$builder instanceof AuthenticatorBuilderInterface) {
-                throw new \LogicException(sprintf('Authenticator Builder "%s" must implement AuthenticatorBuilderInterface', $type));
+        } else {
+            if (class_exists($type)) {
+                $builder = $this->container->make($type, $options);
+                if (!$builder instanceof AuthenticatorBuilderInterface) {
+                    throw new \LogicException(sprintf('Authenticator Builder "%s" must implement AuthenticatorBuilderInterface', $type));
+                }
+                return $builder->create($options, $userProvider, $eventDispatcher);
+            } else {
+                throw new \InvalidArgumentException(sprintf("Unsupported authenticator type: %s", $type));
             }
-
-            return $builder->create($options, $userProvider, $eventDispatcher);
         }
-
-        throw new \InvalidArgumentException(sprintf("Unsupported authenticator type: %s", $type));
     }
 
     /**
