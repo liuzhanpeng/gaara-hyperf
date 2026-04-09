@@ -38,6 +38,7 @@ class Passport
         callable $userLoader,
         private array $badges = [],
     ) {
+        $userLoader = \Closure::fromCallable($userLoader);
         $user = ($userLoader)($userIdentifier);
         if (is_null($user)) {
             throw new UserNotFoundException(
