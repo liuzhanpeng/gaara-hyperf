@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * IP白名单检查监听器
- * 
+ *
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class IPWhiteListListener implements EventSubscriberInterface
@@ -22,7 +22,8 @@ class IPWhiteListListener implements EventSubscriberInterface
         private IPResolverInterface $ipResolver,
         private IPWhiteListChecker $whiteListChecker,
         private array|string|IPWhiteListProviderInterface $whiteList = []
-    ) {}
+    ) {
+    }
 
     public static function getSubscribedEvents(): array
     {
@@ -41,7 +42,7 @@ class IPWhiteListListener implements EventSubscriberInterface
         if (!$this->whiteListChecker->isAllowed($ip, $whiteList)) {
             throw new IPNotInWhiteListException(
                 message: 'IP address not in white list',
-                userIdentifier: $passport->getUserIdentifier(),
+                userIdentifier: $passport->getUser()->getIdentifier(),
                 ip: $ip
             );
         }

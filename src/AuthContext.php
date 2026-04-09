@@ -13,7 +13,7 @@ use Psr\Http\Message\ResponseInterface;
 
 /**
  * 认证上下文
- * 
+ *
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class AuthContext
@@ -29,7 +29,8 @@ class AuthContext
         private ServerRequestInterface $request,
         private TokenContextInterface $tokenContext,
         private GuardResolver $guardResolver,
-    ) {}
+    ) {
+    }
 
     /**
      * 登录

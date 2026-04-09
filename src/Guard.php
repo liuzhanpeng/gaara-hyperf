@@ -28,7 +28,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * 认证守卫
- * 
+ *
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class Guard implements GuardInterface
@@ -56,7 +56,8 @@ class Guard implements GuardInterface
         private AuthorizationCheckerInterface $authorizationChecker,
         private AccessDeniedHandlerInterface $accessDeniedHandler,
         private EventDispatcherInterface $eventDispatcher
-    ) {}
+    ) {
+    }
 
     /**
      * 返回认证守卫名称
@@ -100,7 +101,7 @@ class Guard implements GuardInterface
      */
     public function authenticateUser(UserInterface $user, ServerRequestInterface $request, ?string $authenticator = null, array $badges = []): ?ResponseInterface
     {
-        $passport = new Passport($user->getIdentifier(), fn() => $user, $badges);
+        $passport = new Passport($user->getIdentifier(), fn () => $user, $badges);
         $authenticator = $this->resolveAuthenticator($authenticator);
 
         return $this->executeAuthenticator($authenticator, $request, $passport);

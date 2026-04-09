@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * 登录尝试限制监听器
- * 
+ *
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class LoginAttemptLimitListener implements EventSubscriberInterface
@@ -50,7 +50,7 @@ class LoginAttemptLimitListener implements EventSubscriberInterface
         $passport = $event->getPassport();
         $request = $event->getRequest();
 
-        $userIdentifier = $passport->getUserIdentifier();
+        $userIdentifier = $passport->getUser()->getIdentifier();
         $ip = $this->ipResolver->resolve($request);
 
         $result = $this->rateLimiter->attempt($userIdentifier . $ip);

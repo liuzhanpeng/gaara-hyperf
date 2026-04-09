@@ -13,7 +13,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * 抽象认证器
- * 
+ *
  * @author lzpeng <liuzhanpeng@gmail.com>
  */
 abstract class AbstractAuthenticator implements AuthenticatorInterface
@@ -25,7 +25,8 @@ abstract class AbstractAuthenticator implements AuthenticatorInterface
     public function __construct(
         protected ?AuthenticationSuccessHandlerInterface $successHandler,
         protected ?AuthenticationFailureHandlerInterface $failureHandler,
-    ) {}
+    ) {
+    }
 
     /**
      * 创建认证令牌
@@ -36,7 +37,7 @@ abstract class AbstractAuthenticator implements AuthenticatorInterface
      */
     public function createToken(Passport $passport, string $guardName): TokenInterface
     {
-        return new AuthenticatedToken($guardName, $passport->getUserIdentifier());
+        return new AuthenticatedToken($guardName, $passport->getUser()->getIdentifier());
     }
 
     /**
