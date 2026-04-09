@@ -22,6 +22,13 @@ class Passport
     private ?UserInterface $user = null;
 
     /**
+     * 用户加载器
+     *
+     * @var \Closure
+     */
+    private \Closure $userLoader;
+
+    /**
      * 保存上下文信息的属性集合
      *
      * @var array
@@ -34,27 +41,25 @@ class Passport
      * @param BadgeInterface[] $badges 认证标识集合
      */
     public function __construct(
-        string $userIdentifier,
+        private string $userIdentifier,
         callable $userLoader,
         private array $badges = [],
     ) {
-        $userLoader = \Closure::fromCallable($userLoader);
-        $user = ($userLoader)($userIdentifier);
-        if (is_null($user)) {
-            throw new UserNotFoundException(
-                message: 'User not found',
-                userIdentifier: $userIdentifier
-            );
-        }
-
-        if (!$user instanceof UserInterface) {
-            throw new \LogicException(sprintf('The user provider must return a UserInterface object, %s given', get_debug_type($user)));
-        }
-
-        $this->user = $user;
+        $this->userLoader = \Closure::fromCallable($userLoader);
+        $this->getUser();
         foreach ($badges as $badge) {
             $this->addBadge($badge);
         }
+    }
+
+    /**
+     * 返回用户标识
+     *
+     * @return string
+     */
+    public function getUserIdentifier(): string
+    {
+        return $this->userIdentifier;
     }
 
     /**
@@ -64,6 +69,22 @@ class Passport
      */
     public function getUser(): UserInterface
     {
+        if (is_null($this->user)) {
+            $user = ($this->userLoader)($this->userIdentifier);
+            if (is_null($user)) {
+                throw new UserNotFoundException(
+                    message: 'User not found',
+                    userIdentifier: $this->userIdentifier
+                );
+            }
+
+            if (!$user instanceof UserInterface) {
+                throw new \LogicException(sprintf('The user provider must return a UserInterface object, %s given', get_debug_type($user)));
+            }
+
+            $this->user = $user;
+        }
+
         return $this->user;
     }
 
