@@ -115,7 +115,9 @@ class HmacAuthenticator extends AbstractAuthenticator
         ksort($queryParams);
         $queryString = http_build_query($queryParams, '', '&', PHP_QUERY_RFC3986);
 
-        $bodyContent = $request->getBody()->getContents();
+        $body = $request->getBody();
+        $bodyContent = $body->getContents();
+        $body->rewind(); // 归位，让后续正常读取
         $bodyDigest = hash('sha256', $bodyContent);
 
         $path = $request->getUri()->getPath();
