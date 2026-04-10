@@ -5,20 +5,14 @@ declare(strict_types=1);
 namespace GaaraHyperf\IPWhiteListChecker;
 
 /**
- * IP白名单检查器
- * 
+ * IP白名单检查器.
+ *
  * 支持单个IP、P段（CIDR格式）和通配符(*)
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class IPWhiteListChecker implements IPWhiteListCheckerInterface
 {
     /**
-     * 检查IP是否在白名单中
-     *
-     * @param string $ip
-     * @param array $whiteList
-     * @return boolean
+     * 检查IP是否在白名单中.
      */
     public function isAllowed(string $ip, array $whiteList): bool
     {
@@ -36,11 +30,7 @@ class IPWhiteListChecker implements IPWhiteListCheckerInterface
     }
 
     /**
-     * 检查IP是否匹配规则
-     *
-     * @param string $ip
-     * @param string $rule
-     * @return boolean
+     * 检查IP是否匹配规则.
      */
     private function matchesRule(string $ip, string $rule): bool
     {
@@ -60,17 +50,13 @@ class IPWhiteListChecker implements IPWhiteListCheckerInterface
     }
 
     /**
-     * 检查IP是否在CIDR范围内
-     *
-     * @param string $ip
-     * @param string $cidr
-     * @return boolean
+     * 检查IP是否在CIDR范围内.
      */
     private function matchesCidr(string $ip, string $cidr): bool
     {
         [$network, $mask] = explode('/', $cidr, 2);
 
-        if (!filter_var($ip, FILTER_VALIDATE_IP) || !filter_var($network, FILTER_VALIDATE_IP)) {
+        if (! filter_var($ip, FILTER_VALIDATE_IP) || ! filter_var($network, FILTER_VALIDATE_IP)) {
             return false;
         }
 
@@ -87,12 +73,7 @@ class IPWhiteListChecker implements IPWhiteListCheckerInterface
     }
 
     /**
-     * IPv4 CIDR 检查
-     *
-     * @param string $ip
-     * @param string $network
-     * @param integer $mask
-     * @return boolean
+     * IPv4 CIDR 检查.
      */
     private function matchesIpv4Cidr(string $ip, string $network, int $mask): bool
     {
@@ -109,12 +90,7 @@ class IPWhiteListChecker implements IPWhiteListCheckerInterface
     }
 
     /**
-     * IPv6 CIDR 检查
-     *
-     * @param string $ip
-     * @param string $network
-     * @param integer $mask
-     * @return boolean
+     * IPv6 CIDR 检查.
      */
     private function matchesIpv6Cidr(string $ip, string $network, int $mask): bool
     {
@@ -145,11 +121,7 @@ class IPWhiteListChecker implements IPWhiteListCheckerInterface
     }
 
     /**
-     * 通配符匹配检查
-     *
-     * @param string $ip
-     * @param string $pattern
-     * @return boolean
+     * 通配符匹配检查.
      */
     private function matchesWildcard(string $ip, string $pattern): bool
     {

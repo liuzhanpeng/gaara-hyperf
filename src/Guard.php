@@ -7,7 +7,6 @@ namespace GaaraHyperf;
 use GaaraHyperf\Authenticator\AuthenticatorInterface;
 use GaaraHyperf\Authorization\AccessDeniedHandlerInterface;
 use GaaraHyperf\Authorization\AuthorizationCheckerInterface;
-use GaaraHyperf\Constants;
 use GaaraHyperf\Event\AuthenticationFailureEvent;
 use GaaraHyperf\Event\AuthenticationSuccessEvent;
 use GaaraHyperf\Event\CheckPassportEvent;
@@ -25,25 +24,15 @@ use GaaraHyperf\UserProvider\UserProviderInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use RuntimeException;
 
 /**
- * 认证守卫
- *
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 认证守卫.
  */
 class Guard implements GuardInterface
 {
     /**
-     * @param string $name
-     * @param RequestMatcherInterface $requestMatcher
-     * @param TokenStorageInterface $tokenStorage
-     * @param TokenContextInterface $tokenContext
-     * @param UserProviderInterface $userProvider
      * @param array<string, AuthenticatorInterface> $authenticators
-     * @param UnauthenticatedHandlerInterface $unauthenticatedHandler
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param AccessDeniedHandlerInterface $accessDeniedHandler
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         private string $name,
@@ -60,9 +49,7 @@ class Guard implements GuardInterface
     }
 
     /**
-     * 返回认证守卫名称
-     *
-     * @return string
+     * 返回认证守卫名称.
      */
     public function name(): string
     {
@@ -70,9 +57,7 @@ class Guard implements GuardInterface
     }
 
     /**
-     * 返回用户提供器
-     *
-     * @return UserProviderInterface
+     * 返回用户提供器.
      */
     public function getUserProvider(): UserProviderInterface
     {
@@ -80,10 +65,7 @@ class Guard implements GuardInterface
     }
 
     /**
-     * 检查请求是否匹配当前守卫
-     *
-     * @param ServerRequestInterface $request
-     * @return boolean
+     * 检查请求是否匹配当前守卫.
      */
     public function supports(ServerRequestInterface $request): bool
     {
@@ -91,13 +73,7 @@ class Guard implements GuardInterface
     }
 
     /**
-     * 认证用户
-     *
-     * @param UserInterface $user
-     * @param ServerRequestInterface $request
-     * @param string|null $authenticator
-     * @param array $badges
-     * @return ResponseInterface|null
+     * 认证用户.
      */
     public function authenticateUser(UserInterface $user, ServerRequestInterface $request, ?string $authenticator = null, array $badges = []): ?ResponseInterface
     {
@@ -108,25 +84,7 @@ class Guard implements GuardInterface
     }
 
     /**
-     * 解析认证器
-     *
-     * @param string|null $authenticator
-     * @return AuthenticatorInterface
-     */
-    private function resolveAuthenticator(?string $authenticator): AuthenticatorInterface
-    {
-        if ($authenticator === null) {
-            return $this->authenticators[0] ?? throw new \RuntimeException('No authenticator configured for guard ' . $this->name);
-        }
-
-        return $this->authenticators[$authenticator] ?? throw new \RuntimeException('Authenticator "' . $authenticator . '" not found for guard ' . $this->name);
-    }
-
-    /**
      * 认证请求
-     *
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface|null
      */
     public function authenticate(ServerRequestInterface $request): ?ResponseInterface
     {
@@ -139,7 +97,7 @@ class Guard implements GuardInterface
         }
 
         foreach ($this->authenticators as $authenticator) {
-            if (!$authenticator->supports($request)) {
+            if (! $authenticator->supports($request)) {
                 continue;
             }
 
@@ -153,7 +111,7 @@ class Guard implements GuardInterface
 
         // 认证器处理认证逻辑后继续放行
         $token = $this->tokenContext->getToken();
-        if ($token === null || !$token instanceof AuthenticatedToken) {
+        if ($token === null || ! $token instanceof AuthenticatedToken) {
             return $this->unauthenticatedHandler->handle($request, $token);
         }
 
@@ -167,12 +125,49 @@ class Guard implements GuardInterface
     }
 
     /**
-     * 执行指定的认证器
-     *
-     * @param AuthenticatorInterface $authenticator
-     * @param ServerRequestInterface $request
-     * @param Passport|null $passport
-     * @return ResponseInterface|null
+     * 检查令牌所属用户是否具有指定的权限.
+     */
+    public function isGranted(TokenInterface $token, array|string $attribute, mixed $subject = null): bool
+    {
+        return $this->authorizationChecker->check($token, $attribute, $subject);
+    }
+
+    /**
+     * 注销
+     */
+    public function logout(?TokenInterface $token = null, ?ServerRequestInterface $request = null): ?ResponseInterface
+    {
+        if ($token === null) {
+            $token = $this->tokenContext->getToken();
+        }
+
+        if ($token === null) {
+            return null;
+        }
+
+        $logoutEvent = new LogoutEvent($token, $request);
+        $this->eventDispatcher->dispatch($logoutEvent);
+
+        $this->tokenStorage->delete($token->getGuardName());
+        $this->tokenContext->setToken(null);
+
+        return $logoutEvent->getResponse();
+    }
+
+    /**
+     * 解析认证器.
+     */
+    private function resolveAuthenticator(?string $authenticator): AuthenticatorInterface
+    {
+        if ($authenticator === null) {
+            return $this->authenticators[0] ?? throw new RuntimeException('No authenticator configured for guard ' . $this->name);
+        }
+
+        return $this->authenticators[$authenticator] ?? throw new RuntimeException('Authenticator "' . $authenticator . '" not found for guard ' . $this->name);
+    }
+
+    /**
+     * 执行指定的认证器.
      */
     private function executeAuthenticator(AuthenticatorInterface $authenticator, ServerRequestInterface $request, ?Passport $passport = null): ?ResponseInterface
     {
@@ -185,7 +180,7 @@ class Guard implements GuardInterface
             $this->eventDispatcher->dispatch($checkPassportEvent);
 
             foreach ($passport->getBadges() as $badge) {
-                if (!$badge->isResolved()) {
+                if (! $badge->isResolved()) {
                     throw new AuthenticationException(
                         message: 'Credential not resolved',
                         userIdentifier: $passport->getUser()->getIdentifier(),
@@ -202,12 +197,7 @@ class Guard implements GuardInterface
     }
 
     /**
-     * 认证成功处理函数
-     *
-     * @param ServerRequestInterface $request
-     * @param AuthenticatorInterface $authenticator
-     * @param TokenInterface $token
-     * @return ResponseInterface|null
+     * 认证成功处理函数.
      */
     private function handleAuthenticationSuccess(ServerRequestInterface $request, AuthenticatorInterface $authenticator, Passport $passport, TokenInterface $token): ?ResponseInterface
     {
@@ -228,76 +218,25 @@ class Guard implements GuardInterface
     }
 
     /**
-     * 认证失败处理函数
-     *
-     * @param ServerRequestInterface $request
-     * @param AuthenticatorInterface $authenticator
-     * @param AuthenticationException $exception
-     * @param Passport|null $passport
-     * @return ResponseInterface|null
+     * 认证失败处理函数.
      */
     private function handleAuthenticationFailure(ServerRequestInterface $request, AuthenticatorInterface $authenticator, ?Passport $passport, AuthenticationException $exception): ?ResponseInterface
     {
         $response = $authenticator->onAuthenticationFailure($this->name, $request, $exception, $passport);
-        $response = $this->eventDispatcher->dispatch(new AuthenticationFailureEvent($this->name, $authenticator, $exception, $passport, $request, $response))->getResponse();
-
-        return $response;
+        return $this->eventDispatcher->dispatch(new AuthenticationFailureEvent($this->name, $authenticator, $exception, $passport, $request, $response))->getResponse();
     }
 
     /**
-     * 授权检查
-     *
-     * @param ServerRequestInterface $request
-     * @param TokenInterface $token
-     * @return ResponseInterface|null
+     * 授权检查.
      */
     private function checkAuthorization(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
     {
         $attribute = $request->getAttribute(Constants::REQUEST_AUTHORIZATION_ATTRIBUTE, '');
         $subject = $request->getAttribute(Constants::REQUEST_AUTHORIZATION_SUBJECT, null);
-        if (!$this->authorizationChecker->check($token, $attribute, $subject)) {
+        if (! $this->authorizationChecker->check($token, $attribute, $subject)) {
             return $this->accessDeniedHandler->handle($request, $token, $attribute, $subject);
         }
 
         return null;
-    }
-
-    /**
-     * 检查令牌所属用户是否具有指定的权限
-     *
-     * @param TokenInterface $token
-     * @param string|array $attribute
-     * @param mixed $subject
-     * @return boolean
-     */
-    public function isGranted(TokenInterface $token, string|array $attribute, mixed $subject = null): bool
-    {
-        return $this->authorizationChecker->check($token, $attribute, $subject);
-    }
-
-    /**
-     * 注销
-     *
-     * @param TokenInterface|null $token
-     * @param ServerRequestInterface|null $request
-     * @return ResponseInterface|null
-     */
-    public function logout(?TokenInterface $token = null, ?ServerRequestInterface $request = null): ?ResponseInterface
-    {
-        if ($token === null) {
-            $token = $this->tokenContext->getToken();
-        }
-
-        if ($token === null) {
-            return null;
-        }
-
-        $logoutEvent = new LogoutEvent($token, $request);
-        $this->eventDispatcher->dispatch($logoutEvent);
-
-        $this->tokenStorage->delete($token->getGuardName());
-        $this->tokenContext->setToken(null);
-
-        return $logoutEvent->getResponse();
     }
 }

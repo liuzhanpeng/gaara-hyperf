@@ -5,23 +5,17 @@ declare(strict_types=1);
 namespace GaaraHyperf\ServiceProvider;
 
 /**
- * 认证服务注册事件
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 认证服务注册事件.
  */
 class ServiceProviderRegisterEvent
 {
-    /**
-     * @param ServiceProviderRegistry $serviceProviderRegistry
-     */
     public function __construct(
         private readonly ServiceProviderRegistry $serviceProviderRegistry,
-    ) {}
+    ) {
+    }
 
     /**
-     * 获取服务提供者注册表
-     *
-     * @return ServiceProviderRegistry
+     * 获取服务提供者注册表.
      */
     public function serviceProviderRegistry(): ServiceProviderRegistry
     {

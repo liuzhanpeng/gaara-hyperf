@@ -4,34 +4,28 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Passport;
 
+use Closure;
 use GaaraHyperf\Exception\UserNotFoundException;
 use GaaraHyperf\User\UserInterface;
+use LogicException;
 
 /**
  * 认证通行证
- *
- * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class Passport
 {
     /**
-     * 用户
-     *
-     * @var UserInterface|null
+     * 用户.
      */
     private ?UserInterface $user = null;
 
     /**
-     * 用户加载器
-     *
-     * @var \Closure
+     * 用户加载器.
      */
-    private \Closure $userLoader;
+    private Closure $userLoader;
 
     /**
-     * 保存上下文信息的属性集合
-     *
-     * @var array
+     * 保存上下文信息的属性集合.
      */
     private array $attributes = [];
 
@@ -45,7 +39,7 @@ class Passport
         callable $userLoader,
         private array $badges = [],
     ) {
-        $this->userLoader = \Closure::fromCallable($userLoader);
+        $this->userLoader = Closure::fromCallable($userLoader);
         $this->getUser();
         foreach ($badges as $badge) {
             $this->addBadge($badge);
@@ -53,9 +47,7 @@ class Passport
     }
 
     /**
-     * 返回用户标识
-     *
-     * @return string
+     * 返回用户标识.
      */
     public function getUserIdentifier(): string
     {
@@ -63,9 +55,7 @@ class Passport
     }
 
     /**
-     * 返回所属用户
-     *
-     * @return UserInterface
+     * 返回所属用户.
      */
     public function getUser(): UserInterface
     {
@@ -78,8 +68,8 @@ class Passport
                 );
             }
 
-            if (!$user instanceof UserInterface) {
-                throw new \LogicException(sprintf('The user provider must return a UserInterface object, %s given', get_debug_type($user)));
+            if (! $user instanceof UserInterface) {
+                throw new LogicException(sprintf('The user provider must return a UserInterface object, %s given', get_debug_type($user)));
             }
 
             $this->user = $user;
@@ -89,10 +79,7 @@ class Passport
     }
 
     /**
-     * 添加认证标识
-     *
-     * @param BadgeInterface $badge
-     * @return void
+     * 添加认证标识.
      */
     public function addBadge(BadgeInterface $badge): void
     {
@@ -100,10 +87,7 @@ class Passport
     }
 
     /**
-     * 返回指定认证标识
-     *
-     * @param string $name
-     * @return BadgeInterface|null
+     * 返回指定认证标识.
      */
     public function getBadge(string $name): ?BadgeInterface
     {
@@ -111,7 +95,7 @@ class Passport
     }
 
     /**
-     * 返回所有认认证标识
+     * 返回所有认认证标识.
      *
      * @return array<string, BadgeInterface>
      */
@@ -121,11 +105,7 @@ class Passport
     }
 
     /**
-     * 设置上下文信息属性
-     *
-     * @param string $name
-     * @param mixed $value
-     * @return void
+     * 设置上下文信息属性.
      */
     public function setAttribute(string $name, mixed $value): void
     {
@@ -133,11 +113,7 @@ class Passport
     }
 
     /**
-     * 获取上下文信息属性
-     *
-     * @param string $name
-     * @param mixed $default
-     * @return mixed
+     * 获取上下文信息属性.
      */
     public function getAttribute(string $name, mixed $default = null): mixed
     {
@@ -145,9 +121,7 @@ class Passport
     }
 
     /**
-     * 获取上下文信息属性集合
-     *
-     * @return array
+     * 获取上下文信息属性集合.
      */
     public function getAttributes(): array
     {

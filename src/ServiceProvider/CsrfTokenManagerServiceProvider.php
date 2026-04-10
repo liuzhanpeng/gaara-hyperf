@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\ServiceProvider;
 
-use Hyperf\Contract\ContainerInterface;
 use GaaraHyperf\Config\ConfigLoaderInterface;
 use GaaraHyperf\Constants;
 use GaaraHyperf\CsrfTokenManager\CsrfTokenManagerFactory;
 use GaaraHyperf\CsrfTokenManager\CsrfTokenManagerResolver;
 use GaaraHyperf\CsrfTokenManager\CsrfTokenManagerResolverInterface;
+use Hyperf\Contract\ContainerInterface;
 
 /**
- * CSRF令牌管理器服务提供者
- *
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * CSRF令牌管理器服务提供者.
  */
 class CsrfTokenManagerServiceProvider implements ServiceProviderInterface
 {
@@ -32,9 +30,9 @@ class CsrfTokenManagerServiceProvider implements ServiceProviderInterface
         $csrfTokenManagerMap = [];
         foreach ($csrfTokenManagerConfig as $name => $config) {
             $csrfTokenManagerMap[$name] = sprintf('%s.csrf_token_manager.%s', Constants::__PREFIX, $name);
-            $container->define($csrfTokenManagerMap[$name], fn() => $container->get(CsrfTokenManagerFactory::class)->create($config));
+            $container->define($csrfTokenManagerMap[$name], fn () => $container->get(CsrfTokenManagerFactory::class)->create($config));
         }
 
-        $container->define(CsrfTokenManagerResolverInterface::class, fn() => new CsrfTokenManagerResolver($csrfTokenManagerMap, $container));
+        $container->define(CsrfTokenManagerResolverInterface::class, fn () => new CsrfTokenManagerResolver($csrfTokenManagerMap, $container));
     }
 }

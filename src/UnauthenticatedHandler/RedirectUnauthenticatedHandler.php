@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\UnauthenticatedHandler;
 
-use Hyperf\Contract\SessionInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Hyperf\Session\Session;
 use GaaraHyperf\Token\TokenInterface;
+use Hyperf\Contract\SessionInterface;
+use Hyperf\Session\Session;
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * 重定向未认证处理器
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 重定向未认证处理器.
  */
 class RedirectUnauthenticatedHandler implements UnauthenticatedHandlerInterface
 {
@@ -27,7 +26,7 @@ class RedirectUnauthenticatedHandler implements UnauthenticatedHandlerInterface
         private string $errorMessage = '未认证或已登出，请重新登录',
     ) {
         if (empty($this->targetPath)) {
-            throw new \InvalidArgumentException('target_path is required');
+            throw new InvalidArgumentException('target_path is required');
         }
     }
 

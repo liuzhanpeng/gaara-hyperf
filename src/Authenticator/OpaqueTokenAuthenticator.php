@@ -6,25 +6,16 @@ namespace GaaraHyperf\Authenticator;
 
 use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorInterface;
 use GaaraHyperf\Exception\UnauthenticatedException;
-use Psr\Http\Message\ServerRequestInterface;
 use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerInterface;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\UserProvider\UserProviderInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * 不透明令牌认证器
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 不透明令牌认证器.
  */
 class OpaqueTokenAuthenticator extends AbstractAuthenticator
 {
-    /**
-     * @param UserProviderInterface $userProvider
-     * @param OpaqueTokenManagerInterface $opaqueTokenManager
-     * @param AccessTokenExtractorInterface $accessTokenExtractor
-     * @param AuthenticationSuccessHandlerInterface|null $successHandler
-     * @param AuthenticationFailureHandlerInterface|null $failureHandler
-     */
     public function __construct(
         private UserProviderInterface $userProvider,
         private OpaqueTokenManagerInterface $opaqueTokenManager,
@@ -35,17 +26,11 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
         parent::__construct($successHandler, $failureHandler);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function supports(ServerRequestInterface $request): bool
     {
         return $this->accessTokenExtractor->extract($request) !== null;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function authenticate(ServerRequestInterface $request): Passport
     {
         $accessToken = $this->accessTokenExtractor->extract($request);
@@ -64,9 +49,6 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
         );
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isInteractive(): bool
     {
         return false;

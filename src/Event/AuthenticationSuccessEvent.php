@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Event;
 
-use Psr\Http\Message\ServerRequestInterface;
 use GaaraHyperf\Authenticator\AuthenticatorInterface;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * 认证成功事件
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 认证成功事件.
  */
 class AuthenticationSuccessEvent
 {
@@ -23,8 +21,8 @@ class AuthenticationSuccessEvent
      * @param TokenInterface $token 认证令牌
      * @param Passport $passport 认证通行证
      * @param ServerRequestInterface $request 请求对象
-     * @param ResponseInterface|null $response 响应对象
-     * @param TokenInterface|null $previousToken 上一个认证令牌
+     * @param null|ResponseInterface $response 响应对象
+     * @param null|TokenInterface $previousToken 上一个认证令牌
      */
     public function __construct(
         private string $guardName,
@@ -34,12 +32,11 @@ class AuthenticationSuccessEvent
         private ServerRequestInterface $request,
         private ?ResponseInterface $response,
         private ?TokenInterface $previousToken
-    ) {}
+    ) {
+    }
 
     /**
-     * 返回认证守卫名称
-     *
-     * @return string
+     * 返回认证守卫名称.
      */
     public function getGuardName(): string
     {
@@ -47,9 +44,7 @@ class AuthenticationSuccessEvent
     }
 
     /**
-     * 返回认证器
-     *
-     * @return AuthenticatorInterface
+     * 返回认证器.
      */
     public function getAuthenticator(): AuthenticatorInterface
     {
@@ -57,9 +52,7 @@ class AuthenticationSuccessEvent
     }
 
     /**
-     * 返回认证令牌
-     * 
-     * @return TokenInterface
+     * 返回认证令牌.
      */
     public function getToken(): TokenInterface
     {
@@ -67,10 +60,7 @@ class AuthenticationSuccessEvent
     }
 
     /**
-     * 设置认证令牌
-     *
-     * @param TokenInterface $token
-     * @return void
+     * 设置认证令牌.
      */
     public function setToken(TokenInterface $token): void
     {
@@ -79,8 +69,6 @@ class AuthenticationSuccessEvent
 
     /**
      * 返回认证通行证
-     *
-     * @return Passport
      */
     public function getPassport(): Passport
     {
@@ -89,8 +77,6 @@ class AuthenticationSuccessEvent
 
     /**
      * 返回请求
-     *
-     * @return ServerRequestInterface
      */
     public function getRequest(): ServerRequestInterface
     {
@@ -98,9 +84,7 @@ class AuthenticationSuccessEvent
     }
 
     /**
-     * 返回响应
-     *
-     * @return ResponseInterface|null
+     * 返回响应.
      */
     public function getResponse(): ?ResponseInterface
     {
@@ -108,10 +92,7 @@ class AuthenticationSuccessEvent
     }
 
     /**
-     * 设置响应
-     *
-     * @param ResponseInterface|null $response
-     * @return void
+     * 设置响应.
      */
     public function setResponse(?ResponseInterface $response): void
     {
@@ -119,9 +100,7 @@ class AuthenticationSuccessEvent
     }
 
     /**
-     * 返回上一次认证的token
-     *
-     * @return TokenInterface|null
+     * 返回上一次认证的token.
      */
     public function getPreviousToken(): ?TokenInterface
     {

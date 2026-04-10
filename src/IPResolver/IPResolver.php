@@ -7,9 +7,7 @@ namespace GaaraHyperf\IPResolver;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * IP地址解析器
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * IP地址解析器.
  */
 class IPResolver implements IPResolverInterface
 {
@@ -19,14 +17,13 @@ class IPResolver implements IPResolverInterface
     public function __construct(private array $headers = [
         'X-Forwarded-For',
         'X-Real-IP',
-        'CF-Connecting-IP'
-    ]) {}
+        'CF-Connecting-IP',
+    ])
+    {
+    }
 
     /**
-     * 获取请求的真实IP地址，支持代理转发
-     *
-     * @param ServerRequestInterface $request
-     * @return string
+     * 获取请求的真实IP地址，支持代理转发.
      */
     public function resolve(ServerRequestInterface $request): string
     {
@@ -59,13 +56,10 @@ class IPResolver implements IPResolverInterface
     }
 
     /**
-     * 是否有效ip
-     *
-     * @param mixed $ip
-     * @return boolean
+     * 是否有效ip.
      */
     private function isValidIp(mixed $ip): bool
     {
-        return !empty($ip) && filter_var($ip, FILTER_VALIDATE_IP) !== false;
+        return ! empty($ip) && filter_var($ip, FILTER_VALIDATE_IP) !== false;
     }
 }

@@ -9,9 +9,7 @@ use GaaraHyperf\Passport\Passport;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Passport 检查事件
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * Passport 检查事件.
  */
 class CheckPassportEvent
 {
@@ -26,12 +24,11 @@ class CheckPassportEvent
         private AuthenticatorInterface $authenticator,
         private Passport $passport,
         private ServerRequestInterface $request,
-    ) {}
+    ) {
+    }
 
     /**
-     * 返回认证守卫名称
-     *
-     * @return string
+     * 返回认证守卫名称.
      */
     public function getGuardName(): string
     {
@@ -39,9 +36,7 @@ class CheckPassportEvent
     }
 
     /**
-     * 返回认证器
-     *
-     * @return AuthenticatorInterface
+     * 返回认证器.
      */
     public function getAuthenticator(): AuthenticatorInterface
     {
@@ -50,8 +45,6 @@ class CheckPassportEvent
 
     /**
      * 返回认证通行证
-     *
-     * @return Passport
      */
     public function getPassport(): Passport
     {
@@ -60,8 +53,6 @@ class CheckPassportEvent
 
     /**
      * 返回请求对象
-     *
-     * @return ServerRequestInterface
      */
     public function getRequest(): ServerRequestInterface
     {

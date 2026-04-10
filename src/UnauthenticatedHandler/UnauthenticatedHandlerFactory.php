@@ -4,23 +4,20 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\UnauthenticatedHandler;
 
-use Hyperf\Contract\ContainerInterface;
 use GaaraHyperf\Config\ComponentConfig;
 use GaaraHyperf\Config\CustomConfig;
-use GaaraHyperf\UnauthenticatedHandler\DefaultUnauthenticatedHandler;
-use GaaraHyperf\UnauthenticatedHandler\RedirectUnauthenticatedHandler;
-use GaaraHyperf\UnauthenticatedHandler\UnauthenticatedHandlerInterface;
+use Hyperf\Contract\ContainerInterface;
+use InvalidArgumentException;
 
 /**
  * 未认证处理器服务工厂
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class UnauthenticatedHandlerFactory
 {
     public function __construct(
         private ContainerInterface $container,
-    ) {}
+    ) {
+    }
 
     public function create(ComponentConfig $config): UnauthenticatedHandlerInterface
     {
@@ -42,14 +39,13 @@ class UnauthenticatedHandlerFactory
                 $customConfig = CustomConfig::from($options);
 
                 $unauthenticatedHandler = $this->container->make($customConfig->class(), $customConfig->params());
-                if (!$unauthenticatedHandler instanceof UnauthenticatedHandlerInterface) {
-                    throw new \InvalidArgumentException(sprintf('Unauthenticated Handler "%s" must implement %s', $customConfig->class(), UnauthenticatedHandlerInterface::class));
+                if (! $unauthenticatedHandler instanceof UnauthenticatedHandlerInterface) {
+                    throw new InvalidArgumentException(sprintf('Unauthenticated Handler "%s" must implement %s', $customConfig->class(), UnauthenticatedHandlerInterface::class));
                 }
 
                 return $unauthenticatedHandler;
-
             default:
-                throw new \InvalidArgumentException(sprintf('Unsupported unauthenticated handler type: %s', $type));
+                throw new InvalidArgumentException(sprintf('Unsupported unauthenticated handler type: %s', $type));
         }
     }
 }

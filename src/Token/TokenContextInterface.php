@@ -5,24 +5,17 @@ declare(strict_types=1);
 namespace GaaraHyperf\Token;
 
 /**
- * 用户令牌上下文接口
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 用户令牌上下文接口.
  */
 interface TokenContextInterface
 {
     /**
-     * 获取令牌
-     *
-     * @return TokenInterface|null
+     * 获取令牌.
      */
     public function getToken(): ?TokenInterface;
 
     /**
-     * 设置令牌
-     *
-     * @param TokenInterface|null $token
-     * @return void
+     * 设置令牌.
      */
     public function setToken(?TokenInterface $token): void;
 }

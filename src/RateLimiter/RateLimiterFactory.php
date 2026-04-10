@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\RateLimiter;
 
+use GaaraHyperf\Constants;
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Redis\Redis;
-use GaaraHyperf\Constants;
+use InvalidArgumentException;
 
 /**
  * 限流器创建工厂
- *
- * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class RateLimiterFactory
 {
     public function __construct(
         private ContainerInterface $container,
-    ) {}
+    ) {
+    }
 
     public function create(array $config): RateLimiterInterface
     {
@@ -64,7 +64,7 @@ class RateLimiterFactory
                     prefix: sprintf('%s:login_rate_limiter:fixed_window:%s', Constants::__PREFIX, $options['prefix'] ?? 'default'),
                 );
             default:
-                throw new \InvalidArgumentException("Unsupported rate limiter type: {$type}");
+                throw new InvalidArgumentException("Unsupported rate limiter type: {$type}");
         }
     }
 }

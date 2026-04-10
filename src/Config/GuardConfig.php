@@ -6,25 +6,13 @@ namespace GaaraHyperf\Config;
 
 use GaaraHyperf\Authorization\DefaultAccessDeniedHandler;
 use GaaraHyperf\Authorization\NullAuthorizationChecker;
+use InvalidArgumentException;
 
 /**
- * 认证守卫配置
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 认证守卫配置.
  */
 class GuardConfig
 {
-    /**
-     * @param ComponentConfig $requestMatcherConfig
-     * @param ComponentConfig $userProviderConfig
-     * @param AuthenticatorConfigCollection $authenticatorConfigCollection
-     * @param ComponentConfig $tokenStorageConfig
-     * @param ComponentConfig $unauthenticatedHandlerConfig
-     * @param CustomConfig $authorizationCheckerConfig
-     * @param CustomConfig $accessDeniedHandlerConfig
-     * @param ListenerConfigCollection $listenerConfigCollection
-     * @param string $passwordHasherId
-     */
     public function __construct(
         private ComponentConfig $requestMatcherConfig,
         private ComponentConfig $userProviderConfig,
@@ -35,17 +23,14 @@ class GuardConfig
         private CustomConfig $accessDeniedHandlerConfig,
         private ListenerConfigCollection $listenerConfigCollection,
         private string $passwordHasherId
-    ) {}
+    ) {
+    }
 
-    /**
-     * @param array $config
-     * @return self
-     */
     public static function from(array $config): self
     {
-        $requestMatcherConfig = ComponentConfig::from($config['matcher'] ??  throw new \InvalidArgumentException('matcher config is required'), 'default');
-        $userProviderConfig = ComponentConfig::from($config['user_provider'] ?? throw new \InvalidArgumentException('user_provider config is required'));
-        $authenticatorConfigCollection = AuthenticatorConfigCollection::from($config['authenticators'] ?? throw new \InvalidArgumentException('authenticators config is required'));
+        $requestMatcherConfig = ComponentConfig::from($config['matcher'] ?? throw new InvalidArgumentException('matcher config is required'), 'default');
+        $userProviderConfig = ComponentConfig::from($config['user_provider'] ?? throw new InvalidArgumentException('user_provider config is required'));
+        $authenticatorConfigCollection = AuthenticatorConfigCollection::from($config['authenticators'] ?? throw new InvalidArgumentException('authenticators config is required'));
         $tokenStorageConfig = ComponentConfig::from($config['token_storage'] ?? ['type' => 'null']);
         $unauthenticatedHandlerConfig = ComponentConfig::from($config['unauthenticated_handler'] ?? ['type' => 'default']);
         $authorizationCheckerConfig = CustomConfig::from($config['authorization']['checker'] ?? [
@@ -71,9 +56,7 @@ class GuardConfig
     }
 
     /**
-     * 返回请求匹配器配置
-     *
-     * @return ComponentConfig
+     * 返回请求匹配器配置.
      */
     public function requestMatcherConfig(): ComponentConfig
     {
@@ -81,9 +64,7 @@ class GuardConfig
     }
 
     /**
-     * 返回认证存储器配置
-     *
-     * @return ComponentConfig
+     * 返回认证存储器配置.
      */
     public function tokenStorageConfig(): ComponentConfig
     {
@@ -91,9 +72,7 @@ class GuardConfig
     }
 
     /**
-     * 返回用户提供者配置
-     *
-     * @return ComponentConfig
+     * 返回用户提供者配置.
      */
     public function userProviderConfig(): ComponentConfig
     {
@@ -101,9 +80,7 @@ class GuardConfig
     }
 
     /**
-     * 返回认证器配置集合
-     *
-     * @return AuthenticatorConfigCollection
+     * 返回认证器配置集合.
      */
     public function authenticatorConfigCollection(): AuthenticatorConfigCollection
     {
@@ -111,9 +88,7 @@ class GuardConfig
     }
 
     /**
-     * 返回未认证处理器配置
-     *
-     * @return ComponentConfig
+     * 返回未认证处理器配置.
      */
     public function unauthenticatedHandlerConfig(): ComponentConfig
     {
@@ -121,9 +96,7 @@ class GuardConfig
     }
 
     /**
-     * 返回授权检查器配置
-     *
-     * @return CustomConfig
+     * 返回授权检查器配置.
      */
     public function authorizationCheckerConfig(): CustomConfig
     {
@@ -131,9 +104,7 @@ class GuardConfig
     }
 
     /**
-     * 返回拒绝访问处理器配置
-     *
-     * @return CustomConfig
+     * 返回拒绝访问处理器配置.
      */
     public function accessDeniedHandlerConfig(): CustomConfig
     {
@@ -141,9 +112,7 @@ class GuardConfig
     }
 
     /**
-     * 返回监听器配置集合
-     *
-     * @return ListenerConfigCollection
+     * 返回监听器配置集合.
      */
     public function listenerConfigCollection(): ListenerConfigCollection
     {
@@ -151,9 +120,7 @@ class GuardConfig
     }
 
     /**
-     * 返回密码哈希器ID
-     * 
-     * @return string
+     * 返回密码哈希器ID.
      */
     public function passwordHasherId(): string
     {

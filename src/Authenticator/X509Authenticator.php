@@ -8,23 +8,17 @@ use GaaraHyperf\Exception\AuthenticationException;
 use GaaraHyperf\Exception\InvalidCredentialsException;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\UserProvider\UserProviderInterface;
+use Hyperf\HttpMessage\Server\Response;
+use Hyperf\HttpMessage\Stream\SwooleStream;
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * X509 认证器
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * X509 认证器.
  */
 class X509Authenticator extends AbstractAuthenticator
 {
-    /**
-     * @param string $sslClientSDNField
-     * @param string $identifierField
-     * @param UserProviderInterface $userProvider
-     * @param AuthenticationSuccessHandlerInterface|null $successHandler
-     * @param AuthenticationFailureHandlerInterface|null $failureHandler
-     */
     public function __construct(
         private string $sslClientSDNField,
         private string $identifierField,
@@ -35,25 +29,19 @@ class X509Authenticator extends AbstractAuthenticator
         parent::__construct($successHandler, $failureHandler);
 
         if (empty($this->sslClientSDNField)) {
-            throw new \InvalidArgumentException('ssl_client_s_dn_field cannot be empty');
+            throw new InvalidArgumentException('ssl_client_s_dn_field cannot be empty');
         }
 
         if (empty($this->identifierField)) {
-            throw new \InvalidArgumentException('identifier_field cannot be empty');
+            throw new InvalidArgumentException('identifier_field cannot be empty');
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function supports(ServerRequestInterface $request): bool
     {
         return $this->extractUserIdentifier($request) !== null;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function authenticate(ServerRequestInterface $request): Passport
     {
         $identifier = $this->extractUserIdentifier($request);
@@ -74,44 +62,37 @@ class X509Authenticator extends AbstractAuthenticator
 
         return new Passport(
             $user->getIdentifier(),
-            fn() => $user,
+            fn () => $user,
         );
     }
 
     /**
-     * @inheritDoc
      * @override
      */
     public function onAuthenticationFailure(string $guardName, ServerRequestInterface $request, AuthenticationException $exception, ?Passport $passport = null): ?ResponseInterface
     {
-        if (!is_null($this->failureHandler)) {
+        if (! is_null($this->failureHandler)) {
             return $this->failureHandler->handle($guardName, $request, $exception, $passport);
         }
 
-        $response = new \Hyperf\HttpMessage\Server\Response();
-        return $response->withStatus(401)->withBody(new \Hyperf\HttpMessage\Stream\SwooleStream($exception->getMessage()));
+        $response = new Response();
+        return $response->withStatus(401)->withBody(new SwooleStream($exception->getMessage()));
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isInteractive(): bool
     {
         return false;
     }
 
     /**
-     * 从请求中提取用户标识符
-     *
-     * @param ServerRequestInterface $request
-     * @return string|null
+     * 从请求中提取用户标识符.
      */
     private function extractUserIdentifier(ServerRequestInterface $request): ?string
     {
         $identifier = null;
         // 提取SSL_CLIENT_S_DN中，指定identifier_field的值
         $sslClientSDN = $request->getHeaderLine($this->sslClientSDNField);
-        if (!empty($sslClientSDN)) {
+        if (! empty($sslClientSDN)) {
             $identifierField = $this->identifierField;
 
             // 兼容 email -> emailAddress
@@ -129,11 +110,7 @@ class X509Authenticator extends AbstractAuthenticator
      * 从 DN 字符串中提取指定字段
      * 支持格式:
      * 1. /C=CN/CN=Alice/emailAddress=a@b.com (OpenSSL 旧版)
-     * 2. emailAddress=a@b.com,CN=Alice,C=CN (RFC 2253/4514)
-     *
-     * @param string $dn
-     * @param string $field
-     * @return string|null
+     * 2. emailAddress=a@b.com,CN=Alice,C=CN (RFC 2253/4514).
      */
     private function extractFieldFromDn(string $dn, string $field): ?string
     {

@@ -4,31 +4,32 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Encryptor;
 
+use InvalidArgumentException;
+use RuntimeException;
+
 /**
- * 数据加密器
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 数据加密器.
  */
 class Encryptor implements EncryptorInterface
 {
     /**
      * @param string $key base64编码的密钥
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function __construct(private string $key, private string $algo = 'AES-256-CBC')
     {
         $expectedKeyLength = $this->getExpectedKeyLength($this->algo);
         if (strlen($key) !== $expectedKeyLength) {
-            throw new \InvalidArgumentException("Key length must be " . $expectedKeyLength . " bytes");
+            throw new InvalidArgumentException('Key length must be ' . $expectedKeyLength . ' bytes');
         }
     }
 
     /**
-     * 加密数据
+     * 加密数据.
      *
      * @param string $data 要加密的数据
      * @return string 十六进制编码的密文（包含IV）
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function encrypt(string $data): string
     {
@@ -43,30 +44,30 @@ class Encryptor implements EncryptorInterface
         );
 
         if ($encrypted === false) {
-            throw new \RuntimeException('Encryption failed: ' . openssl_error_string());
+            throw new RuntimeException('Encryption failed: ' . openssl_error_string());
         }
 
         return bin2hex($iv . $encrypted);
     }
 
     /**
-     * 解密数据
+     * 解密数据.
      *
      * @param string $data 十六进制编码的密文（包含IV）
      * @return string 解密后的明文
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
      */
     public function decrypt(string $data): string
     {
         $binaryData = hex2bin($data);
         if ($binaryData === false) {
-            throw new \InvalidArgumentException('Invalid hex data provided');
+            throw new InvalidArgumentException('Invalid hex data provided');
         }
 
         $ivSize = openssl_cipher_iv_length($this->algo);
         if (strlen($binaryData) < $ivSize) {
-            throw new \InvalidArgumentException('Data too short to contain IV');
+            throw new InvalidArgumentException('Data too short to contain IV');
         }
 
         // 从数据中分离IV和密文
@@ -82,35 +83,31 @@ class Encryptor implements EncryptorInterface
         );
 
         if ($decrypted === false) {
-            throw new \RuntimeException('Decryption failed: ' . openssl_error_string());
+            throw new RuntimeException('Decryption failed: ' . openssl_error_string());
         }
 
         return $decrypted;
     }
 
     /**
-     * 生成随机IV（初始化向量）
+     * 生成随机IV（初始化向量）.
      *
-     * @return string
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     private function generateRandomIv(): string
     {
         $size = openssl_cipher_iv_length($this->algo);
         $iv = openssl_random_pseudo_bytes($size, $strong);
 
-        if (!$strong) {
-            throw new \RuntimeException('Unable to generate cryptographically strong random IV');
+        if (! $strong) {
+            throw new RuntimeException('Unable to generate cryptographically strong random IV');
         }
 
         return $iv;
     }
 
     /**
-     * 获取算法期望的密钥长度
-     *
-     * @param string $algo
-     * @return integer
+     * 获取算法期望的密钥长度.
      */
     private function getExpectedKeyLength(string $algo): int
     {
@@ -123,7 +120,7 @@ class Encryptor implements EncryptorInterface
             'SM4-CBC' => 16,
             'DES-CBC' => 8,
             '3DES-CBC', 'DES-EDE3-CBC' => 24,
-            default => throw new \InvalidArgumentException("Unsupported algorithm: {$algo}")
+            default => throw new InvalidArgumentException("Unsupported algorithm: {$algo}")
         };
     }
 }

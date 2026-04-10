@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Exception;
 
+use Exception;
+
 /**
- * 认证异常
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 认证异常.
  */
-class AuthenticationException extends \Exception
+class AuthenticationException extends Exception
 {
-    /**
-     * @param string $message
-     * @param string $userIdentifier
-     */
     public function __construct(
         string $message,
         private string $userIdentifier = '',
@@ -23,9 +19,7 @@ class AuthenticationException extends \Exception
     }
 
     /**
-     * 返回用户标识
-     *
-     * @return string
+     * 返回用户标识.
      */
     public function getUserIdentifier(): string
     {

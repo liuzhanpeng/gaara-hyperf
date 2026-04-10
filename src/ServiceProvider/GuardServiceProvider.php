@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\ServiceProvider;
 
-use Hyperf\Contract\ContainerInterface;
 use GaaraHyperf\Authenticator\AuthenticatorFactory;
 use GaaraHyperf\Config\ConfigLoaderInterface;
 use GaaraHyperf\Config\GuardConfig;
@@ -22,31 +21,28 @@ use GaaraHyperf\Token\TokenContextInterface;
 use GaaraHyperf\TokenStorage\TokenStorageFactory;
 use GaaraHyperf\UnauthenticatedHandler\UnauthenticatedHandlerFactory;
 use GaaraHyperf\UserProvider\UserProviderFactory;
+use Hyperf\Contract\ContainerInterface;
+use InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * 认证守卫服务提供者
- * 
- * 核心提供器，负责在容器中注册所有的认证守卫
+ * 认证守卫服务提供者.
  *
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 核心提供器，负责在容器中注册所有的认证守卫
  */
 class GuardServiceProvider implements ServiceProviderInterface
 {
     /**
      * 注册服务
-     *
-     * @param ContainerInterface $container
-     * @return void
      */
     public function register(ContainerInterface $container): void
     {
         // 注册内置的令牌上下文
-        $container->define(TokenContextInterface::class, fn() => new TokenContext(Constants::TOKEN_CONTEXT_PREFIX));
+        $container->define(TokenContextInterface::class, fn () => new TokenContext(Constants::TOKEN_CONTEXT_PREFIX));
 
         // 注册内部组件
-        $container->define(IPResolverInterface::class, fn() => new IPResolver());
+        $container->define(IPResolverInterface::class, fn () => new IPResolver());
 
         $config = $container->get(ConfigLoaderInterface::class)->load();
 
@@ -54,19 +50,14 @@ class GuardServiceProvider implements ServiceProviderInterface
         foreach ($config->guardConfigCollection() as $guardName => $guardConfig) {
             $guardMap[$guardName] = sprintf('%s.%s', Constants::GUARD_PREFIX, $guardName);
 
-            $container->define($guardMap[$guardName], fn() => $this->createGuard($container, $guardName, $guardConfig));
+            $container->define($guardMap[$guardName], fn () => $this->createGuard($container, $guardName, $guardConfig));
         }
 
         $container->set(GuardResolver::class, new GuardResolver($guardMap, $container));
     }
 
     /**
-     * 创建一个认证守卫实例
-     *
-     * @param ContainerInterface $container
-     * @param string $guardName
-     * @param GuardConfig $guardConfig
-     * @return GuardInterface
+     * 创建一个认证守卫实例.
      */
     private function createGuard(ContainerInterface $container, string $guardName, GuardConfig $guardConfig): GuardInterface
     {
@@ -100,8 +91,8 @@ class GuardServiceProvider implements ServiceProviderInterface
         // 注册自定义监听器
         foreach ($guardConfig->listenerConfigCollection() as $listenerConfig) {
             $listener = $container->make($listenerConfig->class(), $listenerConfig->params());
-            if (!$listener instanceof EventSubscriberInterface) {
-                throw new \InvalidArgumentException(sprintf('Listener "%s" must implement EventSubscriberInterface.', $listenerConfig->class()));
+            if (! $listener instanceof EventSubscriberInterface) {
+                throw new InvalidArgumentException(sprintf('Listener "%s" must implement EventSubscriberInterface.', $listenerConfig->class()));
             }
 
             $eventDispatcher->addSubscriber($listener);

@@ -13,9 +13,7 @@ use GaaraHyperf\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
- * OpaqueToken认证器构建器
- *
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * OpaqueToken认证器构建器.
  */
 class OpaqueTokenAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {

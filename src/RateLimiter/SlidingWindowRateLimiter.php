@@ -7,18 +7,15 @@ namespace GaaraHyperf\RateLimiter;
 use Hyperf\Redis\Redis;
 
 /**
- * 滑动窗口限流器
- * 
+ * 滑动窗口限流器.
+ *
  * 依赖于Redis有序集合实现
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class SlidingWindowRateLimiter implements RateLimiterInterface
 {
     /**
-     * @param Redis $redis
-     * @param integer $interval 时间窗口，单位秒
-     * @param integer $limit 最大请求数
+     * @param int $interval 时间窗口，单位秒
+     * @param int $limit 最大请求数
      * @param string $prefix 缓存键前缀
      */
     public function __construct(
@@ -26,13 +23,13 @@ class SlidingWindowRateLimiter implements RateLimiterInterface
         private int $interval,
         private int $limit,
         private string $prefix
-    ) {}
+    ) {
+    }
 
     /**
-     * 尝试请求并返回限流结果
+     * 尝试请求并返回限流结果.
      *
      * @param string $key 限流key
-     * @return LimitResult
      */
     public function attempt(string $key): LimitResult
     {
@@ -80,7 +77,7 @@ class SlidingWindowRateLimiter implements RateLimiterInterface
     }
 
     /**
-     * 重置指定key的限流记录
+     * 重置指定key的限流记录.
      *
      * @param string $key 限流key
      * @return bool
@@ -91,10 +88,6 @@ class SlidingWindowRateLimiter implements RateLimiterInterface
         $this->redis->del($redisKey);
     }
 
-    /**
-     * @param string $key
-     * @return string
-     */
     private function getKey(string $key): string
     {
         return sprintf('%s:%s', $this->prefix, $key);

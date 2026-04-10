@@ -25,8 +25,8 @@ class ConfigProvider
                     'description' => 'The config for gaara-hyperf.',
                     'source' => __DIR__ . '/../publish/auth.php',
                     'destination' => BASE_PATH . '/config/autoload/gaara.php',
-                ]
-            ]
+                ],
+            ],
         ];
     }
 }

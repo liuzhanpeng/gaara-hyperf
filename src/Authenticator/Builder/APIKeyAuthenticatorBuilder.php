@@ -10,9 +10,7 @@ use GaaraHyperf\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
- * API Key认证器构建器
- *
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * API Key认证器构建器.
  */
 class APIKeyAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {

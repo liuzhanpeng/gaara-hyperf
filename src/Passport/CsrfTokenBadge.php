@@ -4,36 +4,28 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Passport;
 
+use SensitiveParameter;
+
 /**
- * CSRF令牌认证标识
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * CSRF令牌认证标识.
  */
 class CsrfTokenBadge implements BadgeInterface
 {
     /**
-     * 是否已被解决
-     *
-     * @var boolean
+     * 是否已被解决.
      */
     private bool $isResolved = false;
 
-    /**
-     * @param string $id
-     * @param string $token
-     */
     public function __construct(
         private string $id,
-        #[\SensitiveParameter]
+        #[SensitiveParameter]
         private string $token
     ) {
         $this->token = $token;
     }
 
     /**
-     * 返回令牌ID
-     *
-     * @return string
+     * 返回令牌ID.
      */
     public function getId(): string
     {
@@ -41,9 +33,7 @@ class CsrfTokenBadge implements BadgeInterface
     }
 
     /**
-     * 返回CSRF令牌
-     *
-     * @return string
+     * 返回CSRF令牌.
      */
     public function getToken(): string
     {
@@ -51,9 +41,7 @@ class CsrfTokenBadge implements BadgeInterface
     }
 
     /**
-     * 是否已解决
-     *
-     * @return boolean
+     * 是否已解决.
      */
     public function isResolved(): bool
     {
@@ -61,9 +49,7 @@ class CsrfTokenBadge implements BadgeInterface
     }
 
     /**
-     * 设为已解决
-     *
-     * @return void
+     * 设为已解决.
      */
     public function resolve(): void
     {

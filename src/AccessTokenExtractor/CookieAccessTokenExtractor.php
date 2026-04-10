@@ -7,9 +7,7 @@ namespace GaaraHyperf\AccessTokenExtractor;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * 从 Cookie 中提取访问令牌的提取器
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 从 Cookie 中提取访问令牌的提取器.
  */
 class CookieAccessTokenExtractor implements AccessTokenExtractorInterface
 {
@@ -18,20 +16,18 @@ class CookieAccessTokenExtractor implements AccessTokenExtractorInterface
      */
     public function __construct(
         private string $field,
-    ) {}
+    ) {
+    }
 
-    /**
-     * @inheritDoc
-     */
     public function extract(ServerRequestInterface $request): ?string
     {
         $cookies = $request->getCookieParams();
-        if (!isset($cookies[$this->field])) {
+        if (! isset($cookies[$this->field])) {
             return null;
         }
 
         $token = $cookies[$this->field];
-        if (!\is_string($token) || empty($token)) {
+        if (! \is_string($token) || empty($token)) {
             return null;
         }
 

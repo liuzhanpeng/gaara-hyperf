@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace GaaraHyperf\ServiceProvider;
 
 /**
- * 服务提供者注册表
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 服务提供者注册表.
  */
 class ServiceProviderRegistry
 {
@@ -17,10 +15,7 @@ class ServiceProviderRegistry
     private array $providers = [];
 
     /**
-     * 注册服务提供者
-     *
-     * @param ServiceProviderInterface $provider
-     * @return self
+     * 注册服务提供者.
      */
     public function register(ServiceProviderInterface $provider): self
     {
@@ -29,7 +24,7 @@ class ServiceProviderRegistry
     }
 
     /**
-     * 获取所有注册的服务提供者
+     * 获取所有注册的服务提供者.
      *
      * @return ServiceProviderInterface[]
      */

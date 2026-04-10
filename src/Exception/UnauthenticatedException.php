@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Exception;
 
+use Exception;
 use GaaraHyperf\Token\TokenInterface;
 
 /**
- * 未认证异常
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 未认证异常.
  */
-class UnauthenticatedException extends \Exception
+class UnauthenticatedException extends Exception
 {
     public function __construct(
         string $message = 'Unauthenticated',

@@ -5,27 +5,24 @@ declare(strict_types=1);
 namespace GaaraHyperf\RateLimiter;
 
 /**
- * 限流结果
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 限流结果.
  */
 class LimitResult
 {
     /**
-     * @param boolean $accepted 是否通过限流检查
-     * @param integer $remaining 剩余可用数
+     * @param bool $accepted 是否通过限流检查
+     * @param int $remaining 剩余可用数
      * @param int $retryAfter 多少秒后可以重试
      */
     public function __construct(
         private bool $accepted,
         private int $remaining,
         private int $retryAfter,
-    ) {}
+    ) {
+    }
 
     /**
-     * 是否通过限流检查
-     *
-     * @return boolean
+     * 是否通过限流检查.
      */
     public function isAccepted(): bool
     {
@@ -33,9 +30,7 @@ class LimitResult
     }
 
     /**
-     * 剩余可用数
-     *
-     * @return integer
+     * 剩余可用数.
      */
     public function getRemaining(): int
     {
@@ -43,9 +38,7 @@ class LimitResult
     }
 
     /**
-     * 返回可重试时间(多少秒后可以重试)
-     *
-     * @return int
+     * 返回可重试时间(多少秒后可以重试).
      */
     public function getRetryAfter(): int
     {

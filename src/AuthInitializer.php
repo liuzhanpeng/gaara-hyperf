@@ -4,35 +4,29 @@ declare(strict_types=1);
 
 namespace GaaraHyperf;
 
-use Hyperf\Contract\ContainerInterface;
-use GaaraHyperf\ServiceProvider\ServiceProviderRegisterEvent;
 use GaaraHyperf\ServiceProvider\BuiltInAuthenticatorServiceProvider;
 use GaaraHyperf\ServiceProvider\BuiltInUserProviderServiceProvider;
 use GaaraHyperf\ServiceProvider\CsrfTokenManagerServiceProvider;
 use GaaraHyperf\ServiceProvider\GuardServiceProvider;
 use GaaraHyperf\ServiceProvider\OpaqueTokenManagerServiceProvider;
 use GaaraHyperf\ServiceProvider\PasswordHasherServiceProvider;
+use GaaraHyperf\ServiceProvider\ServiceProviderRegisterEvent;
 use GaaraHyperf\ServiceProvider\ServiceProviderRegistry;
+use Hyperf\Contract\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 /**
- * 认证组件初始化器
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 认证组件初始化器.
  */
 class AuthInitializer
 {
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(
         private ContainerInterface $container,
-    ) {}
+    ) {
+    }
 
     /**
-     * 初始化认证组件
-     *
-     * @return void
+     * 初始化认证组件.
      */
     public function init(): void
     {

@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\AccessTokenExtractor;
 
-use Hyperf\Contract\ContainerInterface;
 use GaaraHyperf\Config\CustomConfig;
+use Hyperf\Contract\ContainerInterface;
+use InvalidArgumentException;
+use LogicException;
 
 /**
  * 访问令牌提取器工厂
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class AccessTokenExtractorFactory
 {
     public function __construct(
         private ContainerInterface $container,
-    ) {}
+    ) {
+    }
 
     public function create(array $config): AccessTokenExtractorInterface
     {
@@ -41,13 +42,13 @@ class AccessTokenExtractorFactory
                 $customConfig = CustomConfig::from($config);
 
                 $accessTokenExtractor = $this->container->make($customConfig->class(), $customConfig->params());
-                if (!$accessTokenExtractor instanceof AccessTokenExtractorInterface) {
-                    throw new \LogicException(sprintf('The custom AccessTokenExtractor must implement %s.', AccessTokenExtractorInterface::class));
+                if (! $accessTokenExtractor instanceof AccessTokenExtractorInterface) {
+                    throw new LogicException(sprintf('The custom AccessTokenExtractor must implement %s.', AccessTokenExtractorInterface::class));
                 }
 
                 return $accessTokenExtractor;
             default:
-                throw new \InvalidArgumentException("Access Token Extractor type does not exist: $type");
+                throw new InvalidArgumentException("Access Token Extractor type does not exist: {$type}");
         }
     }
 }

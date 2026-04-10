@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\ServiceProvider;
 
-use Hyperf\Contract\ContainerInterface;
 use GaaraHyperf\Authenticator\AuthenticatorFactory;
 use GaaraHyperf\Authenticator\Builder\APIKeyAuthenticatorBuilder;
 use GaaraHyperf\Authenticator\Builder\FormLoginAuthenticatorBuilder;
@@ -12,11 +11,10 @@ use GaaraHyperf\Authenticator\Builder\HmacAuthenticatorBuilder;
 use GaaraHyperf\Authenticator\Builder\JsonLoginAuthenticatorBuilder;
 use GaaraHyperf\Authenticator\Builder\OpaqueTokenAuthenticatorBuilder;
 use GaaraHyperf\Authenticator\Builder\X509AuthenticatorBuilder;
+use Hyperf\Contract\ContainerInterface;
 
 /**
- * 内置认证器服务提供者
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 内置认证器服务提供者.
  */
 class BuiltInAuthenticatorServiceProvider implements ServiceProviderInterface
 {

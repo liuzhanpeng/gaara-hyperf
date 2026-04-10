@@ -4,26 +4,26 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\EventListener;
 
+use DateTimeImmutable;
 use GaaraHyperf\Event\AuthenticationSuccessEvent;
 use GaaraHyperf\Exception\PasswordExpiredException;
 use GaaraHyperf\User\PasswordExpirationAwareUserInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * 密码过期监听器
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 密码过期监听器.
  */
 class PasswordExpirationListener implements EventSubscriberInterface
 {
     /**
      * @param array $excludedPaths 不检查密码过期的路径
-     * @param integer $warningDays 密码过期前多少天发出警告
+     * @param int $warningDays 密码过期前多少天发出警告
      */
     public function __construct(
         private array $excludedPaths = [],
         private int $warningDays = 7,
-    ) {}
+    ) {
+    }
 
     public static function getSubscribedEvents()
     {
@@ -37,7 +37,7 @@ class PasswordExpirationListener implements EventSubscriberInterface
         $passport = $event->getPassport();
         $user = $passport->getUser();
 
-        if (!$user instanceof PasswordExpirationAwareUserInterface) {
+        if (! $user instanceof PasswordExpirationAwareUserInterface) {
             return;
         }
 
@@ -48,7 +48,7 @@ class PasswordExpirationListener implements EventSubscriberInterface
             return;
         }
 
-        $now = new \DateTimeImmutable();
+        $now = new DateTimeImmutable();
         $expiresAt = $user->getExpiresAt();
         $expired = $expiresAt <= $now;
 

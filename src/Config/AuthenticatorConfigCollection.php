@@ -4,36 +4,35 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Config;
 
+use InvalidArgumentException;
+use IteratorAggregate;
+use Traversable;
+
 /**
- * 认证器配置集合
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 认证器配置集合.
  */
-class AuthenticatorConfigCollection implements \IteratorAggregate
+class AuthenticatorConfigCollection implements IteratorAggregate
 {
     /**
      * @param AuthenticatorConfig[] $authenticatorConfigCollection
      */
     public function __construct(
         private array $authenticatorConfigCollection,
-    ) {}
+    ) {
+    }
 
-    /**
-     * @param array $config
-     * @return self
-     */
     public static function from(array $config): self
     {
         if (count($config) === 0) {
-            throw new \InvalidArgumentException('authenticators配置不能为空');
+            throw new InvalidArgumentException('authenticators配置不能为空');
         }
 
         $authenticatorConfigCollection = [];
         foreach ($config as $type => $options) {
             if ($type === 'custom') {
                 foreach ($options as $customAuthenticatorConfig) {
-                    if (!isset($customAuthenticatorConfig['class'])) {
-                        throw new \InvalidArgumentException("自定义认证器配置缺少class选项");
+                    if (! isset($customAuthenticatorConfig['class'])) {
+                        throw new InvalidArgumentException('自定义认证器配置缺少class选项');
                     }
 
                     $authenticatorConfigCollection[] = new AuthenticatorConfig($customAuthenticatorConfig['class'], $customAuthenticatorConfig['params'] ?? []);
@@ -47,11 +46,9 @@ class AuthenticatorConfigCollection implements \IteratorAggregate
     }
 
     /**
-     * @inheritDoc
-     * 
-     * @return \Traversable<AuthenticatorConfig>
+     * @return Traversable<AuthenticatorConfig>
      */
-    public function getIterator(): \Traversable
+    public function getIterator(): Traversable
     {
         yield from $this->authenticatorConfigCollection;
     }

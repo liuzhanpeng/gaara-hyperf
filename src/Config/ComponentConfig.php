@@ -4,31 +4,23 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Config;
 
+use InvalidArgumentException;
+
 /**
- * 内部组件通用配置
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 内部组件通用配置.
  */
 class ComponentConfig
 {
-    /**
-     * @param string $type
-     * @param array $options
-     */
     public function __construct(
         private string $type,
         private array $options = []
-    ) {}
+    ) {
+    }
 
-    /**
-     * @param array $config
-     * @param string $default
-     * @return self
-     */
     public static function from(array $config, string $default = ''): self
     {
-        if (!isset($config['type']) && empty($default)) {
-            throw new \InvalidArgumentException('type is required for component config');
+        if (! isset($config['type']) && empty($default)) {
+            throw new InvalidArgumentException('type is required for component config');
         }
 
         $type = $config['type'] ?? $default;
@@ -38,9 +30,7 @@ class ComponentConfig
     }
 
     /**
-     * 返回类型
-     *
-     * @return string
+     * 返回类型.
      */
     public function type(): string
     {
@@ -48,9 +38,7 @@ class ComponentConfig
     }
 
     /**
-     * 返回参数
-     * 
-     * @return array
+     * 返回参数.
      */
     public function options(): array
     {

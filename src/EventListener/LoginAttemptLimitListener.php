@@ -13,9 +13,7 @@ use GaaraHyperf\RateLimiter\RateLimiterInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * 登录尝试限制监听器
- *
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 登录尝试限制监听器.
  */
 class LoginAttemptLimitListener implements EventSubscriberInterface
 {
@@ -29,7 +27,7 @@ class LoginAttemptLimitListener implements EventSubscriberInterface
     ) {
         $this->rateLimiter = $this->rateLimiterFactory->create([
             'type' => $type,
-            'options' => $options
+            'options' => $options,
         ]);
     }
 
@@ -43,7 +41,7 @@ class LoginAttemptLimitListener implements EventSubscriberInterface
 
     public function checkPassport(CheckPassportEvent $event): void
     {
-        if (!$event->getAuthenticator()->isInteractive()) {
+        if (! $event->getAuthenticator()->isInteractive()) {
             return;
         }
 
@@ -54,7 +52,7 @@ class LoginAttemptLimitListener implements EventSubscriberInterface
         $ip = $this->ipResolver->resolve($request);
 
         $result = $this->rateLimiter->attempt($userIdentifier . $ip);
-        if (!$result->isAccepted()) {
+        if (! $result->isAccepted()) {
             throw new TooManyLoginAttemptsException(
                 message: 'Too many login attempts. Please try again later.',
                 userIdentifier: $userIdentifier,
@@ -65,7 +63,7 @@ class LoginAttemptLimitListener implements EventSubscriberInterface
 
     public function onAuthenticationSuccess(AuthenticationSuccessEvent $event): void
     {
-        if (!$event->getAuthenticator()->isInteractive()) {
+        if (! $event->getAuthenticator()->isInteractive()) {
             return;
         }
 

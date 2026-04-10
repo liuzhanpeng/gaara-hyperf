@@ -10,16 +10,15 @@ use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * 撤消OpaqueToken登出监听器
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 撤消OpaqueToken登出监听器.
  */
 class OpaqueTokenRevokeLogoutListener implements EventSubscriberInterface
 {
     public function __construct(
         private OpaqueTokenManagerInterface $opaqueTokenManager,
         private AccessTokenExtractorInterface $accessTokenExtractor,
-    ) {}
+    ) {
+    }
 
     public static function getSubscribedEvents()
     {

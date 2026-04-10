@@ -5,16 +5,12 @@ declare(strict_types=1);
 namespace GaaraHyperf\User;
 
 /**
- * 用户接口
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 用户接口.
  */
 interface UserInterface
 {
     /**
-     * 返回用户标识符
-     *
-     * @return string
+     * 返回用户标识符.
      */
     public function getIdentifier(): string;
 }

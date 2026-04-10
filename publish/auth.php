@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'guards' => [
         'admin' => [
@@ -70,14 +72,14 @@ return [
                 //     'failure_handler' => CustomFailureHandler::class // 可选，认证失败处理器配置
                 // ],
                 // 'api_key' => [ // API-Key认证器
-                //     'api_key_field' => 'X-API-KEY', // 请求头中的api key参数名; 默认X-API-KEY; 
+                //     'api_key_field' => 'X-API-KEY', // 请求头中的api key参数名; 默认X-API-KEY;
                 // ],
                 // 'hmac' => [ // HMAC签名认证器
-                //     'api_key_field' => 'X-API-KEY', // 请求头中的api key参数名; 默认X-API-KEY; 
+                //     'api_key_field' => 'X-API-KEY', // 请求头中的api key参数名; 默认X-API-KEY;
                 //     'signature_field' => 'X-SIGNATURE', // 请求头中的签名参数名
                 //     'timestamp_field' => 'X-TIMESTAMP', // 请求头中的时间戳参数名
                 //     'nonce_enabled' => true, // 是否启用随机字符串; 防止重放攻击
-                //     'nonce_field' => 'X-NONCE', // nonce_enabled==true必须; 请求头中的随机字符串参数名 
+                //     'nonce_field' => 'X-NONCE', // nonce_enabled==true必须; 请求头中的随机字符串参数名
                 //     'nonce_cache_prefix' => 'default', // nonce_enabled==true必须; 缓存前缀
                 //     'ttl' => 60, // 请求签名的有效期，单位秒
                 //     'leeway' => 300, // 允许的时间戳偏差，单位秒，默认300秒
@@ -118,7 +120,7 @@ return [
 
             // 'password_hasher' => 'default', // 可选，密码哈希器服务名称；默认default
 
-            'listeners' =>  [
+            'listeners' => [
                 // [
                 //     'class' => IPWhiteListListener::class, // IP白名单检查监听器
                 //     'params' => [

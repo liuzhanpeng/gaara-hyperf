@@ -4,35 +4,25 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Event;
 
-use Psr\Http\Message\ServerRequestInterface;
 use GaaraHyperf\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * 登出事件
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 登出事件.
  */
 class LogoutEvent
 {
-    /**
-     * @var ResponseInterface|null
-     */
     private ?ResponseInterface $response = null;
 
-    /**
-     * @param TokenInterface $token
-     * @param ServerRequestInterface $request
-     */
     public function __construct(
         private TokenInterface $token,
         private ServerRequestInterface $request,
-    ) {}
+    ) {
+    }
 
     /**
-     * 返回用户令牌
-     *
-     * @return TokenInterface
+     * 返回用户令牌.
      */
     public function getToken(): TokenInterface
     {
@@ -41,8 +31,6 @@ class LogoutEvent
 
     /**
      * 返回请求
-     *
-     * @return ServerRequestInterface
      */
     public function getRequest(): ServerRequestInterface
     {
@@ -50,9 +38,7 @@ class LogoutEvent
     }
 
     /**
-     * 返回响应
-     *
-     * @return ResponseInterface|null
+     * 返回响应.
      */
     public function getResponse(): ?ResponseInterface
     {
@@ -60,10 +46,7 @@ class LogoutEvent
     }
 
     /**
-     * 设置响应
-     *
-     * @param ResponseInterface $response
-     * @return void
+     * 设置响应.
      */
     public function setResponse(ResponseInterface $response): void
     {

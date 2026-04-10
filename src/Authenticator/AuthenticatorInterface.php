@@ -4,74 +4,48 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Authenticator;
 
-use Psr\Http\Message\ServerRequestInterface;
 use GaaraHyperf\Exception\AuthenticationException;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * 认证器接口
- * 
+ * 认证器接口.
+ *
  * 通过实现此接口可以实现自定义的认证逻辑
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
  */
 interface AuthenticatorInterface
 {
     /**
      * 判断请求是否需要进行认证
-     * 
-     * 返回ture时会调用 authenticate 方法进行认证，否则不进行认证
      *
-     * @param ServerRequestInterface $request
-     * @return boolean
+     * 返回ture时会调用 authenticate 方法进行认证，否则不进行认证
      */
     public function supports(ServerRequestInterface $request): bool;
 
     /**
      * 对请求进行认证
-     *
-     * @param ServerRequestInterface $request
-     * @return Passport
      */
     public function authenticate(ServerRequestInterface $request): Passport;
 
     /**
-     * 创建token
-     *
-     * @param Passport $passport
-     * @param string $guardName
-     * @return TokenInterface
+     * 创建token.
      */
     public function createToken(Passport $passport, string $guardName): TokenInterface;
 
     /**
-     * 认证成功处理函数
-     *
-     * @param string $guardName
-     * @param ServerRequestInterface $request
-     * @param TokenInterface $token
-     * @param Passport $passport
-     * @return ResponseInterface|null
+     * 认证成功处理函数.
      */
     public function onAuthenticationSuccess(string $guardName, ServerRequestInterface $request, TokenInterface $token, Passport $passport): ?ResponseInterface;
 
     /**
-     * 认证失败处理函数
-     *
-     * @param string $guardName
-     * @param ServerRequestInterface $request
-     * @param AuthenticationException $exception
-     * @param Passport|null $passport
-     * @return ResponseInterface|null
+     * 认证失败处理函数.
      */
     public function onAuthenticationFailure(string $guardName, ServerRequestInterface $request, AuthenticationException $exception, ?Passport $passport = null): ?ResponseInterface;
 
     /**
      * 是否交互式认证
-     *
-     * @return boolean
      */
     public function isInteractive(): bool;
 }

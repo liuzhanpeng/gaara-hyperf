@@ -14,33 +14,17 @@ use GaaraHyperf\Exception\UserNotFoundException;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\User\PasswordAwareUserInterface;
 use GaaraHyperf\UserProvider\UserProviderInterface;
+use Hyperf\HttpMessage\Server\Response;
+use Hyperf\HttpMessage\Stream\SwooleStream;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\SimpleCache\CacheInterface;
 
 /**
- * Hmac签名认证器
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * Hmac签名认证器.
  */
 class HmacAuthenticator extends AbstractAuthenticator
 {
-    /**
-     * @param string $apiKeyField
-     * @param string $signatureField
-     * @param string $timestampField
-     * @param bool $nonceEnabled
-     * @param string $nonceField
-     * @param string $nonceCachePrefix
-     * @param integer $ttl
-     * @param integer $leeway
-     * @param string $algo
-     * @param UserProviderInterface $userProvider
-     * @param CacheInterface $cache
-     * @param EncryptorInterface|null $encryptor
-     * @param AuthenticationSuccessHandlerInterface|null $successHandler
-     * @param AuthenticationFailureHandlerInterface|null $failureHandler
-     */
     public function __construct(
         private string $apiKeyField,
         private string $signatureField,
@@ -60,19 +44,13 @@ class HmacAuthenticator extends AbstractAuthenticator
         parent::__construct($successHandler, $failureHandler);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function supports(ServerRequestInterface $request): bool
     {
-        return !empty($request->getHeaderLine($this->apiKeyField))
-            && !empty($request->getHeaderLine($this->signatureField))
-            && !empty($request->getHeaderLine($this->timestampField));
+        return ! empty($request->getHeaderLine($this->apiKeyField))
+            && ! empty($request->getHeaderLine($this->signatureField))
+            && ! empty($request->getHeaderLine($this->timestampField));
     }
 
-    /**
-     * @inheritDoc
-     */
     public function authenticate(ServerRequestInterface $request): Passport
     {
         $apiKey = $request->getHeaderLine($this->apiKeyField);
@@ -124,7 +102,7 @@ class HmacAuthenticator extends AbstractAuthenticator
             );
         }
 
-        if (!$user instanceof PasswordAwareUserInterface) {
+        if (! $user instanceof PasswordAwareUserInterface) {
             throw new AuthenticationException(
                 message: 'User must implement PasswordAwareUserInterface',
                 userIdentifier: $apiKey,
@@ -159,13 +137,13 @@ class HmacAuthenticator extends AbstractAuthenticator
         $signStr = implode("\n", $parts);
 
         $secret = $user->getPassword();
-        if (!is_null($this->encryptor)) {
+        if (! is_null($this->encryptor)) {
             $secret = $this->encryptor->decrypt($secret);
         }
 
         // 验签
         $computedSignature = hash_hmac($this->algo, $signStr, $secret);
-        if (!hash_equals($computedSignature, $signature)) {
+        if (! hash_equals($computedSignature, $signature)) {
             throw new InvalidSignatureException(
                 message: 'Invalid request signature',
                 userIdentifier: $apiKey,
@@ -174,27 +152,23 @@ class HmacAuthenticator extends AbstractAuthenticator
 
         return new Passport(
             $apiKey,
-            fn() => $user,
+            fn () => $user,
         );
     }
 
     /**
-     * @inheritDoc
      * @override
      */
     public function onAuthenticationFailure(string $guardName, ServerRequestInterface $request, AuthenticationException $exception, ?Passport $passport = null): ?ResponseInterface
     {
-        if (!is_null($this->failureHandler)) {
+        if (! is_null($this->failureHandler)) {
             return $this->failureHandler->handle($guardName, $request, $exception, $passport);
         }
 
-        $response = new \Hyperf\HttpMessage\Server\Response();
-        return $response->withStatus(401)->withBody(new \Hyperf\HttpMessage\Stream\SwooleStream($exception->getMessage()));
+        $response = new Response();
+        return $response->withStatus(401)->withBody(new SwooleStream($exception->getMessage()));
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isInteractive(): bool
     {
         return false;

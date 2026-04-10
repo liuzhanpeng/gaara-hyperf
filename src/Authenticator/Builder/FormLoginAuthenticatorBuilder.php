@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Authenticator\Builder;
 
-use Hyperf\Contract\SessionInterface;
 use GaaraHyperf\Authenticator\AuthenticatorInterface;
 use GaaraHyperf\Authenticator\FormLoginAuthenticator;
 use GaaraHyperf\CsrfTokenManager\CsrfTokenManagerResolverInterface;
 use GaaraHyperf\EventListener\CsrfTokenBadgeCheckListener;
 use GaaraHyperf\UserProvider\UserProviderInterface;
+use Hyperf\Contract\SessionInterface;
+use Hyperf\HttpServer\Contract\ResponseInterface;
+use InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
- * 表单登录认证器构建器
- *
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 表单登录认证器构建器.
  */
 class FormLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
-        if (!isset($options['check_path'])) {
-            throw new \InvalidArgumentException('The "check_path" option must be set.');
+        if (! isset($options['check_path'])) {
+            throw new InvalidArgumentException('The "check_path" option must be set.');
         }
 
         $csrfEnabled = $options['csrf_enabled'] ?? true;
@@ -45,7 +45,7 @@ class FormLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             csrfId: $options['csrf_id'] ?? 'authenticate',
             errorMessage: $options['error_message'] ?? '用户名或密码错误',
             userProvider: $userProvider,
-            response: $this->container->get(\Hyperf\HttpServer\Contract\ResponseInterface::class),
+            response: $this->container->get(ResponseInterface::class),
             session: $this->container->get(SessionInterface::class),
             successHandler: $this->createSuccessHandler($options),
             failureHandler: $this->createFailureHandler($options),

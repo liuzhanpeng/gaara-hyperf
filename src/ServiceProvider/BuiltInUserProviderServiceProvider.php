@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\ServiceProvider;
 
-use Hyperf\Contract\ContainerInterface;
 use GaaraHyperf\UserProvider\Builder\MemoryUserProviderBuilder;
 use GaaraHyperf\UserProvider\Builder\ModelUserProviderBuilder;
 use GaaraHyperf\UserProvider\UserProviderFactory;
+use Hyperf\Contract\ContainerInterface;
 
 /**
- * 内置用户提供者服务提供者
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 内置用户提供者服务提供者.
  */
 class BuiltInUserProviderServiceProvider implements ServiceProviderInterface
 {

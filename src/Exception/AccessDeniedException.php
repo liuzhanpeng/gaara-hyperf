@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Exception;
 
+use Exception;
 use GaaraHyperf\Token\TokenInterface;
 
 /**
- * 访问被拒绝异常
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 访问被拒绝异常.
  */
-class AccessDeniedException extends \Exception
+class AccessDeniedException extends Exception
 {
     /**
      * @param TokenInterface $token 用户令牌
@@ -20,16 +19,14 @@ class AccessDeniedException extends \Exception
      */
     public function __construct(
         private TokenInterface $token,
-        private string|array $attribute = [],
+        private array|string $attribute = [],
         private mixed $subject = null
     ) {
         parent::__construct();
     }
 
     /**
-     * 返回用户令牌
-     *
-     * @return TokenInterface
+     * 返回用户令牌.
      */
     public function getToken(): TokenInterface
     {
@@ -37,19 +34,15 @@ class AccessDeniedException extends \Exception
     }
 
     /**
-     * 返回访问属性
-     *
-     * @return string|array
+     * 返回访问属性.
      */
-    public function getAttribute(): string|array
+    public function getAttribute(): array|string
     {
         return $this->attribute;
     }
 
     /**
-     * 返回访问主体
-     *
-     * @return mixed
+     * 返回访问主体.
      */
     public function getSubject(): mixed
     {

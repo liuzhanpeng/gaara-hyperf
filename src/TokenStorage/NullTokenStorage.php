@@ -7,27 +7,20 @@ namespace GaaraHyperf\TokenStorage;
 use GaaraHyperf\Token\TokenInterface;
 
 /**
- * 用于无状态认证的TokenStorage实现
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 用于无状态认证的TokenStorage实现.
  */
 class NullTokenStorage implements TokenStorageInterface
 {
-    /**
-     * @inheritDoc
-     */
     public function get(string $key): ?TokenInterface
     {
         return null;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function set(string $key, TokenInterface $token): void {}
+    public function set(string $key, TokenInterface $token): void
+    {
+    }
 
-    /**
-     * @inheritDoc
-     */
-    public function delete(string $key): void {}
+    public function delete(string $key): void
+    {
+    }
 }

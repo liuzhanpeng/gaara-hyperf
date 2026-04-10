@@ -7,9 +7,7 @@ namespace GaaraHyperf;
 use function Hyperf\Support\make;
 
 /**
- * 获取认证上下文
- * 
- * @return AuthContext
+ * 获取认证上下文.
  */
 function auth(): AuthContext
 {

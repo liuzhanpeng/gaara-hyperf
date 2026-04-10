@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace GaaraHyperf\Exception;
 
 /**
- * 签名过期异常
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 签名过期异常.
  */
 class SignatureExpiredException extends InvalidCredentialsException
 {

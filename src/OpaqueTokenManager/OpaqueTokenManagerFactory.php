@@ -4,25 +4,22 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\OpaqueTokenManager;
 
-use Hyperf\Contract\ContainerInterface;
 use GaaraHyperf\Config\CustomConfig;
 use GaaraHyperf\Constants;
+use Hyperf\Contract\ContainerInterface;
+use InvalidArgumentException;
+use LogicException;
 
 /**
  * OpaqueToken管理器创建工厂
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class OpaqueTokenManagerFactory
 {
     public function __construct(
         private ContainerInterface $container,
-    ) {}
+    ) {
+    }
 
-    /**
-     * @param array $config
-     * @return OpaqueTokenManagerInterface
-     */
     public function create(array $config): OpaqueTokenManagerInterface
     {
         $type = $config['type'] ?? 'default';
@@ -44,13 +41,13 @@ class OpaqueTokenManagerFactory
                 $customConfig = CustomConfig::from($config);
 
                 $opaqueTokenManager = $this->container->make($customConfig->class(), $customConfig->params());
-                if (!$opaqueTokenManager instanceof OpaqueTokenManagerInterface) {
-                    throw new \LogicException(sprintf('The custom OpaqueTokenManager must implement %s.', OpaqueTokenManagerInterface::class));
+                if (! $opaqueTokenManager instanceof OpaqueTokenManagerInterface) {
+                    throw new LogicException(sprintf('The custom OpaqueTokenManager must implement %s.', OpaqueTokenManagerInterface::class));
                 }
 
                 return $opaqueTokenManager;
             default:
-                throw new \InvalidArgumentException('Unsupported opaque token manager type: ' . $type);
+                throw new InvalidArgumentException('Unsupported opaque token manager type: ' . $type);
         }
     }
 }

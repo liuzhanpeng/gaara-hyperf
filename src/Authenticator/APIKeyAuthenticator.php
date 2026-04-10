@@ -7,24 +7,19 @@ namespace GaaraHyperf\Authenticator;
 use GaaraHyperf\Exception\AuthenticationException;
 use GaaraHyperf\Exception\InvalidCredentialsException;
 use GaaraHyperf\Exception\UserNotFoundException;
-use Psr\Http\Message\ServerRequestInterface;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\UserProvider\UserProviderInterface;
+use Hyperf\HttpMessage\Server\Response;
+use Hyperf\HttpMessage\Stream\SwooleStream;
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * API Key认证器
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * API Key认证器.
  */
 class APIKeyAuthenticator extends AbstractAuthenticator
 {
-    /**
-     * @param string $apiKeyField
-     * @param UserProviderInterface $userProvider
-     * @param AuthenticationSuccessHandlerInterface|null $successHandler
-     * @param AuthenticationFailureHandlerInterface|null $failureHandler
-     */
     public function __construct(
         private string $apiKeyField,
         private UserProviderInterface $userProvider,
@@ -34,21 +29,15 @@ class APIKeyAuthenticator extends AbstractAuthenticator
         parent::__construct($successHandler, $failureHandler);
 
         if (empty($this->apiKeyField)) {
-            throw new \InvalidArgumentException('apiKeyField cannot be empty');
+            throw new InvalidArgumentException('apiKeyField cannot be empty');
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function supports(ServerRequestInterface $request): bool
     {
-        return !empty($request->getHeaderLine($this->apiKeyField));
+        return ! empty($request->getHeaderLine($this->apiKeyField));
     }
 
-    /**
-     * @inheritDoc
-     */
     public function authenticate(ServerRequestInterface $request): Passport
     {
         $apiKey = $request->getHeaderLine($this->apiKeyField);
@@ -64,27 +53,23 @@ class APIKeyAuthenticator extends AbstractAuthenticator
             );
         }
 
-        return new Passport($apiKey, fn() => $user);
+        return new Passport($apiKey, fn () => $user);
     }
 
     /**
-     * @inheritDoc
      * @override
      */
     public function onAuthenticationFailure(string $guardName, ServerRequestInterface $request, AuthenticationException $exception, ?Passport $passport = null): ?ResponseInterface
     {
-        if (!is_null($this->failureHandler)) {
+        if (! is_null($this->failureHandler)) {
             return $this->failureHandler->handle($guardName, $request, $exception, $passport);
         }
 
         // 默认返回401响应
-        $response = new \Hyperf\HttpMessage\Server\Response();
-        return $response->withStatus(401)->withBody(new \Hyperf\HttpMessage\Stream\SwooleStream($exception->getMessage()));
+        $response = new Response();
+        return $response->withStatus(401)->withBody(new SwooleStream($exception->getMessage()));
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isInteractive(): bool
     {
         return false;

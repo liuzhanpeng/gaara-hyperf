@@ -7,28 +7,23 @@ namespace GaaraHyperf\RequestMatcher;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * 默认请求匹配器
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 默认请求匹配器.
  */
 class RequestMatcher implements RequestMatcherInterface
 {
     /**
-     * @param string|array $pattern 匹配的路径模式
-     * @param string|null $logoutPath 注销路径
+     * @param array|string $pattern 匹配的路径模式
+     * @param null|string $logoutPath 注销路径
      * @param array $exclusions 排除的路径模式数组
      */
     public function __construct(
-        private string|array $pattern,
+        private array|string $pattern,
         private ?string $logoutPath,
         private array $exclusions,
     ) {
         $this->pattern = is_array($this->pattern) ? $pattern : [$pattern];
     }
 
-    /**
-     * @inheritDoc
-     */
     public function matchesPattern(ServerRequestInterface $request): bool
     {
         $path = $request->getUri()->getPath();
@@ -42,9 +37,6 @@ class RequestMatcher implements RequestMatcherInterface
         return false;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function matchesLogout(ServerRequestInterface $request): bool
     {
         if (is_null($this->logoutPath)) {
@@ -54,9 +46,6 @@ class RequestMatcher implements RequestMatcherInterface
         return strcmp($request->getUri()->getPath(), $this->logoutPath) === 0;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function matchesExcluded(ServerRequestInterface $request): bool
     {
         $path = $request->getUri()->getPath();
@@ -70,11 +59,7 @@ class RequestMatcher implements RequestMatcherInterface
     }
 
     /**
-     * 是否匹配给定的路径模式
-     *
-     * @param string $path
-     * @param string $pattern
-     * @return boolean
+     * 是否匹配给定的路径模式.
      */
     private function matches(string $path, string $pattern): bool
     {

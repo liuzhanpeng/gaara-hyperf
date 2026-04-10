@@ -5,25 +5,18 @@ declare(strict_types=1);
 namespace GaaraHyperf\Config;
 
 /**
- * 认证器配置
- *
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 认证器配置.
  */
 class AuthenticatorConfig
 {
-    /**
-     * @param string $type
-     * @param array $options
-     */
     public function __construct(
         private string $type,
         private array $options
-    ) {}
+    ) {
+    }
 
     /**
-     * 返回认证器类型
-     *
-     * @return string
+     * 返回认证器类型.
      */
     public function type(): string
     {
@@ -31,9 +24,7 @@ class AuthenticatorConfig
     }
 
     /**
-     * 返回选项
-     *
-     * @return array
+     * 返回选项.
      */
     public function options(): array
     {

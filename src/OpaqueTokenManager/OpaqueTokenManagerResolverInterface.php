@@ -5,15 +5,9 @@ declare(strict_types=1);
 namespace GaaraHyperf\OpaqueTokenManager;
 
 /**
- * OpaqueToken管理器解析器接口
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * OpaqueToken管理器解析器接口.
  */
 interface OpaqueTokenManagerResolverInterface
 {
-    /**
-     * @param string $name
-     * @return OpaqueTokenManagerInterface
-     */
     public function resolve(string $name = 'default'): OpaqueTokenManagerInterface;
 }

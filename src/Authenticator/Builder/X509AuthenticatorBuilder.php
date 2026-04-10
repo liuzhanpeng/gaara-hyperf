@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Authenticator\Builder;
 
-use GaaraHyperf\UserProvider\UserProviderInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use GaaraHyperf\Authenticator\AuthenticatorInterface;
 use GaaraHyperf\Authenticator\X509Authenticator;
+use GaaraHyperf\UserProvider\UserProviderInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
- * X509证书认证器
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * X509证书认证器.
  */
 class X509AuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {

@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace GaaraHyperf\Exception;
 
 /**
- * 登录次数限制异常
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 登录次数限制异常.
  */
 class TooManyLoginAttemptsException extends AuthenticationException
 {
@@ -20,9 +18,7 @@ class TooManyLoginAttemptsException extends AuthenticationException
     }
 
     /**
-     * 返回多少秒后可重试
-     *
-     * @return integer
+     * 返回多少秒后可重试.
      */
     public function getRetryAfter(): int
     {

@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace GaaraHyperf\Exception;
 
 /**
- * 无效access token异常
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 无效access token异常.
  */
 class InvalidAccessTokenException extends InvalidCredentialsException
 {

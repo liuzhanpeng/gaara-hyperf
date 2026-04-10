@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Authenticator;
 
-use Hyperf\Contract\SessionInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Hyperf\Session\Session;
+use Closure;
 use GaaraHyperf\Exception\AuthenticationException;
 use GaaraHyperf\Exception\InvalidCsrfTokenException;
 use GaaraHyperf\Exception\InvalidPasswordException;
@@ -16,34 +14,21 @@ use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\Passport\PasswordBadge;
 use GaaraHyperf\Token\TokenInterface;
 use GaaraHyperf\UserProvider\UserProviderInterface;
+use Hyperf\Contract\SessionInterface;
+use Hyperf\Session\Session;
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * 表单登录认证器
- * 
+ * 表单登录认证器.
+ *
  * 基于Session的有状态认证
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class FormLoginAuthenticator extends AbstractAuthenticator
 {
     /**
-     * @param string $checkPath
-     * @param string $usernameField
-     * @param string $passwordField
-     * @param bool $csrfEnabled
-     * @param string $csrfField
-     * @param string $csrfId
-     * @param bool $redirectEnabled
-     * @param string $redirectField
-     * @param string $targetPath
-     * @param string $failurePath
-     * @param string|callable $errorMessage
-     * @param UserProviderInterface $userProvider
-     * @param \Hyperf\HttpServer\Contract\ResponseInterface $response
-     * @param SessionInterface $session
-     * @param AuthenticationSuccessHandlerInterface|null $successHandler
-     * @param AuthenticationFailureHandlerInterface|null $failureHandler
+     * @param callable|string $errorMessage
      */
     public function __construct(
         private string $checkPath,
@@ -56,7 +41,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
         private bool $csrfEnabled,
         private string $csrfField,
         private string $csrfId,
-        private string|\Closure $errorMessage,
+        private Closure|string $errorMessage,
         private UserProviderInterface $userProvider,
         private \Hyperf\HttpServer\Contract\ResponseInterface $response,
         private SessionInterface $session,
@@ -65,22 +50,16 @@ class FormLoginAuthenticator extends AbstractAuthenticator
     ) {
         parent::__construct($successHandler, $failureHandler);
         if (empty($this->checkPath)) {
-            throw new \InvalidArgumentException('The "check_path" option must be set.');
+            throw new InvalidArgumentException('The "check_path" option must be set.');
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function supports(ServerRequestInterface $request): bool
     {
         return $request->getUri()->getPath() === $this->checkPath
             && $request->getMethod() === 'POST';
     }
 
-    /**
-     * @inheritDoc
-     */
     public function authenticate(ServerRequestInterface $request): Passport
     {
         $credientials = $this->getCredentials($request);
@@ -111,19 +90,18 @@ class FormLoginAuthenticator extends AbstractAuthenticator
     }
 
     /**
-     * @inheritDoc
      * @override
      */
     public function onAuthenticationSuccess(string $guardName, ServerRequestInterface $request, TokenInterface $token, Passport $passport): ?ResponseInterface
     {
         $this->session->migrate(true);
 
-        if (!is_null($this->successHandler)) {
+        if (! is_null($this->successHandler)) {
             return $this->successHandler->handle($guardName, $request, $token, $passport);
         }
 
         $redirectTo = $request->getParsedBody()[$this->redirectField] ?? null;
-        if ($this->redirectEnabled && !is_null($redirectTo)) {
+        if ($this->redirectEnabled && ! is_null($redirectTo)) {
             return $this->response->redirect(urldecode($redirectTo));
         }
 
@@ -131,12 +109,11 @@ class FormLoginAuthenticator extends AbstractAuthenticator
     }
 
     /**
-     * @inheritDoc
      * @override
      */
     public function onAuthenticationFailure(string $guardName, ServerRequestInterface $request, AuthenticationException $exception, ?Passport $passport = null): ?ResponseInterface
     {
-        if (!is_null($this->failureHandler)) {
+        if (! is_null($this->failureHandler)) {
             return $this->failureHandler->handle($guardName, $request, $exception, $passport);
         }
 
@@ -153,9 +130,6 @@ class FormLoginAuthenticator extends AbstractAuthenticator
         return $this->response->redirect($this->failurePath);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isInteractive(): bool
     {
         return true;
@@ -163,15 +137,12 @@ class FormLoginAuthenticator extends AbstractAuthenticator
 
     /**
      * 获取认证凭证
-     *
-     * @param ServerRequestInterface $request
-     * @return array
      */
     private function getCredentials(ServerRequestInterface $request): array
     {
         $credientials = [];
         $username = $request->getParsedBody()[$this->usernameField] ?? '';
-        if (!is_string($username) || empty($username)) {
+        if (! is_string($username) || empty($username)) {
             throw new UserNotFoundException(
                 message: 'Username is missing',
                 userIdentifier: $username,
@@ -180,7 +151,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
         $credientials['username'] = trim($username);
 
         $password = $request->getParsedBody()[$this->passwordField] ?? '';
-        if (!is_string($password) || empty($password)) {
+        if (! is_string($password) || empty($password)) {
             throw new InvalidPasswordException(
                 message: 'Password is missing',
                 userIdentifier: $username

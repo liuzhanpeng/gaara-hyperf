@@ -9,19 +9,18 @@ use GaaraHyperf\Exception\IPNotInWhiteListException;
 use GaaraHyperf\IPResolver\IPResolverInterface;
 use GaaraHyperf\IPWhiteListChecker\IPWhiteListChecker;
 use GaaraHyperf\IPWhiteListChecker\IPWhiteListProviderInterface;
+use InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * IP白名单检查监听器
- *
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * IP白名单检查监听器.
  */
 class IPWhiteListListener implements EventSubscriberInterface
 {
     public function __construct(
         private IPResolverInterface $ipResolver,
         private IPWhiteListChecker $whiteListChecker,
-        private array|string|IPWhiteListProviderInterface $whiteList = []
+        private array|IPWhiteListProviderInterface|string $whiteList = []
     ) {
     }
 
@@ -39,7 +38,7 @@ class IPWhiteListListener implements EventSubscriberInterface
 
         $whiteList = $this->resolveWhiteList();
 
-        if (!$this->whiteListChecker->isAllowed($ip, $whiteList)) {
+        if (! $this->whiteListChecker->isAllowed($ip, $whiteList)) {
             throw new IPNotInWhiteListException(
                 message: 'IP address not in white list',
                 userIdentifier: $passport->getUser()->getIdentifier(),
@@ -49,9 +48,7 @@ class IPWhiteListListener implements EventSubscriberInterface
     }
 
     /**
-     * 解析白名单
-     *
-     * @return array
+     * 解析白名单.
      */
     private function resolveWhiteList(): array
     {
@@ -60,14 +57,14 @@ class IPWhiteListListener implements EventSubscriberInterface
         }
 
         if (is_string($this->whiteList)) {
-            if (!class_exists($this->whiteList)) {
-                throw new \InvalidArgumentException(sprintf('White list provider class "%s" does not exist.', $this->whiteList));
+            if (! class_exists($this->whiteList)) {
+                throw new InvalidArgumentException(sprintf('White list provider class "%s" does not exist.', $this->whiteList));
             }
 
             $provider = new $this->whiteList();
 
-            if (!$provider instanceof IPWhiteListProviderInterface) {
-                throw new \InvalidArgumentException(sprintf('White list provider class "%s" must implement IPWhiteListProviderInterface.', $this->whiteList));
+            if (! $provider instanceof IPWhiteListProviderInterface) {
+                throw new InvalidArgumentException(sprintf('White list provider class "%s" must implement IPWhiteListProviderInterface.', $this->whiteList));
             }
 
             return $provider->getWhiteList();

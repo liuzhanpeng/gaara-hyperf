@@ -7,16 +7,13 @@ namespace GaaraHyperf\RateLimiter;
 use Hyperf\Redis\Redis;
 
 /**
- * 令牌桶限流器
+ * 令牌桶限流器.
  *
  * 依赖于Redis HASH 实现
- *
- * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class TokenBucketRateLimiter implements RateLimiterInterface
 {
     /**
-     * @param Redis $redis
      * @param int $limit 桶的容量 (最大令牌数)
      * @param float $rate 每秒生成的令牌数
      * @param string $prefix 缓存键前缀
@@ -26,13 +23,13 @@ class TokenBucketRateLimiter implements RateLimiterInterface
         private int $limit,
         private float $rate,
         private string $prefix
-    ) {}
+    ) {
+    }
 
     /**
-     * 尝试请求并返回限流结果
+     * 尝试请求并返回限流结果.
      *
      * @param string $key 限流key
-     * @return LimitResult
      */
     public function attempt(string $key): LimitResult
     {
@@ -100,10 +97,9 @@ class TokenBucketRateLimiter implements RateLimiterInterface
     }
 
     /**
-     * 重置指定key的限流记录
+     * 重置指定key的限流记录.
      *
      * @param string $key 限流key
-     * @return void
      */
     public function reset(string $key): void
     {
@@ -111,10 +107,6 @@ class TokenBucketRateLimiter implements RateLimiterInterface
         $this->redis->del($redisKey);
     }
 
-    /**
-     * @param string $key
-     * @return string
-     */
     private function getKey(string $key): string
     {
         return sprintf('%s:%s', $this->prefix, $key);

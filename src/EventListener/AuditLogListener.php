@@ -13,18 +13,17 @@ use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * 审计日志监听器
- * 
+ * 审计日志监听器.
+ *
  * 基于Logger记录认证成功和失败的审计日志
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class AuditLogListener implements EventSubscriberInterface
 {
     public function __construct(
         private LoggerInterface $logger,
         private IPResolverInterface $ipResolver,
-    ) {}
+    ) {
+    }
 
     public static function getSubscribedEvents(): array
     {
@@ -45,7 +44,7 @@ class AuditLogListener implements EventSubscriberInterface
             'guard' => $token->getGuardName(),
             'authenticator' => get_class($authenticator),
             'user_identifier' => $token->getUserIdentifier(),
-            'request_uri' => (string)$request->getUri(),
+            'request_uri' => (string) $request->getUri(),
             'ip' => $this->ipResolver->resolve($request),
             'user_agent' => $request->getHeaderLine('User-Agent'),
             'occurred_at' => date('c'),
@@ -62,7 +61,7 @@ class AuditLogListener implements EventSubscriberInterface
             'guard' => $event->getGuardName(),
             'authenticator' => get_class($authenticator),
             'user_identifier' => $exception->getUserIdentifier(),
-            'request_uri' => (string)$request->getUri(),
+            'request_uri' => (string) $request->getUri(),
             'ip' => $this->ipResolver->resolve($request),
             'user_agent' => $request->getHeaderLine('User-Agent'),
             'exception_type' => get_class($exception),
@@ -79,7 +78,7 @@ class AuditLogListener implements EventSubscriberInterface
         $this->logger->log(LogLevel::INFO, 'User logout', [
             'guard' => $token->getGuardName(),
             'user_identifier' => $token->getUserIdentifier(),
-            'request_uri' => (string)$request->getUri(),
+            'request_uri' => (string) $request->getUri(),
             'ip' => $this->ipResolver->resolve($request),
             'user_agent' => $request->getHeaderLine('User-Agent'),
             'occurred_at' => date('c'),

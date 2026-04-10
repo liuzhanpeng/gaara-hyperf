@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace GaaraHyperf\Exception;
 
 /**
- * 无效的CSRF令牌异常
- *
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 无效的CSRF令牌异常.
  */
-class InvalidCsrfTokenException extends AuthenticationException {}
+class InvalidCsrfTokenException extends AuthenticationException
+{
+}

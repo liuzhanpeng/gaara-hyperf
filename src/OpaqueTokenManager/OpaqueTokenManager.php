@@ -4,32 +4,19 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\OpaqueTokenManager;
 
-use Hyperf\HttpServer\Contract\RequestInterface;
 use GaaraHyperf\IPResolver\IPResolverInterface;
 use GaaraHyperf\Token\TokenInterface;
+use Hyperf\HttpServer\Contract\RequestInterface;
+use InvalidArgumentException;
 use Psr\SimpleCache\CacheInterface;
 
 /**
- * 内置的OpaqueToken管理器
- * 
+ * 内置的OpaqueToken管理器.
+ *
  * 基于缓存实现
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class OpaqueTokenManager implements OpaqueTokenManagerInterface
 {
-    /**
-     * @param CacheInterface $cache
-     * @param RequestInterface $request
-     * @param IPResolverInterface $ipResolver
-     * @param string $prefix
-     * @param integer $ttl
-     * @param integer $maxTtl
-     * @param boolean $tokenRefresh
-     * @param boolean $singleSession
-     * @param boolean $ipBindEnabled
-     * @param boolean $userAgentBindEnabled
-     */
     public function __construct(
         private CacheInterface $cache,
         private RequestInterface $request,
@@ -44,17 +31,14 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
         private int $accessTokenLength
     ) {
         if ($this->accessTokenLength < 16) {
-            throw new \InvalidArgumentException('Access token length must be at least 16 characters.');
+            throw new InvalidArgumentException('Access token length must be at least 16 characters.');
         }
 
         if ($this->ttl > $this->maxTtl) {
-            throw new \InvalidArgumentException('The ttl option must be less than or equal to max_ttl option.');
+            throw new InvalidArgumentException('The ttl option must be less than or equal to max_ttl option.');
         }
     }
 
-    /**
-     * @inheritDoc
-     */
     public function issue(TokenInterface $token): string
     {
         $accessToken = bin2hex(random_bytes($this->accessTokenLength / 2));
@@ -75,7 +59,7 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
 
         if ($this->singleSession) {
             $preAccessToken = $this->cache->get($this->getUserKey($token->getUserIdentifier()));
-            if (!is_null($preAccessToken)) {
+            if (! is_null($preAccessToken)) {
                 $this->cache->delete($this->getAccessTokenKey($preAccessToken));
             }
 
@@ -87,9 +71,6 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
         return $accessToken;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function resolve(string $accessToken): ?TokenInterface
     {
         $data = $this->cache->get($this->getAccessTokenKey($accessToken));
@@ -102,10 +83,10 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
             return null;
         }
 
-        if ($this->ipBindEnabled && (!isset($data['ip']) || $data['ip'] !== $this->ipResolver->resolve($this->request))) {
+        if ($this->ipBindEnabled && (! isset($data['ip']) || $data['ip'] !== $this->ipResolver->resolve($this->request))) {
             return null;
         }
-        if ($this->userAgentBindEnabled && (!isset($data['user_agent']) || $data['user_agent'] !== md5($this->request->getHeaderLine('User-Agent')))) {
+        if ($this->userAgentBindEnabled && (! isset($data['user_agent']) || $data['user_agent'] !== md5($this->request->getHeaderLine('User-Agent')))) {
             return null;
         }
 
@@ -116,14 +97,11 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
         return $data['token'];
     }
 
-    /**
-     * @inheritDoc
-     */
     public function revoke(string $accessToken): void
     {
         if ($this->singleSession) {
             $data = $this->cache->get($this->getAccessTokenKey($accessToken));
-            if (!is_null($data)) {
+            if (! is_null($data)) {
                 $this->cache->delete($this->getUserKey($data['token']->getUserIdentifier()));
             }
         }
@@ -132,10 +110,7 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
     }
 
     /**
-     * 返回AccessToken键
-     *
-     * @param string $accessToken
-     * @return string
+     * 返回AccessToken键.
      */
     private function getAccessTokenKey(string $accessToken): string
     {
@@ -143,10 +118,7 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
     }
 
     /**
-     * 返回用户键
-     *
-     * @param string $identifier
-     * @return string
+     * 返回用户键.
      */
     private function getUserKey(string $identifier): string
     {

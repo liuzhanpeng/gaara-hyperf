@@ -4,33 +4,26 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Passport;
 
+use SensitiveParameter;
 
 /**
- * 密码凭证标识
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 密码凭证标识.
  */
 class PasswordBadge implements BadgeInterface
 {
     /**
-     * 是否已被解决
-     *
-     * @var boolean
+     * 是否已被解决.
      */
     private bool $isResolved = false;
 
-    /**
-     * @param string $password
-     */
     public function __construct(
-        #[\SensitiveParameter]
+        #[SensitiveParameter]
         private string $password
-    ) {}
+    ) {
+    }
 
     /**
      * 返回密码
-     *
-     * @return string
      */
     public function getPassword(): string
     {
@@ -38,18 +31,13 @@ class PasswordBadge implements BadgeInterface
     }
 
     /**
-     * 设为已解决
-     *
-     * @return void
+     * 设为已解决.
      */
     public function resolve(): void
     {
         $this->isResolved = true;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function isResolved(): bool
     {
         return $this->isResolved;

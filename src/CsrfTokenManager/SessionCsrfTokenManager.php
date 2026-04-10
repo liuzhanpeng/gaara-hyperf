@@ -7,22 +7,18 @@ namespace GaaraHyperf\CsrfTokenManager;
 use Hyperf\Contract\SessionInterface;
 
 /**
- * 内置的CsrfToken管理器
- * 
+ * 内置的CsrfToken管理器.
+ *
  * 依赖于Session
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class SessionCsrfTokenManager implements CsrfTokenManagerInterface
 {
     public function __construct(
         private string $prefix,
         private SessionInterface $session,
-    ) {}
+    ) {
+    }
 
-    /**
-     * @inheritDoc
-     */
     public function generate(string $tokenId = 'authenticate'): CsrfToken
     {
         $csrfToken = new CsrfToken($tokenId, $this->generateToken());
@@ -35,9 +31,6 @@ class SessionCsrfTokenManager implements CsrfTokenManagerInterface
         return $csrfToken;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function verify(CsrfToken $token): bool
     {
         $key = $this->getKey($token->getId());
@@ -49,9 +42,7 @@ class SessionCsrfTokenManager implements CsrfTokenManagerInterface
     }
 
     /**
-     * 生成随机令牌
-     *
-     * @return string
+     * 生成随机令牌.
      */
     private function generateToken(): string
     {
@@ -59,10 +50,7 @@ class SessionCsrfTokenManager implements CsrfTokenManagerInterface
     }
 
     /**
-     * 获取存储在Session中的Key
-     *
-     * @param string $tokenId
-     * @return string
+     * 获取存储在Session中的Key.
      */
     private function getKey(string $tokenId): string
     {

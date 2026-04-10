@@ -4,32 +4,27 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Config;
 
+use InvalidArgumentException;
+
 /**
- * 认证配置
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 认证配置.
  */
 class Config
 {
     /**
      * @param array<string, GuardConfig> $guardConfigCollection
-     * @param array $servicesConfig
-     * @param array $exceptionMessages
      */
     public function __construct(
         private array $guardConfigCollection,
         private array $servicesConfigCollection,
         private array $exceptionMessages
-    ) {}
+    ) {
+    }
 
-    /**
-     * @param array $config
-     * @return self
-     */
     public static function from(array $config): self
     {
-        if (!isset($config['guards']) || count($config['guards']) === 0) {
-            throw new \InvalidArgumentException('guards config is required');
+        if (! isset($config['guards']) || count($config['guards']) === 0) {
+            throw new InvalidArgumentException('guards config is required');
         }
 
         $guardConfigCollection = [];
@@ -41,8 +36,8 @@ class Config
     }
 
     /**
-     * 返回所有guard的配置
-     * 
+     * 返回所有guard的配置.
+     *
      * @return array<string, GuardConfig>
      */
     public function guardConfigCollection(): array
@@ -51,7 +46,7 @@ class Config
     }
 
     /**
-     * 返回指定服务的配置
+     * 返回指定服务的配置.
      *
      * @return array<string, array>
      */
@@ -61,9 +56,7 @@ class Config
     }
 
     /**
-     * 返回异常消息配置
-     * 
-     * @return array
+     * 返回异常消息配置.
      */
     public function exceptionMessages(): array
     {

@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace GaaraHyperf\Exception;
 
 /**
- * Nonce 已使用异常
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * Nonce 已使用异常.
  */
 class UsedNonceException extends InvalidCredentialsException
 {

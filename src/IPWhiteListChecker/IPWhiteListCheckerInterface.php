@@ -5,18 +5,12 @@ declare(strict_types=1);
 namespace GaaraHyperf\IPWhiteListChecker;
 
 /**
- * IP白名单检查器
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * IP白名单检查器.
  */
 interface IPWhiteListCheckerInterface
 {
     /**
-     * 检查ip是否在白名单内
-     *
-     * @param string $ip
-     * @param array $whiteList
-     * @return boolean
+     * 检查ip是否在白名单内.
      */
     public function isAllowed(string $ip, array $whiteList): bool;
 }

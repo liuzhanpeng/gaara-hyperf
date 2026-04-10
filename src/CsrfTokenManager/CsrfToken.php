@@ -4,27 +4,28 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\CsrfTokenManager;
 
+use SensitiveParameter;
+use Stringable;
+
 /**
- * CSRF令牌
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * CSRF令牌.
  */
-class CsrfToken implements \Stringable
+class CsrfToken implements Stringable
 {
-    /**
-     * @param string $id
-     * @param string $value
-     */
     public function __construct(
         private string $id,
-        #[\SensitiveParameter]
+        #[SensitiveParameter]
         private string $value,
-    ) {}
+    ) {
+    }
+
+    public function __toString(): string
+    {
+        return $this->value;
+    }
 
     /**
-     * 返回ID
-     *
-     * @return string
+     * 返回ID.
      */
     public function getId(): string
     {
@@ -33,20 +34,8 @@ class CsrfToken implements \Stringable
 
     /**
      * 返回值
-     *
-     * @return string
      */
     public function getValue(): string
-    {
-        return $this->value;
-    }
-
-    /**
-     * @inheritDoc
-     *
-     * @return string
-     */
-    public function __toString(): string
     {
         return $this->value;
     }

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Authenticator\Builder;
 
-use GaaraHyperf\UserProvider\UserProviderInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use GaaraHyperf\Authenticator\AuthenticatorInterface;
 use GaaraHyperf\Authenticator\HmacAuthenticator;
 use GaaraHyperf\Constants;
 use GaaraHyperf\Encryptor\EncryptorFactory;
+use GaaraHyperf\UserProvider\UserProviderInterface;
 use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class HmacAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {

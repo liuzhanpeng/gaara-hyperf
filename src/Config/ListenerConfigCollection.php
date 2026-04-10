@@ -4,26 +4,22 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Config;
 
+use IteratorAggregate;
 use Traversable;
 
 /**
- * 监听器配置集合
- *
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 监听器配置集合.
  */
-class ListenerConfigCollection implements \IteratorAggregate
+class ListenerConfigCollection implements IteratorAggregate
 {
     /**
      * @param CustomConfig[] $listenerConfigCollection
      */
     public function __construct(
         private array $listenerConfigCollection
-    ) {}
+    ) {
+    }
 
-    /**
-     * @param array $config
-     * @return self
-     */
     public static function from(array $config): self
     {
         $listenerConfigCollection = [];
@@ -35,8 +31,6 @@ class ListenerConfigCollection implements \IteratorAggregate
     }
 
     /**
-     * @inheritDoc
-     * 
      * @return Traversable<CustomConfig>
      */
     public function getIterator(): Traversable

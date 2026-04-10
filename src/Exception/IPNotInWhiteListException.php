@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace GaaraHyperf\Exception;
 
 /**
- * 白名单外IP异常
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 白名单外IP异常.
  */
 class IPNotInWhiteListException extends AuthenticationException
 {
@@ -20,9 +18,7 @@ class IPNotInWhiteListException extends AuthenticationException
     }
 
     /**
-     * 返回用户id
-     *
-     * @return string
+     * 返回用户id.
      */
     public function getIp(): string
     {

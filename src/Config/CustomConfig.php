@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Config;
 
+use InvalidArgumentException;
+
 /**
- * 自定义扩展配置
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 自定义扩展配置.
  */
 class CustomConfig
 {
@@ -18,26 +18,23 @@ class CustomConfig
     public function __construct(
         private string $class,
         private array $params
-    ) {}
+    ) {
+    }
 
-    /**
-     * @param array|string $config
-     * @return self
-     */
     public static function from(array|string $config): self
     {
         if (is_string($config)) {
             return new self($config, []);
         }
 
-        if (!isset($config['class'])) {
-            throw new \InvalidArgumentException('class is required');
+        if (! isset($config['class'])) {
+            throw new InvalidArgumentException('class is required');
         }
 
         $params = $config['params'] ?? [];
         if (count($params) > 0) {
             $params = array_combine(
-                array_map(fn($key) => lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))), array_keys($params)),
+                array_map(fn ($key) => lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key)))), array_keys($params)),
                 $params
             );
         }
@@ -46,9 +43,7 @@ class CustomConfig
     }
 
     /**
-     * 返回类名
-     *
-     * @return string
+     * 返回类名.
      */
     public function class(): string
     {
@@ -56,9 +51,7 @@ class CustomConfig
     }
 
     /**
-     * 返回参数
-     *
-     * @return array
+     * 返回参数.
      */
     public function params(): array
     {

@@ -4,22 +4,21 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\CsrfTokenManager;
 
-use Hyperf\Contract\ContainerInterface;
-use Hyperf\Contract\SessionInterface;
 use GaaraHyperf\Config\CustomConfig;
 use GaaraHyperf\Constants;
-use GaaraHyperf\CsrfTokenManager\CsrfTokenManagerInterface;
+use Hyperf\Contract\ContainerInterface;
+use Hyperf\Contract\SessionInterface;
+use InvalidArgumentException;
 
 /**
  * CSRF令牌管理器工厂
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
  */
 class CsrfTokenManagerFactory
 {
     public function __construct(
         private ContainerInterface $container,
-    ) {}
+    ) {
+    }
 
     public function create(array $config): CsrfTokenManagerInterface
     {
@@ -36,13 +35,13 @@ class CsrfTokenManagerFactory
                 $customConfig = CustomConfig::from($config);
 
                 $csrfTokenManager = $this->container->make($customConfig->class(), $customConfig->params());
-                if (!$csrfTokenManager instanceof CsrfTokenManagerInterface) {
-                    throw new \InvalidArgumentException(sprintf('The custom CsrfTokenManager must implement %s.', CsrfTokenManagerInterface::class));
+                if (! $csrfTokenManager instanceof CsrfTokenManagerInterface) {
+                    throw new InvalidArgumentException(sprintf('The custom CsrfTokenManager must implement %s.', CsrfTokenManagerInterface::class));
                 }
 
                 return $csrfTokenManager;
             default:
-                throw new \InvalidArgumentException("Unsupported CSRF Token Manager type: $type");
+                throw new InvalidArgumentException("Unsupported CSRF Token Manager type: {$type}");
         }
     }
 }

@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\ServiceProvider;
 
-use Hyperf\Contract\ContainerInterface;
 use GaaraHyperf\Config\ConfigLoaderInterface;
 use GaaraHyperf\Constants;
 use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerFactory;
 use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerResolver;
 use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerResolverInterface;
+use Hyperf\Contract\ContainerInterface;
 
 /**
- * Opaque Token 管理器服务提供者
- *
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * Opaque Token 管理器服务提供者.
  */
 class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
 {
@@ -38,9 +36,9 @@ class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
         $opaqueTokenManagerMap = [];
         foreach ($opaqueTokenManagerConfig as $name => $config) {
             $opaqueTokenManagerMap[$name] = sprintf('%s.opaque_token_manager.%s', Constants::__PREFIX, $name);
-            $container->define($opaqueTokenManagerMap[$name], fn() => $container->get(OpaqueTokenManagerFactory::class)->create($config));
+            $container->define($opaqueTokenManagerMap[$name], fn () => $container->get(OpaqueTokenManagerFactory::class)->create($config));
         }
 
-        $container->define(OpaqueTokenManagerResolverInterface::class, fn() => new OpaqueTokenManagerResolver($opaqueTokenManagerMap, $container));
+        $container->define(OpaqueTokenManagerResolverInterface::class, fn () => new OpaqueTokenManagerResolver($opaqueTokenManagerMap, $container));
     }
 }

@@ -4,54 +4,37 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\TokenStorage;
 
-use Hyperf\Contract\SessionInterface;
 use GaaraHyperf\Token\TokenInterface;
+use Hyperf\Contract\SessionInterface;
 
 /**
- * 基于Session的TokenStorage实现
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * 基于Session的TokenStorage实现.
  */
 class SessionTokenStorage implements TokenStorageInterface
 {
-    /**
-     * @param SessionInterface $session
-     * @param string $prefix
-     */
     public function __construct(
         private SessionInterface $session,
         private string $prefix,
-    ) {}
+    ) {
+    }
 
-    /**
-     * @inheritDoc
-     */
     public function get(string $key): ?TokenInterface
     {
         return $this->session->get($this->getKey($key));
     }
 
-    /**
-     * @inheritDoc
-     */
     public function set(string $key, TokenInterface $token): void
     {
         $this->session->set($this->getKey($key), $token);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function delete(string $key): void
     {
         $this->session->remove($this->getKey($key));
     }
 
     /**
-     * 返回令牌存储的key
-     *
-     * @param string $key
-     * @return string
+     * 返回令牌存储的key.
      */
     private function getKey(string $key): string
     {

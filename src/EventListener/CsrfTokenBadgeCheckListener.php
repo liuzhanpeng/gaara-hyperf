@@ -12,15 +12,14 @@ use GaaraHyperf\Passport\CsrfTokenBadge;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * CSRF令牌检查监听器
- * 
- * @author lzpeng <liuzhanpeng@gmail.com>
+ * CSRF令牌检查监听器.
  */
 class CsrfTokenBadgeCheckListener implements EventSubscriberInterface
 {
     public function __construct(
         private CsrfTokenManagerInterface $csrfTokenManager,
-    ) {}
+    ) {
+    }
 
     public static function getSubscribedEvents()
     {
@@ -32,16 +31,16 @@ class CsrfTokenBadgeCheckListener implements EventSubscriberInterface
     public function checkPassport(CheckPassportEvent $event): void
     {
         /**
-         * @var CsrfTokenBadge|null $badge
+         * @var null|CsrfTokenBadge $badge
          */
         $badge = $event->getPassport()->getBadge(CsrfTokenBadge::class);
-        if (!$badge || $badge->isResolved()) {
+        if (! $badge || $badge->isResolved()) {
             return;
         }
 
         $csrfToken = new CsrfToken($badge->getId(), $badge->getToken());
 
-        if (!$this->csrfTokenManager->verify($csrfToken)) {
+        if (! $this->csrfTokenManager->verify($csrfToken)) {
             throw new InvalidCsrfTokenException(
                 message: 'Invalid CSRF token',
                 userIdentifier: $event->getPassport()->getUser()->getIdentifier(),
