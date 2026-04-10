@@ -44,6 +44,7 @@ class SlidingWindowRateLimiter implements RateLimiterInterface
             local now = tonumber(ARGV[2])
             local limit = tonumber(ARGV[3])
             local interval = tonumber(ARGV[4])
+            local member = ARGV[5]
 
             -- 删除窗口外的记录
             redis.call("ZREMRANGEBYSCORE", key, 0, window_start)
@@ -52,20 +53,27 @@ class SlidingWindowRateLimiter implements RateLimiterInterface
             local current_count = redis.call("ZCARD", key)
 
             if current_count < limit then
-                -- 直接使用时间戳作为member
-                redis.call("ZADD", key, now, tostring(now))
-                -- 每次成功添加都刷新过期时间，确保key不会意外过期
+                -- 使用 "时间戳:唯一标识" 作为 member，避免并发时同一微秒覆盖已有记录
+                redis.call("ZADD", key, now, member)
                 redis.call("EXPIRE", key, interval)
                 return {1, limit - current_count - 1, 0}
             else
-                -- 对于滑动窗口，精确计算retry_after比较复杂，通常返回0
-                return {0, 0, 0}
+                -- 取出窗口内最早的记录，计算其滑出窗口所需秒数
+                local oldest = redis.call("ZRANGE", key, 0, 0, "WITHSCORES")
+                local retry_after = 0
+                if oldest[2] then
+                    retry_after = math.ceil(tonumber(oldest[2]) + interval - now)
+                    if retry_after < 0 then retry_after = 0 end
+                end
+                return {0, 0, retry_after}
             end
         ';
 
+        $member = $now . ':' . bin2hex(random_bytes(4));
+
         $result = $this->redis->eval(
             $script,
-            [$redisKey, $windowStart, $now, $this->limit, $this->interval],
+            [$redisKey, $windowStart, $now, $this->limit, $this->interval, $member],
             1
         );
 
