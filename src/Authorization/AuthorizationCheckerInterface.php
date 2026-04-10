@@ -17,8 +17,8 @@ interface AuthorizationCheckerInterface
      * 检查给定的Token是否被授权执行某个操作或访问某个资源.
      *
      * @param TokenInterface $token 认证Token对象
-     * @param string|string[] $attribute 要检查的权限、角色或属性
-     * @param mixed $subject 要检查权限的对象，可选
+     * @param mixed $attribute 要检查的权限、角色或属性等
+     * @param mixed $resource 要检查权限的资源，可选
      */
-    public function check(TokenInterface $token, array|string $attribute, mixed $subject = null): bool;
+    public function check(TokenInterface $token, mixed $attribute, mixed $resource = null): bool;
 }

@@ -16,12 +16,12 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class DefaultAccessDeniedHandler implements AccessDeniedHandlerInterface
 {
-    public function handle(ServerRequestInterface $request, ?TokenInterface $token, array|string $attribute, mixed $subject = null): ResponseInterface
+    public function handle(ServerRequestInterface $request, ?TokenInterface $token, mixed $attribute, mixed $resource = null): ResponseInterface
     {
         throw new AccessDeniedException(
             token: $token,
             attribute: $attribute,
-            subject: $subject
+            resource: $resource
         );
     }
 }

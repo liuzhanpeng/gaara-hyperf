@@ -127,9 +127,9 @@ class Guard implements GuardInterface
     /**
      * 检查令牌所属用户是否具有指定的权限.
      */
-    public function isGranted(TokenInterface $token, array|string $attribute, mixed $subject = null): bool
+    public function isGranted(TokenInterface $token, mixed $attribute, mixed $resource = null): bool
     {
-        return $this->authorizationChecker->check($token, $attribute, $subject);
+        return $this->authorizationChecker->check($token, $attribute, $resource);
     }
 
     /**
@@ -232,9 +232,9 @@ class Guard implements GuardInterface
     private function checkAuthorization(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
     {
         $attribute = $request->getAttribute(Constants::REQUEST_AUTHORIZATION_ATTRIBUTE, '');
-        $subject = $request->getAttribute(Constants::REQUEST_AUTHORIZATION_SUBJECT, null);
-        if (! $this->authorizationChecker->check($token, $attribute, $subject)) {
-            return $this->accessDeniedHandler->handle($request, $token, $attribute, $subject);
+        $resource = $request->getAttribute(Constants::REQUEST_AUTHORIZATION_RESOURCE, null);
+        if (! $this->authorizationChecker->check($token, $attribute, $resource)) {
+            return $this->accessDeniedHandler->handle($request, $token, $attribute, $resource);
         }
 
         return null;

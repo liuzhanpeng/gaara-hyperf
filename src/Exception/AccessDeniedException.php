@@ -12,15 +12,10 @@ use GaaraHyperf\Token\TokenInterface;
  */
 class AccessDeniedException extends Exception
 {
-    /**
-     * @param TokenInterface $token 用户令牌
-     * @param array $attribute 访问属性
-     * @param mixed $subject 访问主体
-     */
     public function __construct(
         private TokenInterface $token,
-        private array|string $attribute = [],
-        private mixed $subject = null
+        private mixed $attribute,
+        private mixed $resource = null
     ) {
         parent::__construct();
     }
@@ -36,7 +31,7 @@ class AccessDeniedException extends Exception
     /**
      * 返回访问属性.
      */
-    public function getAttribute(): array|string
+    public function getAttribute(): mixed
     {
         return $this->attribute;
     }
@@ -44,8 +39,8 @@ class AccessDeniedException extends Exception
     /**
      * 返回访问主体.
      */
-    public function getSubject(): mixed
+    public function getResource(): mixed
     {
-        return $this->subject;
+        return $this->resource;
     }
 }

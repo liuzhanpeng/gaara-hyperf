@@ -16,5 +16,5 @@ interface AccessDeniedHandlerInterface
     /**
      * 处理访问控制拒绝.
      */
-    public function handle(ServerRequestInterface $request, ?TokenInterface $token, array|string $attribute, mixed $subject = null): ResponseInterface;
+    public function handle(ServerRequestInterface $request, ?TokenInterface $token, mixed $attribute, mixed $resource = null): ResponseInterface;
 }

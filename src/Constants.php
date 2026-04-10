@@ -15,7 +15,7 @@ final class Constants
 
     public const REQUEST_AUTHORIZATION_ATTRIBUTE = self::__PREFIX . '.authorization_attribute';
 
-    public const REQUEST_AUTHORIZATION_SUBJECT = self::__PREFIX . '.authorization_subject';
+    public const REQUEST_AUTHORIZATION_RESOURCE = self::__PREFIX . '.authorization_resource';
 
     public const GUARD_PREFIX = self::__PREFIX . '.guard';
 
