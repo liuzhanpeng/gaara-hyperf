@@ -147,6 +147,8 @@ class Guard implements GuardInterface
             if ($response !== null) {
                 return $response;
             }
+
+            break;
         }
 
         // 认证器处理认证逻辑后继续放行
