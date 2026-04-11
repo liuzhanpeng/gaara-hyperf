@@ -132,13 +132,10 @@ class User extends Model implements UserInterface, PasswordAwareUserInterface
 // 通过辅助函数获取认证上下文
 $context = auth();
 
-// 获取当前 Token（由中间件在请求处理期间设置）
+// 获取当前 Token
 $token = $context->getToken();
 
-// 获取用户标识符
-$identifier = $token?->getUserIdentifier();
-
-// 获取当前用户对象（底层调用 UserProvider）
+// 获取当前用户对象
 $user = $context->getUser();
 ```
 

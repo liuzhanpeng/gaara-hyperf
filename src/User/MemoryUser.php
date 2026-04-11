@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GaaraHyperf\User;
 
 use BadMethodCallException;
+use SensitiveParameter;
 use Serializable;
 
 /**
@@ -16,6 +17,7 @@ class MemoryUser implements UserInterface, PasswordAwareUserInterface, Serializa
 {
     public function __construct(
         private string $username,
+        #[SensitiveParameter]
         private string $password,
     ) {
     }

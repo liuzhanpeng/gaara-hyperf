@@ -30,8 +30,8 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
         private bool $userAgentBindEnabled,
         private int $accessTokenLength
     ) {
-        if ($this->accessTokenLength < 16) {
-            throw new InvalidArgumentException('Access token length must be at least 16 characters.');
+        if ($this->accessTokenLength < 32) {
+            throw new InvalidArgumentException('Access token length must be at least 32 characters.');
         }
 
         if ($this->ttl > $this->maxTtl) {

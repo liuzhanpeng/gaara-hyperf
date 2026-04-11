@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace GaaraHyperf\ServiceProvider;
 
 use GaaraHyperf\Config\ConfigLoaderInterface;
-use GaaraHyperf\Constants;
 use GaaraHyperf\CsrfTokenManager\CsrfTokenManagerFactory;
 use GaaraHyperf\CsrfTokenManager\CsrfTokenManagerResolver;
 use GaaraHyperf\CsrfTokenManager\CsrfTokenManagerResolverInterface;
@@ -18,21 +17,19 @@ class CsrfTokenManagerServiceProvider implements ServiceProviderInterface
 {
     public function register(ContainerInterface $container): void
     {
-        $config = $container->get(ConfigLoaderInterface::class)->load();
-
-        $csrfTokenManagerConfig = array_replace_recursive([
+        $gaaraConfig = $container->get(ConfigLoaderInterface::class)->load();
+        $configGroup = ($gaaraConfig->serviceConfig('csrf_token_managers') ?? []) + [
             'default' => [
                 'type' => 'session',
                 'prefix' => 'default',
             ],
-        ], $config->serviceConfig('csrf_token_managers') ?? []);
+        ];
 
-        $csrfTokenManagerMap = [];
-        foreach ($csrfTokenManagerConfig as $name => $config) {
-            $csrfTokenManagerMap[$name] = sprintf('%s.csrf_token_manager.%s', Constants::__PREFIX, $name);
-            $container->define($csrfTokenManagerMap[$name], fn () => $container->get(CsrfTokenManagerFactory::class)->create($config));
+        $factories = [];
+        foreach ($configGroup as $name => $config) {
+            $factories[$name] = fn () => $container->get(CsrfTokenManagerFactory::class)->create($config);
         }
 
-        $container->define(CsrfTokenManagerResolverInterface::class, fn () => new CsrfTokenManagerResolver($csrfTokenManagerMap, $container));
+        $container->define(CsrfTokenManagerResolverInterface::class, new CsrfTokenManagerResolver($factories));
     }
 }

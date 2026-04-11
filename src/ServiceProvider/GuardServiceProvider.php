@@ -12,8 +12,6 @@ use GaaraHyperf\EventListener\PasswordBadgeCheckListener;
 use GaaraHyperf\Guard;
 use GaaraHyperf\GuardInterface;
 use GaaraHyperf\GuardResolver;
-use GaaraHyperf\IPResolver\IPResolver;
-use GaaraHyperf\IPResolver\IPResolverInterface;
 use GaaraHyperf\PasswordHasher\PasswordHasherResolverInterface;
 use GaaraHyperf\RequestMatcher\RequestMatcherFactory;
 use GaaraHyperf\Token\TokenContext;
@@ -39,21 +37,15 @@ class GuardServiceProvider implements ServiceProviderInterface
     public function register(ContainerInterface $container): void
     {
         // 注册内置的令牌上下文
-        $container->define(TokenContextInterface::class, fn () => new TokenContext(Constants::TOKEN_CONTEXT_PREFIX));
-
-        // 注册内部组件
-        $container->define(IPResolverInterface::class, fn () => new IPResolver());
+        $container->define(TokenContextInterface::class, new TokenContext(Constants::TOKEN_CONTEXT_PREFIX));
 
         $config = $container->get(ConfigLoaderInterface::class)->load();
-
-        $guardMap = [];
+        $factories = [];
         foreach ($config->guardConfigCollection() as $guardName => $guardConfig) {
-            $guardMap[$guardName] = sprintf('%s.%s', Constants::GUARD_PREFIX, $guardName);
-
-            $container->define($guardMap[$guardName], fn () => $this->createGuard($container, $guardName, $guardConfig));
+            $factories[$guardName] = fn () => $this->createGuard($container, $guardName, $guardConfig);
         }
 
-        $container->set(GuardResolver::class, new GuardResolver($guardMap, $container));
+        $container->set(GuardResolver::class, new GuardResolver($factories));
     }
 
     /**

@@ -12,6 +12,7 @@ use GaaraHyperf\ServiceProvider\OpaqueTokenManagerServiceProvider;
 use GaaraHyperf\ServiceProvider\PasswordHasherServiceProvider;
 use GaaraHyperf\ServiceProvider\ServiceProviderRegisterEvent;
 use GaaraHyperf\ServiceProvider\ServiceProviderRegistry;
+use GaaraHyperf\ServiceProvider\UtilServiceProvider;
 use Hyperf\Contract\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
@@ -39,15 +40,15 @@ class AuthInitializer
             ->register(new PasswordHasherServiceProvider())
             ->register(new CsrfTokenManagerServiceProvider())
             ->register(new OpaqueTokenManagerServiceProvider())
+            ->register(new UtilServiceProvider())
             ->register(new GuardServiceProvider());
 
         /**
          * @var EventDispatcherInterface $eventDispatcher
          */
         $eventDispatcher = $this->container->get(EventDispatcherInterface::class);
-        // 分发认证服务注册事件，允许用户注册自定义的服务提供者
+        // 允许扩展开发者注册自定义的服务提供者
         $eventDispatcher->dispatch(new ServiceProviderRegisterEvent($serviceProviderRegistry));
-
         foreach ($serviceProviderRegistry->getProviders() as $provider) {
             $provider->register($this->container);
         }

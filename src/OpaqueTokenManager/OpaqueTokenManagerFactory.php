@@ -7,7 +7,6 @@ namespace GaaraHyperf\OpaqueTokenManager;
 use GaaraHyperf\Config\CustomConfig;
 use GaaraHyperf\Constants;
 use Hyperf\Contract\ContainerInterface;
-use InvalidArgumentException;
 use LogicException;
 
 /**
@@ -47,7 +46,7 @@ class OpaqueTokenManagerFactory
 
                 return $opaqueTokenManager;
             default:
-                throw new InvalidArgumentException('Unsupported opaque token manager type: ' . $type);
+                throw new LogicException('Unsupported opaque token manager type: ' . $type);
         }
     }
 }

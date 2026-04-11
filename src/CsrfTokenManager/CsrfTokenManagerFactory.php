@@ -8,7 +8,7 @@ use GaaraHyperf\Config\CustomConfig;
 use GaaraHyperf\Constants;
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Contract\SessionInterface;
-use InvalidArgumentException;
+use LogicException;
 
 /**
  * CSRF令牌管理器工厂
@@ -33,15 +33,14 @@ class CsrfTokenManagerFactory
                 ]);
             case 'custom':
                 $customConfig = CustomConfig::from($config);
-
                 $csrfTokenManager = $this->container->make($customConfig->class(), $customConfig->params());
                 if (! $csrfTokenManager instanceof CsrfTokenManagerInterface) {
-                    throw new InvalidArgumentException(sprintf('The custom CsrfTokenManager must implement %s.', CsrfTokenManagerInterface::class));
+                    throw new LogicException(sprintf('The custom CsrfTokenManager must implement %s.', CsrfTokenManagerInterface::class));
                 }
 
                 return $csrfTokenManager;
             default:
-                throw new InvalidArgumentException("Unsupported CSRF Token Manager type: {$type}");
+                throw new LogicException("Unsupported CSRF Token Manager type: {$type}");
         }
     }
 }

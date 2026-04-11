@@ -7,7 +7,6 @@ namespace GaaraHyperf;
 use Generator;
 use InvalidArgumentException;
 use IteratorAggregate;
-use Psr\Container\ContainerInterface;
 
 /**
  * 认证守卫解析器.
@@ -17,11 +16,15 @@ use Psr\Container\ContainerInterface;
 class GuardResolver implements IteratorAggregate
 {
     /**
-     * @param array<string,string> $guardMap 结构[guardName => guardId, ...]
+     * @var array<string, GuardInterface> 认证守卫工厂列表
+     */
+    private array $guards = [];
+
+    /**
+     * @param array<string, callable> $factories 认证守卫工厂列表
      */
     public function __construct(
-        private array $guardMap,
-        private ContainerInterface $container,
+        private array $factories,
     ) {
     }
 
@@ -30,11 +33,15 @@ class GuardResolver implements IteratorAggregate
      */
     public function resolve(string $guardName): GuardInterface
     {
-        if (! isset($this->guardMap[$guardName])) {
-            throw new InvalidArgumentException(sprintf('guard "%s" not found', $guardName));
+        if (! isset($this->factories[$guardName])) {
+            if (! isset($this->factories[$guardName])) {
+                throw new InvalidArgumentException(sprintf('guard "%s" not found', $guardName));
+            }
+
+            $this->guards[$guardName] = ($this->factories[$guardName])();
         }
 
-        return $this->container->get($this->guardMap[$guardName]);
+        return $this->guards[$guardName];
     }
 
     /**
@@ -44,8 +51,8 @@ class GuardResolver implements IteratorAggregate
      */
     public function getIterator(): Generator
     {
-        foreach ($this->guardMap as $guardName => $guardId) {
-            yield $guardName => $this->container->get($guardId);
+        foreach ($this->factories as $guardName => $factory) {
+            yield $guardName => $this->resolve($guardName);
         }
     }
 }

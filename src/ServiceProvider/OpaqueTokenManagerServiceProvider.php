@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace GaaraHyperf\ServiceProvider;
 
 use GaaraHyperf\Config\ConfigLoaderInterface;
-use GaaraHyperf\Constants;
 use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerFactory;
 use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerResolver;
 use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerResolverInterface;
@@ -18,9 +17,9 @@ class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
 {
     public function register(ContainerInterface $container): void
     {
-        $config = $container->get(ConfigLoaderInterface::class)->load();
+        $gaaraConfig = $container->get(ConfigLoaderInterface::class)->load();
 
-        $opaqueTokenManagerConfig = array_replace_recursive([
+        $configGroup = ($gaaraConfig->serviceConfig('opaque_token_managers') ?? []) + [
             'default' => [
                 'type' => 'default',
                 'prefix' => 'default',
@@ -31,14 +30,13 @@ class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
                 'ip_bind_enabled' => false,
                 'user_agent_bind_enabled' => false,
             ],
-        ], $config->serviceConfig('opaque_token_managers') ?? []);
+        ];
 
-        $opaqueTokenManagerMap = [];
-        foreach ($opaqueTokenManagerConfig as $name => $config) {
-            $opaqueTokenManagerMap[$name] = sprintf('%s.opaque_token_manager.%s', Constants::__PREFIX, $name);
-            $container->define($opaqueTokenManagerMap[$name], fn () => $container->get(OpaqueTokenManagerFactory::class)->create($config));
+        $factories = [];
+        foreach ($configGroup as $name => $config) {
+            $factories[$name] = fn () => $container->get(OpaqueTokenManagerFactory::class)->create($config);
         }
 
-        $container->define(OpaqueTokenManagerResolverInterface::class, fn () => new OpaqueTokenManagerResolver($opaqueTokenManagerMap, $container));
+        $container->define(OpaqueTokenManagerResolverInterface::class, new OpaqueTokenManagerResolver($factories));
     }
 }

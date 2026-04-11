@@ -5,32 +5,29 @@ declare(strict_types=1);
 namespace GaaraHyperf\CsrfTokenManager;
 
 use InvalidArgumentException;
-use LogicException;
-use Psr\Container\ContainerInterface;
 
 /**
  * 内置的CSRF令牌管理器解析器.
  */
 class CsrfTokenManagerResolver implements CsrfTokenManagerResolverInterface
 {
+    private array $csrfTokenManagers = [];
+
     public function __construct(
-        private array $csrfTokenManagerMap,
-        private ContainerInterface $container,
+        private array $factories,
     ) {
     }
 
     public function resolve(string $name = 'default'): CsrfTokenManagerInterface
     {
-        if (! isset($this->csrfTokenManagerMap[$name])) {
-            throw new InvalidArgumentException("CSRF Token Manager does not exist: {$name}");
+        if (! isset($this->csrfTokenManagers[$name])) {
+            if (! isset($this->factories[$name])) {
+                throw new InvalidArgumentException("CSRF Token Manager does not exist: {$name}");
+            }
+
+            $this->csrfTokenManagers[$name] = ($this->factories[$name])();
         }
 
-        $csrfTokenManagerId = $this->csrfTokenManagerMap[$name];
-        $csrfTokenManager = $this->container->get($csrfTokenManagerId);
-        if (! $csrfTokenManager instanceof CsrfTokenManagerInterface) {
-            throw new LogicException(sprintf('CSRF Token Manager "%s" must implement %s interface', $csrfTokenManagerId, CsrfTokenManagerInterface::class));
-        }
-
-        return $csrfTokenManager;
+        return $this->csrfTokenManagers[$name];
     }
 }

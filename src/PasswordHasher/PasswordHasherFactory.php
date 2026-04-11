@@ -6,7 +6,6 @@ namespace GaaraHyperf\PasswordHasher;
 
 use GaaraHyperf\Config\CustomConfig;
 use Hyperf\Contract\ContainerInterface;
-use InvalidArgumentException;
 use LogicException;
 
 /**
@@ -29,7 +28,6 @@ class PasswordHasherFactory
                 return new DefaultPasswordHasher($config['algo'] ?? PASSWORD_BCRYPT);
             case 'custom':
                 $customConfig = CustomConfig::from($config);
-
                 $passwordHasher = $this->container->make($customConfig->class(), $customConfig->params());
                 if (! $passwordHasher instanceof PasswordHasherInterface) {
                     throw new LogicException('Custom PasswordHasher class must be an instance of PasswordHasherInterface');
@@ -37,7 +35,7 @@ class PasswordHasherFactory
 
                 return $passwordHasher;
             default:
-                throw new InvalidArgumentException(sprintf('Invalid password hasher type: %s', $type));
+                throw new LogicException(sprintf('Invalid password hasher type: %s', $type));
         }
     }
 }

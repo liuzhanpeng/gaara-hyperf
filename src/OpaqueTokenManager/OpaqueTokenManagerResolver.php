@@ -5,32 +5,29 @@ declare(strict_types=1);
 namespace GaaraHyperf\OpaqueTokenManager;
 
 use InvalidArgumentException;
-use LogicException;
-use Psr\Container\ContainerInterface;
 
 /**
  * OpaqueToken管理器解析器.
  */
 class OpaqueTokenManagerResolver implements OpaqueTokenManagerResolverInterface
 {
+    private array $opaqueTokenManagers = [];
+
     public function __construct(
-        private array $opaqueTokenManagerMap,
-        private ContainerInterface $container,
+        private array $factories,
     ) {
     }
 
     public function resolve(string $name = 'default'): OpaqueTokenManagerInterface
     {
-        if (! isset($this->opaqueTokenManagerMap[$name])) {
-            throw new InvalidArgumentException("Opaque Token Manager does not exist: {$name}");
+        if (! isset($this->opaqueTokenManagers[$name])) {
+            if (! isset($this->factories[$name])) {
+                throw new InvalidArgumentException("Opaque Token Manager does not exist: {$name}");
+            }
+
+            $this->opaqueTokenManagers[$name] = ($this->factories[$name])();
         }
 
-        $opaqueTokenManagerId = $this->opaqueTokenManagerMap[$name];
-        $opaqueTokenManager = $this->container->get($opaqueTokenManagerId);
-        if (! $opaqueTokenManager instanceof OpaqueTokenManagerInterface) {
-            throw new LogicException(sprintf('Opaque Token Manager "%s" must implement %s interface', $opaqueTokenManagerId, OpaqueTokenManagerInterface::class));
-        }
-
-        return $opaqueTokenManager;
+        return $this->opaqueTokenManagers[$name];
     }
 }

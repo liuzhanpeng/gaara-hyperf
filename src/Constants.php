@@ -17,8 +17,6 @@ final class Constants
 
     public const REQUEST_AUTHORIZATION_RESOURCE = self::__PREFIX . '.authorization_resource';
 
-    public const GUARD_PREFIX = self::__PREFIX . '.guard';
-
     private function __construct()
     {
     }

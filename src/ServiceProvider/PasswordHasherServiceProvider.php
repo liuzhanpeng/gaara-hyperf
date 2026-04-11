@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace GaaraHyperf\ServiceProvider;
 
 use GaaraHyperf\Config\ConfigLoaderInterface;
-use GaaraHyperf\Constants;
 use GaaraHyperf\PasswordHasher\PasswordHasherFactory;
 use GaaraHyperf\PasswordHasher\PasswordHasherResolver;
 use GaaraHyperf\PasswordHasher\PasswordHasherResolverInterface;
@@ -18,21 +17,19 @@ class PasswordHasherServiceProvider implements ServiceProviderInterface
 {
     public function register(ContainerInterface $container): void
     {
-        $config = $container->get(ConfigLoaderInterface::class)->load();
-
-        $passwordHasherConfig = array_replace_recursive([
+        $gaaraConfig = $container->get(ConfigLoaderInterface::class)->load();
+        $configGroup = ($gaaraConfig->serviceConfig('password_hashers') ?? []) + [
             'default' => [
                 'type' => 'default',
                 'algo' => PASSWORD_DEFAULT,
             ],
-        ], $config->serviceConfig('password_hashers') ?? []);
+        ];
 
-        $passwordHasherMap = [];
-        foreach ($passwordHasherConfig as $name => $config) {
-            $passwordHasherMap[$name] = sprintf('%s.password_hasher.%s', Constants::__PREFIX, $name);
-            $container->define($passwordHasherMap[$name], fn () => $container->get(PasswordHasherFactory::class)->create($config));
+        $factories = [];
+        foreach ($configGroup as $name => $config) {
+            $factories[$name] = fn () => $container->get(PasswordHasherFactory::class)->create($config);
         }
 
-        $container->define(PasswordHasherResolverInterface::class, fn () => new PasswordHasherResolver($passwordHasherMap, $container));
+        $container->define(PasswordHasherResolverInterface::class, new PasswordHasherResolver($factories));
     }
 }

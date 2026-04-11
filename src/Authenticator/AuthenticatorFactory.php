@@ -7,7 +7,6 @@ namespace GaaraHyperf\Authenticator;
 use GaaraHyperf\Config\AuthenticatorConfig;
 use GaaraHyperf\UserProvider\UserProviderInterface;
 use Hyperf\Contract\ContainerInterface;
-use InvalidArgumentException;
 use LogicException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -47,7 +46,7 @@ class AuthenticatorFactory
             }
             return $builder->create($options, $userProvider, $eventDispatcher);
         }
-        throw new InvalidArgumentException(sprintf('Unsupported authenticator type: %s', $type));
+        throw new LogicException(sprintf('Unsupported authenticator type: %s', $type));
     }
 
     /**
@@ -56,7 +55,7 @@ class AuthenticatorFactory
     public function registerBuilder(string $type, string $builderClass): void
     {
         if (! is_subclass_of($builderClass, AuthenticatorBuilderInterface::class)) {
-            throw new InvalidArgumentException(sprintf('Authenticator Builder "%s" must implement %s', $builderClass, AuthenticatorBuilderInterface::class));
+            throw new LogicException(sprintf('Authenticator Builder "%s" must implement %s', $builderClass, AuthenticatorBuilderInterface::class));
         }
 
         $this->builders[$type] = $builderClass;
