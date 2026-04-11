@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 use GaaraHyperf\RequestMatcher\RequestMatcher;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 
 describe('RequestMatcher', function () {
-    function mockRequest(string $path): ServerRequestInterface
+    function mockRequest(string $path, string $method = 'GET'): ServerRequestInterface
     {
-        $uri = mock(\Psr\Http\Message\UriInterface::class);
+        $uri = mock(UriInterface::class);
         $uri->shouldReceive('getPath')->andReturn($path);
         $request = mock(ServerRequestInterface::class);
         $request->shouldReceive('getUri')->andReturn($uri);
+        $request->shouldReceive('getMethod')->andReturn($method);
         return $request;
     }
 
@@ -24,7 +26,7 @@ describe('RequestMatcher', function () {
     });
 
     it('matches logout', function () {
-        $matcher = new RequestMatcher('/api', '/logout', []);
+        $matcher = new RequestMatcher('/api', '^/logout$', []);
         $request = mockRequest('/logout');
         expect($matcher->matchesLogout($request))->toBeTrue();
         $request2 = mockRequest('/api/logout');
@@ -55,5 +57,40 @@ describe('RequestMatcher', function () {
         expect($matcher->matchesPattern($request))->toBeFalse();
         $request2 = mockRequest('/api/user/1');
         expect($matcher->matchesPattern($request2))->toBeTrue();
+    });
+
+    it('matches pattern with method prefix', function () {
+        $matcher = new RequestMatcher('GET /api/users', null, []);
+        expect($matcher->matchesPattern(mockRequest('/api/users', 'GET')))->toBeTrue();
+        expect($matcher->matchesPattern(mockRequest('/api/users', 'POST')))->toBeFalse();
+        expect($matcher->matchesPattern(mockRequest('/api/other', 'GET')))->toBeFalse();
+    });
+
+    it('matches pattern with multiple methods', function () {
+        $matcher = new RequestMatcher('POST|PUT /api/users/\d+', null, []);
+        expect($matcher->matchesPattern(mockRequest('/api/users/1', 'POST')))->toBeTrue();
+        expect($matcher->matchesPattern(mockRequest('/api/users/1', 'PUT')))->toBeTrue();
+        expect($matcher->matchesPattern(mockRequest('/api/users/1', 'GET')))->toBeFalse();
+        expect($matcher->matchesPattern(mockRequest('/api/users/abc', 'POST')))->toBeFalse();
+    });
+
+    it('matches logout with method prefix', function () {
+        $matcher = new RequestMatcher('/api', 'POST /logout', []);
+        expect($matcher->matchesLogout(mockRequest('/logout', 'POST')))->toBeTrue();
+        expect($matcher->matchesLogout(mockRequest('/logout', 'GET')))->toBeFalse();
+    });
+
+    it('matches excluded with method prefix', function () {
+        $matcher = new RequestMatcher('/api', null, ['GET|HEAD /api/public']);
+        expect($matcher->matchesExcluded(mockRequest('/api/public', 'GET')))->toBeTrue();
+        expect($matcher->matchesExcluded(mockRequest('/api/public', 'HEAD')))->toBeTrue();
+        expect($matcher->matchesExcluded(mockRequest('/api/public', 'POST')))->toBeFalse();
+    });
+
+    it('matches plain string as prefix without regex', function () {
+        $matcher = new RequestMatcher('/api', null, []);
+        expect($matcher->matchesPattern(mockRequest('/api/users', 'GET')))->toBeTrue();
+        expect($matcher->matchesPattern(mockRequest('/api', 'GET')))->toBeTrue();
+        expect($matcher->matchesPattern(mockRequest('/other', 'GET')))->toBeFalse();
     });
 });
