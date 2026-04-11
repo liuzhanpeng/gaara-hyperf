@@ -7,7 +7,7 @@ namespace GaaraHyperf\Passport;
 use Closure;
 use GaaraHyperf\Exception\UserNotFoundException;
 use GaaraHyperf\User\UserInterface;
-use LogicException;
+use InvalidArgumentException;
 
 /**
  * 认证通行证
@@ -69,7 +69,7 @@ class Passport
             }
 
             if (! $user instanceof UserInterface) {
-                throw new LogicException(sprintf('The user provider must return a UserInterface object, %s given', get_debug_type($user)));
+                throw new InvalidArgumentException(sprintf('The user provider must return a UserInterface object, %s given', get_debug_type($user)));
             }
 
             $this->user = $user;

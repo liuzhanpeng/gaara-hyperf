@@ -7,7 +7,6 @@ namespace GaaraHyperf\AccessTokenExtractor;
 use GaaraHyperf\Config\CustomConfig;
 use Hyperf\Contract\ContainerInterface;
 use InvalidArgumentException;
-use LogicException;
 
 /**
  * 访问令牌提取器工厂
@@ -43,7 +42,7 @@ class AccessTokenExtractorFactory
 
                 $accessTokenExtractor = $this->container->make($customConfig->class(), $customConfig->params());
                 if (! $accessTokenExtractor instanceof AccessTokenExtractorInterface) {
-                    throw new LogicException(sprintf('The custom AccessTokenExtractor must implement %s.', AccessTokenExtractorInterface::class));
+                    throw new InvalidArgumentException(sprintf('The custom AccessTokenExtractor must implement %s.', AccessTokenExtractorInterface::class));
                 }
 
                 return $accessTokenExtractor;

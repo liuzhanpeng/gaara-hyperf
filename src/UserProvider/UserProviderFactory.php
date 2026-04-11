@@ -7,7 +7,7 @@ namespace GaaraHyperf\UserProvider;
 use GaaraHyperf\Config\ComponentConfig;
 use GaaraHyperf\Config\CustomConfig;
 use Hyperf\Contract\ContainerInterface;
-use LogicException;
+use InvalidArgumentException;
 
 /**
  * 用户提供者服务工厂
@@ -40,13 +40,13 @@ class UserProviderFactory
 
             $userProvider = $this->container->make($customConfig->class(), $customConfig->params());
             if (! $userProvider instanceof UserProviderInterface) {
-                throw new LogicException('The custom user provider must implement the UserProviderInterface.');
+                throw new InvalidArgumentException('The custom user provider must implement the UserProviderInterface.');
             }
 
             return $userProvider;
         }
 
-        throw new LogicException("Unsupported user provider type: {$type}");
+        throw new InvalidArgumentException("Unsupported user provider type: {$type}");
     }
 
     /**
@@ -55,7 +55,7 @@ class UserProviderFactory
     public function registerBuilder(string $type, string $builderClass): void
     {
         if (! is_subclass_of($builderClass, UserProviderBuilderInterface::class)) {
-            throw new LogicException(sprintf('The builder class "%s" must implement %s.', $builderClass, UserProviderBuilderInterface::class));
+            throw new InvalidArgumentException(sprintf('The builder class "%s" must implement %s.', $builderClass, UserProviderBuilderInterface::class));
         }
 
         $this->builders[$type] = $builderClass;

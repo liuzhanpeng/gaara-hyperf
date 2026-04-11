@@ -6,7 +6,7 @@ namespace GaaraHyperf\UserProvider;
 
 use GaaraHyperf\User\UserInterface;
 use Hyperf\DbConnection\Model\Model;
-use LogicException;
+use InvalidArgumentException;
 
 /**
  * 基于Hyperf内置数据库模型用户提供者.
@@ -18,15 +18,15 @@ class ModelUserProvider implements UserProviderInterface
         private string $identifier
     ) {
         if (empty($this->class) || ! class_exists($this->class)) {
-            throw new LogicException("The model class '{$this->class}' does not exist.");
+            throw new InvalidArgumentException("The model class '{$this->class}' does not exist.");
         }
 
         if (! is_subclass_of($this->class, Model::class)) {
-            throw new LogicException("The model class '{$this->class}' must extend " . Model::class);
+            throw new InvalidArgumentException("The model class '{$this->class}' must extend " . Model::class);
         }
 
         if (empty($this->identifier)) {
-            throw new LogicException('The identifier field name cannot be empty.');
+            throw new InvalidArgumentException('The identifier field name cannot be empty.');
         }
     }
 
@@ -38,7 +38,7 @@ class ModelUserProvider implements UserProviderInterface
         }
 
         if (! $model instanceof UserInterface) {
-            throw new LogicException("{$this->class} must implement UserInterface");
+            throw new InvalidArgumentException("{$this->class} must implement UserInterface");
         }
 
         return $model;

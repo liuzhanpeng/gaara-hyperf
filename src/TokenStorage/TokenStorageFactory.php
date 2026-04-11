@@ -9,7 +9,6 @@ use GaaraHyperf\Config\CustomConfig;
 use GaaraHyperf\Constants;
 use Hyperf\Contract\ContainerInterface;
 use InvalidArgumentException;
-use LogicException;
 
 /**
  * Token存储器服务工厂
@@ -42,7 +41,7 @@ class TokenStorageFactory
 
                 $tokenStorage = $this->container->make($customConfig->class(), $customConfig->params());
                 if (! $tokenStorage instanceof TokenStorageInterface) {
-                    throw new LogicException(sprintf('Token storage "%s" must implement %s', $customConfig->class(), TokenStorageInterface::class));
+                    throw new InvalidArgumentException(sprintf('Token storage "%s" must implement %s', $customConfig->class(), TokenStorageInterface::class));
                 }
 
                 return $tokenStorage;

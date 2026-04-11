@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
+use GaaraHyperf\Exception\UserNotFoundException;
+use GaaraHyperf\Passport\BadgeInterface;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\User\UserInterface;
-use GaaraHyperf\Passport\BadgeInterface;
-use GaaraHyperf\Exception\UserNotFoundException;
 
 describe('Passport', function () {
     function mockUser(string $id = 'u1'): UserInterface
@@ -26,24 +26,24 @@ describe('Passport', function () {
 
     it('loads user via loader', function () {
         $user = mockUser('id2');
-        $passport = new Passport('id2', fn($id) => $user, []);
+        $passport = new Passport('id2', fn ($id) => $user, []);
         expect($passport->getUser())->toBe($user);
     });
 
     it('throws if user not found', function () {
-        $passport = new Passport('id3', fn($id) => null, []);
-        expect(fn() => $passport->getUser())->toThrow(UserNotFoundException::class);
+        $passport = new Passport('id3', fn ($id) => null, []);
+        expect(fn () => $passport->getUser())->toThrow(UserNotFoundException::class);
     });
 
     it('throws if userLoader returns non-UserInterface', function () {
-        $passport = new Passport('id4', fn($id) => 123, []);
-        expect(fn() => $passport->getUser())->toThrow(LogicException::class);
+        $passport = new Passport('id4', fn ($id) => 123, []);
+        expect(fn () => $passport->getUser())->toThrow(InvalidArgumentException::class);
     });
 
     it('can add and get badge', function () {
         $user = mockUser();
         $badge = mockBadge();
-        $passport = new Passport('u1', fn($id) => $user, []);
+        $passport = new Passport('u1', fn ($id) => $user, []);
         $passport->addBadge($badge);
         expect($passport->getBadge(get_class($badge)))->toBe($badge);
     });
@@ -52,7 +52,7 @@ describe('Passport', function () {
         $user = mockUser();
         $badgeA = mockBadge();
         $badgeB = mockBadge();
-        $passport = new Passport('u1', fn($id) => $user, [$badgeA, $badgeB]);
+        $passport = new Passport('u1', fn ($id) => $user, [$badgeA, $badgeB]);
         $badges = $passport->getBadges();
         expect($badges)->toHaveKey(get_class($badgeA));
         expect($badges)->toHaveKey(get_class($badgeB));

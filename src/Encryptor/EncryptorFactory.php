@@ -7,7 +7,6 @@ namespace GaaraHyperf\Encryptor;
 use GaaraHyperf\Config\CustomConfig;
 use Hyperf\Contract\ContainerInterface;
 use InvalidArgumentException;
-use LogicException;
 
 /**
  * 加密器工场.
@@ -36,7 +35,7 @@ class EncryptorFactory
 
                 $encryptor = $this->container->make($customConfig->class(), $customConfig->params());
                 if (! $encryptor instanceof EncryptorInterface) {
-                    throw new LogicException(sprintf('The custom Encryptor must implement %s.', EncryptorInterface::class));
+                    throw new InvalidArgumentException(sprintf('The custom Encryptor must implement %s.', EncryptorInterface::class));
                 }
 
                 return $encryptor;

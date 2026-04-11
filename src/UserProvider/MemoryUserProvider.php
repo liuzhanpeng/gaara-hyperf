@@ -6,7 +6,7 @@ namespace GaaraHyperf\UserProvider;
 
 use GaaraHyperf\User\MemoryUser;
 use GaaraHyperf\User\UserInterface;
-use LogicException;
+use InvalidArgumentException;
 
 /**
  * 内存用户提供者.
@@ -23,7 +23,7 @@ class MemoryUserProvider implements UserProviderInterface
         foreach ($this->users as $username => $info) {
             if ($username === $identifier) {
                 if (! isset($info['password'])) {
-                    throw new LogicException("The 'password' field is missing in the user information.");
+                    throw new InvalidArgumentException("The 'password' field is missing in the user information.");
                 }
 
                 return new MemoryUser(

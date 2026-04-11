@@ -7,7 +7,7 @@ namespace GaaraHyperf\OpaqueTokenManager;
 use GaaraHyperf\Config\CustomConfig;
 use GaaraHyperf\Constants;
 use Hyperf\Contract\ContainerInterface;
-use LogicException;
+use InvalidArgumentException;
 
 /**
  * OpaqueToken管理器创建工厂
@@ -41,12 +41,12 @@ class OpaqueTokenManagerFactory
 
                 $opaqueTokenManager = $this->container->make($customConfig->class(), $customConfig->params());
                 if (! $opaqueTokenManager instanceof OpaqueTokenManagerInterface) {
-                    throw new LogicException(sprintf('The custom OpaqueTokenManager must implement %s.', OpaqueTokenManagerInterface::class));
+                    throw new InvalidArgumentException(sprintf('The custom OpaqueTokenManager must implement %s.', OpaqueTokenManagerInterface::class));
                 }
 
                 return $opaqueTokenManager;
             default:
-                throw new LogicException('Unsupported opaque token manager type: ' . $type);
+                throw new InvalidArgumentException('Unsupported opaque token manager type: ' . $type);
         }
     }
 }

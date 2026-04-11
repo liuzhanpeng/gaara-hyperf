@@ -9,7 +9,7 @@ use GaaraHyperf\Exception\InvalidPasswordException;
 use GaaraHyperf\Passport\PasswordBadge;
 use GaaraHyperf\PasswordHasher\PasswordHasherInterface;
 use GaaraHyperf\User\PasswordAwareUserInterface;
-use LogicException;
+use InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -43,7 +43,7 @@ class PasswordBadgeCheckListener implements EventSubscriberInterface
 
         $user = $passport->getUser();
         if (! $user instanceof PasswordAwareUserInterface) {
-            throw new LogicException('The user must implement PasswordAwareUserInterface');
+            throw new InvalidArgumentException('The user must implement PasswordAwareUserInterface');
         }
 
         if (! $this->passwordHasher->verify($badge->getPassword(), $user->getPassword())) {
