@@ -14,7 +14,7 @@ class UsedNonceException extends InvalidCredentialsException
         private string $nonce,
         string $userIdentifier = ''
     ) {
-        return parent::__construct($message, $userIdentifier);
+        parent::__construct($message, $userIdentifier);
     }
 
     public function getNonce(): string

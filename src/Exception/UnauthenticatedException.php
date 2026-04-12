@@ -17,7 +17,6 @@ class UnauthenticatedException extends Exception
         private ?TokenInterface $token = null
     ) {
         parent::__construct($message);
-        $this->token = $token;
     }
 
     public function getToken(): ?TokenInterface

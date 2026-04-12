@@ -15,7 +15,7 @@ class SignatureExpiredException extends InvalidCredentialsException
         private int $currentTime,
         string $userIdentifier = ''
     ) {
-        return parent::__construct($message, $userIdentifier);
+        parent::__construct($message, $userIdentifier);
     }
 
     public function getTimestamp(): int

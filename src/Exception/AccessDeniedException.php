@@ -17,7 +17,7 @@ class AccessDeniedException extends Exception
         private mixed $attribute,
         private mixed $resource = null
     ) {
-        parent::__construct();
+        parent::__construct('access denied');
     }
 
     /**

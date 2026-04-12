@@ -67,7 +67,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
         if ($this->csrfEnabled && empty($credientials['csrf_token'])) {
             throw new InvalidCsrfTokenException(
                 message: 'CSRF token is missing',
-                userIdentifier: $this->usernameField,
+                userIdentifier: $credientials['username']
             );
         }
 

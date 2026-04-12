@@ -14,7 +14,7 @@ class InvalidAccessTokenException extends InvalidCredentialsException
         private string $accessToken,
         string $userIdentifier = ''
     ) {
-        return parent::__construct($message, $userIdentifier);
+        parent::__construct($message, $userIdentifier);
     }
 
     public function getAccessToken(): string
