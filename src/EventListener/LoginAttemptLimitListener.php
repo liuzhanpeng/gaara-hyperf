@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\EventListener;
 
+use GaaraHyperf\Constants;
 use GaaraHyperf\Event\AuthenticationSuccessEvent;
 use GaaraHyperf\Event\CheckPassportEvent;
 use GaaraHyperf\Exception\TooManyLoginAttemptsException;
 use GaaraHyperf\IPResolver\IPResolverInterface;
-use GaaraHyperf\RateLimiter\RateLimiterFactory;
 use GaaraHyperf\RateLimiter\RateLimiterInterface;
+use GaaraHyperf\RateLimiter\SlidingWindowRateLimiter;
+use Hyperf\Redis\Redis;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -20,15 +22,22 @@ class LoginAttemptLimitListener implements EventSubscriberInterface
     private RateLimiterInterface $rateLimiter;
 
     public function __construct(
-        private RateLimiterFactory $rateLimiterFactory,
+        Redis $redis,
         private IPResolverInterface $ipResolver,
-        string $type = 'sliding_window',
         array $options = [],
     ) {
-        $this->rateLimiter = $this->rateLimiterFactory->create([
-            'type' => $type,
-            'options' => $options,
-        ]);
+        $options = $options + [
+            'prefix' => 'default',
+            'limit' => 5,
+            'interval' => 300,
+        ];
+
+        $this->rateLimiter = new SlidingWindowRateLimiter(
+            redis: $redis,
+            prefix: sprintf('%s:login_rate_limiter:sliding_window:%s', Constants::__PREFIX, $options['prefix']),
+            interval: $options['interval'],
+            limit: $options['limit'],
+        );
     }
 
     public static function getSubscribedEvents()

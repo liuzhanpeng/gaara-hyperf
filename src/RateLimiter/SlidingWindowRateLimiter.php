@@ -14,15 +14,15 @@ use Hyperf\Redis\Redis;
 class SlidingWindowRateLimiter implements RateLimiterInterface
 {
     /**
+     * @param string $prefix 缓存键前缀
      * @param int $interval 时间窗口，单位秒
      * @param int $limit 最大请求数
-     * @param string $prefix 缓存键前缀
      */
     public function __construct(
         private Redis $redis,
+        private string $prefix,
         private int $interval,
         private int $limit,
-        private string $prefix
     ) {
     }
 

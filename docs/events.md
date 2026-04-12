@@ -187,24 +187,16 @@ IP 解析优先级：`CF-Connecting-IP` > `X-Real-IP` > `X-Forwarded-For` > `rem
 [
     'class'  => \GaaraHyperf\EventListener\LoginAttemptLimitListener::class,
     'params' => [
-        'type'    => 'sliding_window', // token_bucket | sliding_window | fixed_window
         'options' => [
             'prefix'   => 'login_limit',
             'limit'    => 5,
-            'interval' => 300,  // sliding_window/fixed_window：时间窗口（秒）
-            // 'rate' => 1.0,   // token_bucket：每秒生成令牌数
+            'interval' => 300,  // 时间窗口（秒）
         ],
     ],
 ],
 ```
 
-三种限流算法：
-
-| 算法 | 特点 | 适用场景 |
-|------|------|---------|
-| `sliding_window` | 平滑，无边界效应 | 推荐用于登录限制 |
-| `fixed_window` | 简单，有窗口边界突刺 | 适合简单计数场景 |
-| `token_bucket` | 支持突发流量 | 适合 API 限流 |
+登录限流固定使用 `sliding_window` 算法（平滑、无窗口边界突刺），无需再配置 `type`。
 
 认证失败时（`AuthenticationFailureEvent`）自动计数；成功时（`AuthenticationSuccessEvent`）自动重置计数器。
 
