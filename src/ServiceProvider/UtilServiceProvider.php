@@ -6,6 +6,8 @@ namespace GaaraHyperf\ServiceProvider;
 
 use GaaraHyperf\IPResolver\IPResolver;
 use GaaraHyperf\IPResolver\IPResolverInterface;
+use GaaraHyperf\IPWhiteListChecker\IPWhiteListChecker;
+use GaaraHyperf\IPWhiteListChecker\IPWhiteListCheckerInterface;
 use Hyperf\Contract\ContainerInterface;
 
 /**
@@ -19,5 +21,6 @@ class UtilServiceProvider implements ServiceProviderInterface
     {
         // 注册一些工具类服务
         $container->define(IPResolverInterface::class, new IPResolver());
+        $container->define(IPWhiteListCheckerInterface::class, new IPWhiteListChecker());
     }
 }

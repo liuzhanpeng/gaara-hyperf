@@ -7,7 +7,7 @@ namespace GaaraHyperf\EventListener;
 use GaaraHyperf\Event\CheckPassportEvent;
 use GaaraHyperf\Exception\IPNotInWhiteListException;
 use GaaraHyperf\IPResolver\IPResolverInterface;
-use GaaraHyperf\IPWhiteListChecker\IPWhiteListChecker;
+use GaaraHyperf\IPWhiteListChecker\IPWhiteListCheckerInterface;
 use GaaraHyperf\IPWhiteListChecker\IPWhiteListProviderInterface;
 use InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -19,7 +19,7 @@ class IPWhiteListListener implements EventSubscriberInterface
 {
     public function __construct(
         private IPResolverInterface $ipResolver,
-        private IPWhiteListChecker $whiteListChecker,
+        private IPWhiteListCheckerInterface $whiteListChecker,
         private array|IPWhiteListProviderInterface|string $whiteList = []
     ) {
     }
