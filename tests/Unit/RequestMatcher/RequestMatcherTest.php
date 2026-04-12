@@ -93,4 +93,21 @@ describe('RequestMatcher', function () {
         expect($matcher->matchesPattern(mockRequest('/api', 'GET')))->toBeTrue();
         expect($matcher->matchesPattern(mockRequest('/other', 'GET')))->toBeFalse();
     });
+
+    it('treats string and array inputs consistently', function () {
+        $stringMatcher = new RequestMatcher('get /api/users', null, []);
+        $arrayMatcher = new RequestMatcher(['get /api/users'], null, []);
+
+        expect($stringMatcher->matchesPattern(mockRequest('/api/users', 'GET')))->toBeTrue();
+        expect($arrayMatcher->matchesPattern(mockRequest('/api/users', 'GET')))->toBeTrue();
+        expect($stringMatcher->matchesPattern(mockRequest('/api/users', 'POST')))->toBeFalse();
+        expect($arrayMatcher->matchesPattern(mockRequest('/api/users', 'POST')))->toBeFalse();
+    });
+
+    it('returns false for logout and exclusions when not configured', function () {
+        $matcher = new RequestMatcher('/api', null, []);
+
+        expect($matcher->matchesLogout(mockRequest('/api/logout', 'POST')))->toBeFalse();
+        expect($matcher->matchesExcluded(mockRequest('/api/public', 'GET')))->toBeFalse();
+    });
 });

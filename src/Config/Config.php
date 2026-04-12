@@ -13,11 +13,11 @@ class Config
 {
     /**
      * @param array<string, GuardConfig> $guardConfigCollection
+     * @param array<string, array> $servicesConfigCollection
      */
     public function __construct(
         private array $guardConfigCollection,
         private array $servicesConfigCollection,
-        private array $exceptionMessages
     ) {
     }
 
@@ -32,7 +32,7 @@ class Config
             $guardConfigCollection[$guardName] = GuardConfig::from($guardConfig);
         }
 
-        return new self($guardConfigCollection, $config['services'] ?? [], $config['exception_messages'] ?? []);
+        return new self($guardConfigCollection, $config['services'] ?? []);
     }
 
     /**
@@ -53,13 +53,5 @@ class Config
     public function serviceConfig(string $name): array
     {
         return $this->servicesConfigCollection[$name] ?? [];
-    }
-
-    /**
-     * 返回异常消息配置.
-     */
-    public function exceptionMessages(): array
-    {
-        return $this->exceptionMessages;
     }
 }
