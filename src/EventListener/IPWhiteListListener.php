@@ -27,7 +27,7 @@ class IPWhiteListListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CheckPassportEvent::class => ['checkPassport', 100],
+            CheckPassportEvent::class => ['checkPassport', Priority::HIGH],
         ];
     }
 

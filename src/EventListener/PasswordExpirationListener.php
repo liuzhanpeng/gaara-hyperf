@@ -28,7 +28,7 @@ class PasswordExpirationListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            AuthenticationSuccessEvent::class => 'onAuthenticationSuccess',
+            AuthenticationSuccessEvent::class => ['onAuthenticationSuccess', Priority::NORMAL],
         ];
     }
 

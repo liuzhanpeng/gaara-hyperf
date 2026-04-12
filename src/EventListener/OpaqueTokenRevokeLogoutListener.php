@@ -23,7 +23,7 @@ class OpaqueTokenRevokeLogoutListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            LogoutEvent::class => 'onLogout',
+            LogoutEvent::class => ['onLogout', Priority::NORMAL],
         ];
     }
 

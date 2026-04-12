@@ -34,8 +34,8 @@ class LoginAttemptLimitListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            CheckPassportEvent::class => ['checkPassport', 100], // 设置高优先级，确保在认证前进行限流检查
-            AuthenticationSuccessEvent::class => 'onAuthenticationSuccess',
+            CheckPassportEvent::class => ['checkPassport', Priority::HIGH], // 设置高优先级，确保在认证前进行限流检查
+            AuthenticationSuccessEvent::class => ['onAuthenticationSuccess', Priority::NORMAL],
         ];
     }
 

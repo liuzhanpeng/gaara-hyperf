@@ -24,7 +24,7 @@ class CsrfTokenBadgeCheckListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            CheckPassportEvent::class => ['checkPassport', 100],
+            CheckPassportEvent::class => ['checkPassport', Priority::NORMAL],
         ];
     }
 
