@@ -7,6 +7,6 @@ namespace GaaraHyperf\Exception;
 /**
  * 无效签名异常.
  */
-class InvalidSignatureException extends AuthenticationException
+class InvalidSignatureException extends InvalidCredentialsException
 {
 }

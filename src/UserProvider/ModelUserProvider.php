@@ -7,6 +7,7 @@ namespace GaaraHyperf\UserProvider;
 use GaaraHyperf\User\UserInterface;
 use Hyperf\DbConnection\Model\Model;
 use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * 基于Hyperf内置数据库模型用户提供者.
@@ -38,7 +39,7 @@ class ModelUserProvider implements UserProviderInterface
         }
 
         if (! $model instanceof UserInterface) {
-            throw new InvalidArgumentException("{$this->class} must implement UserInterface");
+            throw new RuntimeException("{$this->class} must implement UserInterface");
         }
 
         return $model;

@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Authenticator;
 
-use GaaraHyperf\Exception\AuthenticationException;
 use GaaraHyperf\Exception\InvalidCredentialsException;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\UserProvider\UserProviderInterface;
-use Hyperf\HttpMessage\Server\Response;
-use Hyperf\HttpMessage\Stream\SwooleStream;
 use InvalidArgumentException;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -52,31 +48,10 @@ class X509Authenticator extends AbstractAuthenticator
             );
         }
 
-        $user = $this->userProvider->findByIdentifier($identifier);
-        if (is_null($user)) {
-            throw new InvalidCredentialsException(
-                message: 'User not found',
-                userIdentifier: $identifier,
-            );
-        }
-
         return new Passport(
-            $user->getIdentifier(),
-            fn () => $user,
+            $identifier,
+            $this->userProvider->findByIdentifier(...),
         );
-    }
-
-    /**
-     * @override
-     */
-    public function onAuthenticationFailure(string $guardName, ServerRequestInterface $request, AuthenticationException $exception, ?Passport $passport = null): ?ResponseInterface
-    {
-        if (! is_null($this->failureHandler)) {
-            return $this->failureHandler->handle($guardName, $request, $exception, $passport);
-        }
-
-        $response = new Response();
-        return $response->withStatus(401)->withBody(new SwooleStream($exception->getMessage()));
     }
 
     public function isInteractive(): bool

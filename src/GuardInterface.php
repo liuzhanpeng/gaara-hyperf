@@ -51,6 +51,11 @@ interface GuardInterface
     public function logout(?TokenInterface $token = null): ?ResponseInterface;
 
     /**
+     * 判断令牌是否已通过当前守卫的信任判定.
+     */
+    public function isTokenAuthenticated(?TokenInterface $token): bool;
+
+    /**
      * 检查令牌所属用户是否具有指定的权限.
      */
     public function isGranted(TokenInterface $token, mixed $attribute, mixed $resource = null): bool;

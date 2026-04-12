@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace GaaraHyperf\Authenticator;
 
 use GaaraHyperf\Exception\AuthenticationException;
-use GaaraHyperf\Exception\UnauthenticatedException;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\Token\AuthenticatedToken;
 use GaaraHyperf\Token\TokenInterface;
@@ -54,7 +53,7 @@ abstract class AbstractAuthenticator implements AuthenticatorInterface
             return $this->failureHandler->handle($guardName, $request, $exception, $passport);
         }
 
-        if (! $this->isInteractive() && $exception instanceof UnauthenticatedException) {
+        if (! $this->isInteractive()) {
             $response = new Response();
             return $response->withStatus(401)->withBody(new SwooleStream($exception->getMessage()));
         }

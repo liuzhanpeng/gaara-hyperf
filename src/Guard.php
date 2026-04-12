@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GaaraHyperf;
 
+use GaaraHyperf\Authentication\AuthenticationTrustDeciderInterface;
 use GaaraHyperf\Authenticator\AuthenticatorInterface;
 use GaaraHyperf\Authorization\AccessDeniedHandlerInterface;
 use GaaraHyperf\Authorization\AuthorizationCheckerInterface;
@@ -14,7 +15,6 @@ use GaaraHyperf\Event\LogoutEvent;
 use GaaraHyperf\Exception\AuthenticationException;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\RequestMatcher\RequestMatcherInterface;
-use GaaraHyperf\Token\AuthenticatedToken;
 use GaaraHyperf\Token\TokenContextInterface;
 use GaaraHyperf\Token\TokenInterface;
 use GaaraHyperf\TokenStorage\TokenStorageInterface;
@@ -44,6 +44,7 @@ class Guard implements GuardInterface
         private UnauthenticatedHandlerInterface $unauthenticatedHandler,
         private AuthorizationCheckerInterface $authorizationChecker,
         private AccessDeniedHandlerInterface $accessDeniedHandler,
+        private AuthenticationTrustDeciderInterface $authenticationTrustDecider,
         private EventDispatcherInterface $eventDispatcher
     ) {
     }
@@ -111,7 +112,7 @@ class Guard implements GuardInterface
 
         // 认证器处理认证逻辑后继续放行
         $token = $this->tokenContext->getToken();
-        if ($token === null || ! $token instanceof AuthenticatedToken) {
+        if (! $this->authenticationTrustDecider->isAuthenticated($token)) {
             return $this->unauthenticatedHandler->handle($request, $token);
         }
 
@@ -122,6 +123,14 @@ class Guard implements GuardInterface
 
         // 授权检查
         return $this->checkAuthorization($request, $token);
+    }
+
+    /**
+     * 判断令牌是否已通过当前守卫的信任判定.
+     */
+    public function isTokenAuthenticated(?TokenInterface $token): bool
+    {
+        return $this->authenticationTrustDecider->isAuthenticated($token);
     }
 
     /**

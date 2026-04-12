@@ -7,8 +7,6 @@ namespace GaaraHyperf\Authenticator;
 use Closure;
 use GaaraHyperf\Exception\AuthenticationException;
 use GaaraHyperf\Exception\InvalidCredentialsException;
-use GaaraHyperf\Exception\InvalidPasswordException;
-use GaaraHyperf\Exception\UserNotFoundException;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\Passport\PasswordBadge;
 use GaaraHyperf\UserProvider\UserProviderInterface;
@@ -112,16 +110,15 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
         $credientials = [];
         $username = $request->getParsedBody()[$this->usernameField] ?? '';
         if (! is_string($username) || empty($username)) {
-            throw new UserNotFoundException(
+            throw new InvalidCredentialsException(
                 message: 'Username is missing',
-                userIdentifier: $username,
             );
         }
         $credientials['username'] = trim($username);
 
         $password = $request->getParsedBody()[$this->passwordField] ?? '';
         if (! is_string($password) || empty($password)) {
-            throw new InvalidPasswordException(
+            throw new InvalidCredentialsException(
                 message: 'Password is missing',
                 userIdentifier: $credientials['username'],
             );

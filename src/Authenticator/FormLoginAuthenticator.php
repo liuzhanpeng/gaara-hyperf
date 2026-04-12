@@ -6,9 +6,7 @@ namespace GaaraHyperf\Authenticator;
 
 use Closure;
 use GaaraHyperf\Exception\AuthenticationException;
-use GaaraHyperf\Exception\InvalidCsrfTokenException;
-use GaaraHyperf\Exception\InvalidPasswordException;
-use GaaraHyperf\Exception\UserNotFoundException;
+use GaaraHyperf\Exception\InvalidCredentialsException;
 use GaaraHyperf\Passport\CsrfTokenBadge;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\Passport\PasswordBadge;
@@ -65,7 +63,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
         $credientials = $this->getCredentials($request);
 
         if ($this->csrfEnabled && empty($credientials['csrf_token'])) {
-            throw new InvalidCsrfTokenException(
+            throw new InvalidCredentialsException(
                 message: 'CSRF token is missing',
                 userIdentifier: $credientials['username']
             );
@@ -143,16 +141,15 @@ class FormLoginAuthenticator extends AbstractAuthenticator
         $credientials = [];
         $username = $request->getParsedBody()[$this->usernameField] ?? '';
         if (! is_string($username) || empty($username)) {
-            throw new UserNotFoundException(
+            throw new InvalidCredentialsException(
                 message: 'Username is missing',
-                userIdentifier: $username,
             );
         }
         $credientials['username'] = trim($username);
 
         $password = $request->getParsedBody()[$this->passwordField] ?? '';
         if (! is_string($password) || empty($password)) {
-            throw new InvalidPasswordException(
+            throw new InvalidCredentialsException(
                 message: 'Password is missing',
                 userIdentifier: $username
             );

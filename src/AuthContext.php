@@ -88,6 +88,16 @@ class AuthContext
      */
     public function isAuthenticated(): bool
     {
+        $token = $this->getToken();
+        if ($token === null) {
+            return false;
+        }
+
+        $guard = $this->guardResolver->resolve($token->getGuardName());
+        if (! $guard->isTokenAuthenticated($token)) {
+            return false;
+        }
+
         return ! is_null($this->getUser());
     }
 

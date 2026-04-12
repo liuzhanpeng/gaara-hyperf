@@ -141,10 +141,18 @@ UserProvider 的 `findByIdentifier()` 接收的标识符即为请求头中的 AP
 **签名算法**（客户端须按相同规则生成签名）：
 
 ```
-signature = HMAC-SHA256(
-    key    = apiSecret,
-    data   = apiKey + "\n" + timestamp + "\n" + nonce + "\n" + requestBody
-)
+queryString = RFC3986 编码后按 key 排序拼接
+bodyHash    = SHA256(requestBody)
+
+signData = METHOD + "\n"
+         + PATH + "\n"
+         + queryString + "\n"
+         + apiKey + "\n"
+         + timestamp
+         + (nonce_enabled ? "\n" + nonce : "") + "\n"
+         + bodyHash
+
+signature = HMAC(algo, signData, apiSecret)
 ```
 
 ---

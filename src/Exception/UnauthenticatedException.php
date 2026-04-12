@@ -4,23 +4,17 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Exception;
 
-use Exception;
-use GaaraHyperf\Token\TokenInterface;
-
 /**
  * 未认证异常.
  */
-class UnauthenticatedException extends Exception
+class UnauthenticatedException extends AuthenticationException
 {
     public function __construct(
-        string $message = 'Unauthenticated',
-        private ?TokenInterface $token = null
+        string $userIdentifier = ''
     ) {
-        parent::__construct($message);
-    }
-
-    public function getToken(): ?TokenInterface
-    {
-        return $this->token;
+        parent::__construct(
+            message: 'Unauthenticated',
+            userIdentifier: $userIdentifier,
+        );
     }
 }
