@@ -27,14 +27,13 @@ class LoginAttemptLimitListener implements EventSubscriberInterface
         array $options = [],
     ) {
         $options = $options + [
-            'prefix' => 'default',
             'limit' => 5,
             'interval' => 300,
         ];
 
         $this->rateLimiter = new SlidingWindowRateLimiter(
             redis: $redis,
-            prefix: sprintf('%s:login_rate_limiter:sliding_window:%s', Constants::__PREFIX, $options['prefix']),
+            prefix: sprintf('%s:login_attempt_limit', Constants::__PREFIX),
             interval: $options['interval'],
             limit: $options['limit'],
         );
