@@ -120,11 +120,6 @@ return [
 
             // 'password_hasher' => 'default', // 可选，密码哈希器服务名称；默认default
 
-            // 'trust_decider' => [ // 可选，guard级认证信任决策器配置
-            //     'class' => DefaultAuthenticationTrustDecider::class,
-            //     'params' => [],
-            // ],
-
             'listeners' => [
                 // [
                 //     'class' => IPWhiteListListener::class, // IP白名单检查监听器

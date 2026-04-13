@@ -4,19 +4,6 @@
 
 ## 安全建议
 
-### 密码存储
-
-- **不要**使用 MD5、SHA1 等普通哈希算法存储密码，始终使用 `PasswordHasher`（默认 `PASSWORD_BCRYPT`）
-- 生产环境推荐使用 `PASSWORD_ARGON2ID`（需 PHP 7.3+ 且编译时包含 `--with-password-argon2`）：
-
-```php
-'services' => [
-    'password_hashers' => [
-        'default' => ['type' => 'default', 'algo' => PASSWORD_ARGON2ID],
-    ],
-],
-```
-
 ### CSRF 保护
 
 - `FormLoginAuthenticator` 的 CSRF 保护**默认启用**（`csrf_enabled: true`），不要轻易关闭
@@ -68,7 +55,7 @@ class MyService
 
     public function doSomething(): void
     {
-        $this->token = AuthContext::getToken('api'); // 危险！
+        $this->token = AuthContext::getToken(); // 危险！
     }
 }
 
@@ -77,7 +64,7 @@ class MyService
 {
     public function doSomething(): void
     {
-        $token = AuthContext::getToken('api'); // 安全
+        $token = AuthContext::getToken(); // 安全
     }
 }
 ```

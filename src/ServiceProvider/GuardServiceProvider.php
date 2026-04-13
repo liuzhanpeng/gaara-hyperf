@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\ServiceProvider;
 
-use GaaraHyperf\Authentication\AuthenticationTrustDeciderInterface;
-use GaaraHyperf\Authentication\DefaultAuthenticationTrustDecider;
 use GaaraHyperf\Authenticator\AuthenticatorFactory;
 use GaaraHyperf\Config\ConfigLoaderInterface;
-use GaaraHyperf\Config\CustomConfig;
 use GaaraHyperf\Config\GuardConfig;
 use GaaraHyperf\Constants;
 use GaaraHyperf\EventListener\PasswordBadgeCheckListener;
@@ -43,17 +40,13 @@ class GuardServiceProvider implements ServiceProviderInterface
         $container->define(TokenContextInterface::class, new TokenContext(Constants::TOKEN_CONTEXT_PREFIX));
 
         $config = $container->get(ConfigLoaderInterface::class)->load();
-        $defaultAuthenticationTrustDeciderConfig = new CustomConfig(DefaultAuthenticationTrustDecider::class, []);
-
-        $container->define(AuthenticationTrustDeciderInterface::class, new DefaultAuthenticationTrustDecider());
 
         $factories = [];
         foreach ($config->guardConfigCollection() as $guardName => $guardConfig) {
             $factories[$guardName] = fn () => $this->createGuard(
                 $container,
                 $guardName,
-                $guardConfig,
-                $defaultAuthenticationTrustDeciderConfig
+                $guardConfig
             );
         }
 
@@ -63,7 +56,7 @@ class GuardServiceProvider implements ServiceProviderInterface
     /**
      * 创建一个认证守卫实例.
      */
-    private function createGuard(ContainerInterface $container, string $guardName, GuardConfig $guardConfig, CustomConfig $defaultAuthenticationTrustDeciderConfig): GuardInterface
+    private function createGuard(ContainerInterface $container, string $guardName, GuardConfig $guardConfig): GuardInterface
     {
         $requestMatcher = $container->get(RequestMatcherFactory::class)->create($guardConfig->requestMatcherConfig());
         $tokenStorage = $container->get(TokenStorageFactory::class)->create($guardConfig->tokenStorageConfig());
@@ -74,19 +67,6 @@ class GuardServiceProvider implements ServiceProviderInterface
 
         $accessDeniedHandlerConfig = $guardConfig->accessDeniedHandlerConfig();
         $accessDeniedHandler = $container->make($accessDeniedHandlerConfig->class(), $accessDeniedHandlerConfig->params());
-
-        $authenticationTrustDeciderConfig = $guardConfig->authenticationTrustDeciderConfig() ?? $defaultAuthenticationTrustDeciderConfig;
-        $authenticationTrustDecider = $container->make(
-            $authenticationTrustDeciderConfig->class(),
-            $authenticationTrustDeciderConfig->params()
-        );
-        if (! $authenticationTrustDecider instanceof AuthenticationTrustDeciderInterface) {
-            throw new InvalidArgumentException(sprintf(
-                'Authentication trust decider "%s" must implement %s.',
-                $authenticationTrustDeciderConfig->class(),
-                AuthenticationTrustDeciderInterface::class
-            ));
-        }
 
         $eventDispatcher = new EventDispatcher();
 
@@ -125,7 +105,6 @@ class GuardServiceProvider implements ServiceProviderInterface
             unauthenticatedHandler: $unauthenticatedHandler,
             authorizationChecker: $authorizationChecker,
             accessDeniedHandler: $accessDeniedHandler,
-            authenticationTrustDecider: $authenticationTrustDecider,
             eventDispatcher: $eventDispatcher,
         );
     }

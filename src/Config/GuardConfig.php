@@ -22,7 +22,6 @@ class GuardConfig
         private CustomConfig $authorizationCheckerConfig,
         private CustomConfig $accessDeniedHandlerConfig,
         private ListenerConfigCollection $listenerConfigCollection,
-        private ?CustomConfig $authenticationTrustDeciderConfig,
         private string $passwordHasherId
     ) {
     }
@@ -37,10 +36,6 @@ class GuardConfig
         $authorizationCheckerConfig = CustomConfig::from($config['authorization']['checker'] ?? ['class' => NullAuthorizationChecker::class]);
         $accessDeniedHandlerConfig = CustomConfig::from($config['authorization']['access_denied_handler'] ?? ['class' => DefaultAccessDeniedHandler::class]);
         $listenerConfigCollection = ListenerConfigCollection::from($config['listeners'] ?? []);
-        $authenticationTrustDeciderConfig = null;
-        if (isset($config['trust_decider'])) {
-            $authenticationTrustDeciderConfig = CustomConfig::from($config['trust_decider']);
-        }
         $passwordHasherId = $config['password_hasher'] ?? 'default';
 
         return new self(
@@ -52,7 +47,6 @@ class GuardConfig
             $authorizationCheckerConfig,
             $accessDeniedHandlerConfig,
             $listenerConfigCollection,
-            $authenticationTrustDeciderConfig,
             $passwordHasherId,
         );
     }
@@ -119,14 +113,6 @@ class GuardConfig
     public function listenerConfigCollection(): ListenerConfigCollection
     {
         return $this->listenerConfigCollection;
-    }
-
-    /**
-     * 返回认证信任决策器配置.
-     */
-    public function authenticationTrustDeciderConfig(): ?CustomConfig
-    {
-        return $this->authenticationTrustDeciderConfig;
     }
 
     /**

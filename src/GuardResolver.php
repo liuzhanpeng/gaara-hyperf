@@ -16,7 +16,7 @@ use IteratorAggregate;
 class GuardResolver implements IteratorAggregate
 {
     /**
-     * @var array<string, GuardInterface> 认证守卫工厂列表
+     * @var array<string, GuardInterface> 认证守卫列表
      */
     private array $guards = [];
 

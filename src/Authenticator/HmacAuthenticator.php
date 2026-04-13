@@ -13,6 +13,7 @@ use GaaraHyperf\Exception\UserNotFoundException;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\User\PasswordAwareUserInterface;
 use GaaraHyperf\UserProvider\UserProviderInterface;
+use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\SimpleCache\CacheInterface;
 use RuntimeException;
@@ -41,6 +42,10 @@ class HmacAuthenticator extends AbstractAuthenticator
         ?AuthenticationFailureHandlerInterface $failureHandler,
     ) {
         parent::__construct($successHandler, $failureHandler);
+
+        if (! in_array($this->algo, hash_hmac_algos(), true)) {
+            throw new InvalidArgumentException(sprintf('Unsupported hmac algorithm "%s".', $this->algo));
+        }
     }
 
     public function supports(ServerRequestInterface $request): bool

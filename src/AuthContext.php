@@ -28,7 +28,7 @@ class AuthContext
     /**
      * 登录.
      */
-    public function login(UserInterface $user, string $guard, ?string $authenticator = null, array $badges = []): ResponseInterface
+    public function login(UserInterface $user, string $guard, ?string $authenticator = null, array $badges = []): ?ResponseInterface
     {
         $guard = $this->guardResolver->resolve($guard);
 

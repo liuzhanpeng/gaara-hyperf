@@ -31,13 +31,13 @@ describe('Passport', function () {
     });
 
     it('throws if user not found', function () {
-        $passport = new Passport('id3', fn ($id) => null, []);
-        expect(fn () => $passport->getUser())->toThrow(UserNotFoundException::class);
+        expect(fn () => new Passport('id3', fn ($id) => null, []))
+            ->toThrow(UserNotFoundException::class);
     });
 
     it('throws if userLoader returns non-UserInterface', function () {
-        $passport = new Passport('id4', fn ($id) => 123, []);
-        expect(fn () => $passport->getUser())->toThrow(InvalidArgumentException::class);
+        expect(fn () => new Passport('id4', fn ($id) => 123, []))
+            ->toThrow(RuntimeException::class);
     });
 
     it('can add and get badge', function () {

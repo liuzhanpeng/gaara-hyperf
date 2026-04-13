@@ -1,11 +1,14 @@
 <?php
 
 declare(strict_types=1);
+use GaaraHyperf\CsrfTokenManager\CsrfToken;
+use GaaraHyperf\CsrfTokenManager\SessionCsrfTokenManager;
+use Hyperf\Contract\SessionInterface;
 
 describe('SessionCsrfTokenManager', function () {
     beforeEach(function () {
-        $this->session = mock(Hyperf\Contract\SessionInterface::class);
-        $this->csrfTokenManager = new GaaraHyperf\CsrfTokenManager\SessionCsrfTokenManager('csrf', $this->session);
+        $this->session = mock(SessionInterface::class);
+        $this->csrfTokenManager = new SessionCsrfTokenManager('csrf', $this->session);
     });
 
     it('should generate a CSRF token and store it in session', function () {
@@ -18,7 +21,7 @@ describe('SessionCsrfTokenManager', function () {
             });
 
         $token = $this->csrfTokenManager->generate('authenticate');
-        expect($token)->toBeInstanceOf(GaaraHyperf\CsrfTokenManager\CsrfToken::class);
+        expect($token)->toBeInstanceOf(CsrfToken::class);
         expect($token->getId())->toBe('authenticate');
         expect(strlen($token->getValue()))->toBe(32);
     });
@@ -28,8 +31,11 @@ describe('SessionCsrfTokenManager', function () {
             ->once()
             ->with('csrf.authenticate')
             ->andReturn('valid_token_value');
+        $this->session->shouldReceive('remove')
+            ->once()
+            ->with('csrf.authenticate');
 
-        $token = new GaaraHyperf\CsrfTokenManager\CsrfToken('authenticate', 'valid_token_value');
+        $token = new CsrfToken('authenticate', 'valid_token_value');
         $isValid = $this->csrfTokenManager->verify($token);
         expect($isValid)->toBeTrue();
     });
@@ -39,8 +45,11 @@ describe('SessionCsrfTokenManager', function () {
             ->once()
             ->with('csrf.authenticate')
             ->andReturn('valid_token_value');
+        $this->session->shouldReceive('remove')
+            ->once()
+            ->with('csrf.authenticate');
 
-        $token = new GaaraHyperf\CsrfTokenManager\CsrfToken('authenticate', 'invalid_token_value');
+        $token = new CsrfToken('authenticate', 'invalid_token_value');
         $isValid = $this->csrfTokenManager->verify($token);
         expect($isValid)->toBeFalse();
     });

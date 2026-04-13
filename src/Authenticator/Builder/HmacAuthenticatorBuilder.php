@@ -9,6 +9,7 @@ use GaaraHyperf\Authenticator\HmacAuthenticator;
 use GaaraHyperf\Constants;
 use GaaraHyperf\Encryptor\EncryptorFactory;
 use GaaraHyperf\UserProvider\UserProviderInterface;
+use InvalidArgumentException;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -16,6 +17,11 @@ class HmacAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
+        $algo = strtolower((string) ($options['algo'] ?? 'sha256'));
+        if ($algo === '' || ! in_array($algo, hash_hmac_algos(), true)) {
+            throw new InvalidArgumentException(sprintf('Unsupported hmac algorithm "%s".', $algo));
+        }
+
         $encryptor = null;
         if (isset($options['secret_encrypto_enabled']) && $options['secret_encrypto_enabled']) {
             $encryptorFactory = $this->container->get(EncryptorFactory::class);
@@ -31,7 +37,7 @@ class HmacAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             nonceCachePrefix: sprintf('%s:hmac_nonce:%s', Constants::__PREFIX, $options['nonce_cache_prefix'] ?? 'default'),
             ttl: $options['ttl'] ?? 60,
             leeway: $options['leeway'] ?? 300,
-            algo: $options['algo'] ?? 'sha256',
+            algo: $algo,
             userProvider: $userProvider,
             cache: $this->container->get(CacheInterface::class),
             encryptor: $encryptor,

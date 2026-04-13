@@ -25,6 +25,8 @@ class JsonLoginAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             checkPath: $options['check_path'],
             usernameField: $options['username_field'] ?? 'username',
             passwordField: $options['password_field'] ?? 'password',
+            errorField: $options['error_field'] ?? 'error',
+            failureHttpStatusCode: $options['failure_http_status_code'] ?? 401,
             errorMessage: $options['error_message'] ?? '用户名或密码错误',
             userProvider: $userProvider,
             successHandler: $this->createSuccessHandler($options),

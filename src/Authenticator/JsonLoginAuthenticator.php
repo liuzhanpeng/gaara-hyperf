@@ -25,6 +25,8 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
         private string $checkPath,
         private string $usernameField,
         private string $passwordField,
+        private int $failureHttpStatusCode,
+        private string $errorField,
         private Closure|string $errorMessage,
         private UserProviderInterface $userProvider,
         ?AuthenticationSuccessHandlerInterface $successHandler,
@@ -41,6 +43,10 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
 
         if (empty($this->passwordField)) {
             throw new InvalidArgumentException('The "password_field" option must not be empty.');
+        }
+
+        if (empty($this->errorField)) {
+            throw new InvalidArgumentException('The "error_field" option must not be empty.');
         }
 
         if (empty($this->errorMessage)) {
@@ -90,10 +96,10 @@ class JsonLoginAuthenticator extends AbstractAuthenticator
         }
 
         $response = new Response();
-        return $response->withStatus(200)
+        return $response->withStatus($this->failureHttpStatusCode)
             ->withHeader('Content-Type', 'application/json')
             ->withBody(new SwooleStream(json_encode([
-                'error' => $msg,
+                $this->errorField => $msg,
             ], JSON_UNESCAPED_UNICODE)));
     }
 

@@ -2,43 +2,35 @@
 
 ## 概述
 
-`gaara-hyperf` 是一个基于 [Hyperf](https://hyperf.io/) 框架的身份认证库，设计灵感来源于 Symfony Security。它提供了完整的认证、授权、限流、会话管理等功能，支持有状态（Session）和无状态（Token）两种认证模式。
+`gaara-hyperf` 是一个基于 [Hyperf](https://hyperf.io/) 的认证库，设计思路参考 Symfony Security，强调可组合、可扩展与可观测。
 
-### 核心概念
+组件支持有状态与无状态两类认证场景，适用于后台系统与 API 服务；具体能力与实现范围见下方“特性”章节。
 
-| 概念 | 说明 |
-|------|------|
-| **Guard** | 认证守卫，对应一个受保护的路由范围（如 `/admin/`），每个 Guard 独立配置 |
-| **Authenticator** | 认证器，负责从请求中提取凭证并验证用户身份 |
-| **Passport** | 认证上下文，在认证流程中传递用户信息和认证标识（Badge） |
-| **Token** | 认证令牌，表示已通过认证的用户状态，存储到 TokenStorage |
-| **UserProvider** | 用户提供者，根据标识符加载用户对象 |
-| **EventListener** | 事件监听器，在认证各阶段执行附加逻辑（限流、IP白名单等） |
+### 特性
 
-### 认证流程
+- [x] 表单登录认证
+- [x] JSON 登录认证
+- [x] 不透明令牌认证
+    - [x] IP 绑定 / UA 绑定
+    - [x] 单会话
+- [x] API Key 认证
+- [x] HMAC 签名认证
+- [x] X.509 客户端证书认证
+- [x] 内置事件监听器
+    - [x] IP 白名单监听器
+    - [x] 登录尝试次数限制监听器
+    - [x] 密码过期策略监听器
+    - [x] 审计日志监听器
+    - [x] 登出撤销令牌监听器
 
-```
-请求
-  │
-  ▼
-AuthMiddleware（中间件）
-  │
-  ▼
-Guard.authenticate()
-  ├─ 从 TokenStorage 加载已有 Token → 直接通过
-  │
-  └─ 遍历 Authenticator 列表
-       ├─ supports() == false → 跳过
-       └─ supports() == true
-            ├─ authenticate() → 创建 Passport
-            ├─ 触发 CheckPassportEvent（Badge 校验）
-            ├─ createToken() → 创建 AuthenticatedToken
-            ├─ 触发 AuthenticationSuccessEvent
-            ├─ 保存 Token 到 TokenStorage
-            └─ 调用 successHandler
+后续会以扩展包的形式提供更多认证方式：
 
-失败时触发 AuthenticationFailureEvent → failureHandler → UnauthenticatedHandler
-```
+- [ ] JWT 认证
+- [ ] 2FA
+    - [ ] TOTP 认证
+- [ ] WebAuthn 认证
+- [ ] OAuth 2.0/OpenID Connect
+- [ ] Step-up/Risk-based 认证
 
 ---
 
