@@ -37,7 +37,7 @@ class GuardServiceProvider implements ServiceProviderInterface
     public function register(ContainerInterface $container): void
     {
         // 注册内置的令牌上下文
-        $container->define(TokenContextInterface::class, new TokenContext(Constants::TOKEN_CONTEXT_PREFIX));
+        $container->set(TokenContextInterface::class, new TokenContext(Constants::TOKEN_CONTEXT_PREFIX));
 
         $config = $container->get(ConfigLoaderInterface::class)->load();
 

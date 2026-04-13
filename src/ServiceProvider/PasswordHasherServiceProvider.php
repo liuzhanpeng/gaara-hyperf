@@ -30,6 +30,6 @@ class PasswordHasherServiceProvider implements ServiceProviderInterface
             $factories[$name] = fn () => $container->get(PasswordHasherFactory::class)->create($config);
         }
 
-        $container->define(PasswordHasherResolverInterface::class, new PasswordHasherResolver($factories));
+        $container->set(PasswordHasherResolverInterface::class, new PasswordHasherResolver($factories));
     }
 }

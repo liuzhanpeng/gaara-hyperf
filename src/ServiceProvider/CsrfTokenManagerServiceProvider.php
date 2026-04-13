@@ -30,6 +30,6 @@ class CsrfTokenManagerServiceProvider implements ServiceProviderInterface
             $factories[$name] = fn () => $container->get(CsrfTokenManagerFactory::class)->create($config);
         }
 
-        $container->define(CsrfTokenManagerResolverInterface::class, new CsrfTokenManagerResolver($factories));
+        $container->set(CsrfTokenManagerResolverInterface::class, new CsrfTokenManagerResolver($factories));
     }
 }

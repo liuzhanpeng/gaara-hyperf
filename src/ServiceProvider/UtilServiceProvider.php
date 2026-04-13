@@ -20,7 +20,7 @@ class UtilServiceProvider implements ServiceProviderInterface
     public function register(ContainerInterface $container): void
     {
         // 注册一些工具类服务
-        $container->define(IPResolverInterface::class, new IPResolver());
-        $container->define(IPWhiteListCheckerInterface::class, new IPWhiteListChecker());
+        $container->set(IPResolverInterface::class, new IPResolver());
+        $container->set(IPWhiteListCheckerInterface::class, new IPWhiteListChecker());
     }
 }

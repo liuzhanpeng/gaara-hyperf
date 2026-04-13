@@ -37,6 +37,6 @@ class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
             $factories[$name] = fn () => $container->get(OpaqueTokenManagerFactory::class)->create($config);
         }
 
-        $container->define(OpaqueTokenManagerResolverInterface::class, new OpaqueTokenManagerResolver($factories));
+        $container->set(OpaqueTokenManagerResolverInterface::class, new OpaqueTokenManagerResolver($factories));
     }
 }
