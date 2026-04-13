@@ -33,7 +33,7 @@ class GuardResolver implements IteratorAggregate
      */
     public function resolve(string $guardName): GuardInterface
     {
-        if (! isset($this->factories[$guardName])) {
+        if (! isset($this->guards[$guardName])) {
             if (! isset($this->factories[$guardName])) {
                 throw new InvalidArgumentException(sprintf('guard "%s" not found', $guardName));
             }
