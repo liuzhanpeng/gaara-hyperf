@@ -37,13 +37,13 @@
 ## 安装
 
 ```bash
-composer require gaara-hyperf/auth
+composer require lzpeng/gaara-hyperf
 ```
 
 发布配置文件：
 
 ```bash
-php bin/hyperf.php vendor:publish gaara-hyperf/auth
+php bin/hyperf.php vendor:publish lzpeng/gaara-hyperf
 ```
 
 配置文件将发布到 `config/autoload/gaara.php`。
