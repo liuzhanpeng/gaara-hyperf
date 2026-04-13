@@ -20,8 +20,8 @@ class X509AuthenticatorBuilder extends AbstractAuthenticatorBuilder
             sslClientSDNField: $options['ssl_client_s_dn_field'] ?? 'SSL_CLIENT_S_DN',
             identifierField: $options['identifier_field'] ?? 'email',
             userProvider: $userProvider,
-            successHandler: $this->createSuccessHandler($options, $eventDispatcher),
-            failureHandler: $this->createFailureHandler($options, $eventDispatcher),
+            successHandler: $this->createSuccessHandler($options),
+            failureHandler: $this->createFailureHandler($options),
         );
     }
 }

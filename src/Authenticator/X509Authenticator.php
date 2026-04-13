@@ -92,7 +92,7 @@ class X509Authenticator extends AbstractAuthenticator
         // 匹配 pattern:  /FIELD=xxx  或  ,FIELD=xxx  或  ^FIELD=xxx
         // 兼容字段名大小写 (i)
         // 排除分隔符 / 和 ,
-        $pattern = '/(?:^|[\/,])\s*' . preg_quote($field, '/') . '=([^/,]+)/i';
+        $pattern = '/(?:^|[\/,])\s*' . preg_quote($field, '/') . '=([^\/,]+)/i';
 
         if (preg_match($pattern, $dn, $matches)) {
             return trim($matches[1]);

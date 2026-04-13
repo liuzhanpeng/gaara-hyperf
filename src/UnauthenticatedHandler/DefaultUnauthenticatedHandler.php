@@ -19,7 +19,7 @@ class DefaultUnauthenticatedHandler implements UnauthenticatedHandlerInterface
     public function handle(ServerRequestInterface $request, ?TokenInterface $token): ResponseInterface
     {
         throw new UnauthenticatedException(
-            token: $token
+            userIdentifier: $token?->getUserIdentifier() ?? ''
         );
     }
 }
