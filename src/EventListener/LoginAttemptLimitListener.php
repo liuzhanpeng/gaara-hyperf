@@ -24,18 +24,15 @@ class LoginAttemptLimitListener implements EventSubscriberInterface
     public function __construct(
         Redis $redis,
         private IPResolverInterface $ipResolver,
-        array $options = [],
+        private string $prefix = 'default',
+        private int $limit = 5,
+        private int $interval = 300,
     ) {
-        $options = $options + [
-            'limit' => 5,
-            'interval' => 300,
-        ];
-
         $this->rateLimiter = new SlidingWindowRateLimiter(
             redis: $redis,
-            prefix: sprintf('%s:login_attempt_limit', Constants::__PREFIX),
-            interval: $options['interval'],
-            limit: $options['limit'],
+            prefix: sprintf('%s:login_attempt_limit:%s', Constants::__PREFIX, $this->prefix),
+            interval: $this->interval,
+            limit: $this->limit,
         );
     }
 
