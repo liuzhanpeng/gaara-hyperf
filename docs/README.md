@@ -87,7 +87,6 @@ return [
                         'class' => \GaaraHyperf\Authenticator\OpaqueTokenResponseHandler::class,
                         'params' => [
                             'token_manager' => 'default',
-                            'response_template' => '{"access_token":"#ACCESS_TOKEN#"}',
                         ],
                     ],
                 ],

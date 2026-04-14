@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Authenticator;
 
-use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerResolverInterface;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenProcessorResolverInterface;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\Token\TokenInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -16,17 +16,17 @@ use Psr\Http\Message\ServerRequestInterface;
 class OpaqueTokenResponseHandler implements AuthenticationSuccessHandlerInterface
 {
     public function __construct(
-        private OpaqueTokenManagerResolverInterface $opaqueTokenManagerResolver,
+        private OpaqueTokenProcessorResolverInterface $opaqueTokenProcessorResolver,
         private string $tokenManager = 'default',
     ) {
     }
 
     public function handle(string $guardName, ServerRequestInterface $request, TokenInterface $token, Passport $passport): ?ResponseInterface
     {
-        $opaqueTokenManager = $this->opaqueTokenManagerResolver->resolve($this->tokenManager);
+        $opaqueTokenProcessor = $this->opaqueTokenProcessorResolver->resolve($this->tokenManager);
 
-        $opaqueToken = $opaqueTokenManager->issue($token);
+        $opaqueToken = $opaqueTokenProcessor->issue($token);
 
-        return $opaqueTokenManager->getResponder()->respond($opaqueToken);
+        return $opaqueTokenProcessor->respond($opaqueToken);
     }
 }

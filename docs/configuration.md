@@ -250,13 +250,22 @@ return [
         'default' => [
             'type'                    => 'default',
             'prefix'                  => 'api',
-            'ttl'                     => 1200,     // Token 有效期（秒），默认 20 分钟
+            'idle_ttl'                => 1200,     // Token 空闲超时（秒），默认 20 分钟
             'max_ttl'                 => 86400,    // Token 最大生命周期（秒），默认 24 小时
             'token_refresh'           => true,     // 访问时自动续期
             'single_session'          => true,     // 同一用户只允许一个有效 Token
             'ip_bind_enabled'         => false,    // 绑定 IP
             'user_agent_bind_enabled' => false,    // 绑定 User-Agent
             'access_token_length'     => 64,       // 生成令牌的长度（字符数）
+            'token_extractor' => [                // 访问令牌提取器配置
+                'type'   => 'header',             // header | cookie | body | custom
+                'field'  => 'Authorization',
+                'scheme' => 'Bearer',
+            ],
+            'token_responder' => [                // 登录成功响应配置
+                'type'     => 'body',             // body | cookie | custom
+                'template' => '{"code":0,"message":"success","data":{"access_token":"#ACCESS_TOKEN#","expires_in":#EXPIRES_IN#,"user_identifier":"#USER_IDENTIFIER#"}}',
+            ],
         ],
     ],
 ],

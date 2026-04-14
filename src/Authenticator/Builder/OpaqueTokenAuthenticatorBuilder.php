@@ -7,7 +7,7 @@ namespace GaaraHyperf\Authenticator\Builder;
 use GaaraHyperf\Authenticator\AuthenticatorInterface;
 use GaaraHyperf\Authenticator\OpaqueTokenAuthenticator;
 use GaaraHyperf\EventListener\OpaqueTokenRevokeLogoutListener;
-use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerResolverInterface;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenProcessorResolverInterface;
 use GaaraHyperf\UserProvider\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -18,13 +18,13 @@ class OpaqueTokenAuthenticatorBuilder extends AbstractAuthenticatorBuilder
 {
     public function create(array $options, UserProviderInterface $userProvider, EventDispatcher $eventDispatcher): AuthenticatorInterface
     {
-        $opaqueTokenManager = $this->container->get(OpaqueTokenManagerResolverInterface::class)->resolve($options['token_manager'] ?? 'default');
+        $opaqueTokenProcessor = $this->container->get(OpaqueTokenProcessorResolverInterface::class)->resolve($options['token_manager'] ?? 'default');
 
-        $eventDispatcher->addSubscriber(new OpaqueTokenRevokeLogoutListener($opaqueTokenManager));
+        $eventDispatcher->addSubscriber(new OpaqueTokenRevokeLogoutListener($opaqueTokenProcessor));
 
         return new OpaqueTokenAuthenticator(
             userProvider: $userProvider,
-            opaqueTokenManager: $opaqueTokenManager,
+            opaqueTokenProcessor: $opaqueTokenProcessor,
             successHandler: $this->createSuccessHandler($options),
             failureHandler: $this->createFailureHandler($options),
         );

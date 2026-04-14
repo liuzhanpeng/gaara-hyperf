@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\OpaqueTokenManager;
 
-use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorInterface;
-use GaaraHyperf\OpaqueTokenManager\OpaqueTokenResponder\OpaqueTokenResponderInterface;
 use GaaraHyperf\Token\TokenInterface;
 
 /**
@@ -27,14 +25,4 @@ interface OpaqueTokenManagerInterface
      * 撤销一个opaque token.
      */
     public function revoke(string $accessToken): void;
-
-    /**
-     * 返回opaque token提取器.
-     */
-    public function getExtractor(): AccessTokenExtractorInterface;
-
-    /**
-     * 返回opaque token响应器.
-     */
-    public function getResponder(): OpaqueTokenResponderInterface;
 }

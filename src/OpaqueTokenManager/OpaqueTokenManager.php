@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\OpaqueTokenManager;
 
-use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorInterface;
 use GaaraHyperf\IPResolver\IPResolverInterface;
-use GaaraHyperf\OpaqueTokenManager\OpaqueTokenResponder\OpaqueTokenResponderInterface;
 use GaaraHyperf\Token\TokenInterface;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use InvalidArgumentException;
@@ -20,8 +18,6 @@ use Psr\SimpleCache\CacheInterface;
 class OpaqueTokenManager implements OpaqueTokenManagerInterface
 {
     public function __construct(
-        private AccessTokenExtractorInterface $accessTokenExtractor,
-        private OpaqueTokenResponderInterface $opaqueTokenResponder,
         private CacheInterface $cache,
         private RequestInterface $request,
         private IPResolverInterface $ipResolver,
@@ -106,16 +102,6 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
         }
 
         $this->cache->delete($this->getAccessTokenKey($accessToken));
-    }
-
-    public function getExtractor(): AccessTokenExtractorInterface
-    {
-        return $this->accessTokenExtractor;
-    }
-
-    public function getResponder(): OpaqueTokenResponderInterface
-    {
-        return $this->opaqueTokenResponder;
     }
 
     /**

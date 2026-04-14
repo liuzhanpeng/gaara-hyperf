@@ -49,15 +49,14 @@
     'success_handler' => [
         'class'  => \GaaraHyperf\Authenticator\OpaqueTokenResponseHandler::class,
         'params' => [
-            'token_manager'     => 'default',
-            'response_template' => '{"access_token":"#ACCESS_TOKEN#"}',
+            'token_manager' => 'default',
         ],
     ],
     'failure_handler' => null,  // 不配置时默认返回 {"error": "..."} JSON 响应
 ],
 ```
 
-`success_handler` 通常配置为 `OpaqueTokenResponseHandler`，它会为用户签发一个不透明令牌并按模板返回。`#ACCESS_TOKEN#` 是模板占位符。
+`success_handler` 通常配置为 `OpaqueTokenResponseHandler`。响应格式由 `services.opaque_token_managers.<name>.token_responder` 控制。
 
 ---
 
@@ -67,14 +66,7 @@
 
 ```php
 'opaque_token' => [
-    'token_manager'   => 'default',   // 可选：使用哪个令牌管理器
-    'token_extractor' => [
-        'type'   => 'header',         // header | cookie | body | custom
-        'field'  => 'Authorization',  // type==header：请求头名称
-        'scheme' => 'Bearer',         // type==header：认证方案前缀
-        // type==cookie 时：field 为 Cookie 名称，默认 access_token
-        // type==body 时：field 为 POST 字段名，默认 access_token
-    ],
+    'token_manager'   => 'default',   // 可选：使用哪个令牌管理器（提取方式在 manager 中配置）
     'success_handler' => null,
     'failure_handler' => null,
 ],
