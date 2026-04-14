@@ -7,7 +7,7 @@ namespace GaaraHyperf\Exception;
 /**
  * 签名过期异常.
  */
-class SignatureExpiredException extends InvalidCredentialsException
+class SignatureExpiredException extends InvalidSignatureException
 {
     public function __construct(
         string $message,
