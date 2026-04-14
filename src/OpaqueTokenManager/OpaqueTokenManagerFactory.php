@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\OpaqueTokenManager;
 
+use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorFactory;
 use GaaraHyperf\Config\CustomConfig;
 use GaaraHyperf\Constants;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenResponder\OpaqueTokenResponderFactory;
 use Hyperf\Contract\ContainerInterface;
 use InvalidArgumentException;
 
@@ -26,9 +28,28 @@ class OpaqueTokenManagerFactory
 
         switch ($type) {
             case 'default':
+                $accessTokenExtractorFactory = $this->container->make(AccessTokenExtractorFactory::class);
+                $accessTokenExtractor = $accessTokenExtractorFactory->create(
+                    ($config['token_extractor'] ?? []) + [
+                        'type' => 'header',
+                        'field' => 'Authorization',
+                        'scheme' => 'Bearer',
+                    ]
+                );
+
+                $opaqueTokenResponderFactory = $this->container->make(OpaqueTokenResponderFactory::class);
+                $opaqueTokenResponder = $opaqueTokenResponderFactory->create(
+                    ($config['token_responder'] ?? []) + [
+                        'type' => 'body',
+                        'template' => '{"code": 0, "message": "success", "data": {"access_token": "#ACCESS_TOKEN#", "expires_in": #EXPIRES_IN#, "user_identifier": "#USER_IDENTIFIER#"}}',
+                    ]
+                );
+
                 return $this->container->make(OpaqueTokenManager::class, [
+                    'accessTokenExtractor' => $accessTokenExtractor,
+                    'opaqueTokenResponder' => $opaqueTokenResponder,
                     'prefix' => sprintf('%s:opaque_token:%s', Constants::__PREFIX, $config['prefix'] ?? 'default'),
-                    'ttl' => $config['ttl'] ?? 60 * 20,
+                    'idleTtl' => $config['idle_ttl'] ?? 60 * 20,
                     'maxTtl' => $config['max_ttl'] ?? 60 * 60 * 24,
                     'tokenRefresh' => $config['token_refresh'] ?? true,
                     'singleSession' => $config['single_session'] ?? true,

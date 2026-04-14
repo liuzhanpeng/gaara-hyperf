@@ -56,18 +56,12 @@ return [
                 //         'class' => OpaqueTokenResponseHandler::class,
                 //         'params' => [
                 //             'token_manager' => 'default',
-                //             'response_template' => '{"access_token": "#ACCESS_TOKEN#"}',
                 //         ],
                 //     ],
                 //     'failure_handler' => CustomFailureHandler::class // 可选，登录失败处理器配置; 如果不配置，默认返回 200 状态码和错误消息的 JSON 响应：{error: "error_message"}
                 // ],
                 // 'opaque_token' => [ // 不透明令牌认证器，用于API无状态认证； 一般配合 JSON登录认证器 使用
                 //     'token_manager' => 'default', // 可选；不透明令牌管理器服务名称; 默认default
-                //     'token_extractor' => [
-                //         'type' => 'header', // 支持 header, cookie, custom; 默认header
-                //         'field' => 'Authorization', // type == header时可选，默认Authorization; type == cookie时可选，默认access_token
-                //         'scheme' => 'Bearer', // type == header时可选，默认Bearer
-                //     ],
                 //     'success_handler' => CustomSuccessHandler::class // 可选，认证成功处理器配置
                 //     'failure_handler' => CustomFailureHandler::class // 可选，认证失败处理器配置
                 // ],
@@ -183,13 +177,22 @@ return [
         //     'default' => [ // 不透明令牌管理器名称; 可按实际情况为每个Guard配置不同的管理器
         //         'type' => 'default', // 支持 default, custom; 默认default
         //         'prefix' => 'admin', // 存储前缀; 默认default; 多个管理器时必须配置不同的前缀
-        //         'ttl' => 60 * 20, // token过期时间，单位秒; 必须小于等于 max_lifetime; 默认1200秒
+        //         'idle_ttl' => 60 * 20, // token空闲过期时间，单位秒; 必须小于等于 max_lifetime; 默认1200秒
         //         'max_ttl' => 60 * 60 * 24, // token最大生命周期，单位秒; 默认86400秒
         //         'token_refresh' => true, // 是否启用token刷新机制; 默认true
         //         'ip_bind_enabled' => false, // 是否启用IP绑定; 默认false
         //         'user_agent_bind_enabled' => false, // 是否启用User-Agent绑定; 默认false
         //         'single_session' => true, // 是否启用单会话登录; 默认true
         //         'access_token_length' => 64, // 生成令牌长度; 默认64
+        //         'token_extractor' => [
+        //             'type' => 'header', // 支持 header, cookie, custom; 默认header
+        //             'field' => 'Authorization', // type == header时可选，默认Authorization; type == cookie时可选，默认access_token
+        //             'scheme' => 'Bearer', // type == header时可选，默认Bearer
+        //         ],
+        //         'token_responder' => [
+        //             'type' => 'body', // 支持 body, cookie, custom; 默认body
+        //             'template' => '{"code": 0, "message": "success", "data": {"access_token": "#ACCESS_TOKEN#", "expires_in": #EXPIRES_IN#, "user_identifier": "#USER_IDENTIFIER#"}}',
+        //          ]
         //     ]
         // ],
     ],

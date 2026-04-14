@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Authenticator;
 
-use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorInterface;
 use GaaraHyperf\Exception\InvalidCredentialsException;
 use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerInterface;
 use GaaraHyperf\Passport\Passport;
@@ -19,7 +18,6 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
     public function __construct(
         private UserProviderInterface $userProvider,
         private OpaqueTokenManagerInterface $opaqueTokenManager,
-        private AccessTokenExtractorInterface $accessTokenExtractor,
         ?AuthenticationSuccessHandlerInterface $successHandler,
         ?AuthenticationFailureHandlerInterface $failureHandler,
     ) {
@@ -28,20 +26,27 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
 
     public function supports(ServerRequestInterface $request): bool
     {
-        return $this->accessTokenExtractor->extract($request) !== null;
+        return $this->opaqueTokenManager->getExtractor()->extract($request) !== null;
     }
 
     public function authenticate(ServerRequestInterface $request): Passport
     {
-        $accessToken = $this->accessTokenExtractor->extract($request);
+        $accessToken = $this->opaqueTokenManager->getExtractor()->extract($request);
         if (is_null($accessToken)) {
             throw new InvalidCredentialsException('Access token is missing');
         }
 
-        $token = $this->opaqueTokenManager->resolve($accessToken);
-        if (is_null($token)) {
+        $opaqueToken = $this->opaqueTokenManager->resolve($accessToken);
+        if (is_null($opaqueToken)) {
             throw new InvalidCredentialsException('Invalid access token', $accessToken);
         }
+
+        if ($opaqueToken->isExpired()) {
+            $this->opaqueTokenManager->revoke($accessToken);
+            throw new InvalidCredentialsException('Access token has expired', $accessToken);
+        }
+
+        $token = $opaqueToken->token();
 
         return new Passport(
             $token->getUserIdentifier(),

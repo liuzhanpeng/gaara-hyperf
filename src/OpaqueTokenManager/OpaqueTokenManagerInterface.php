@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\OpaqueTokenManager;
 
+use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorInterface;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenResponder\OpaqueTokenResponderInterface;
 use GaaraHyperf\Token\TokenInterface;
 
 /**
@@ -14,15 +16,25 @@ interface OpaqueTokenManagerInterface
     /**
      * 发布一个opaque token.
      */
-    public function issue(TokenInterface $token): string;
+    public function issue(TokenInterface $token): OpaqueToken;
 
     /**
-     * 解析一个opaque token 返回一个用户令牌.
+     * 解析并返回一个opaque token.
      */
-    public function resolve(string $accessToken): ?TokenInterface;
+    public function resolve(string $accessToken): ?OpaqueToken;
 
     /**
      * 撤销一个opaque token.
      */
     public function revoke(string $accessToken): void;
+
+    /**
+     * 返回opaque token提取器.
+     */
+    public function getExtractor(): AccessTokenExtractorInterface;
+
+    /**
+     * 返回opaque token响应器.
+     */
+    public function getResponder(): OpaqueTokenResponderInterface;
 }

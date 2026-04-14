@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\OpaqueTokenManager;
 
+use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorInterface;
 use GaaraHyperf\IPResolver\IPResolverInterface;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenResponder\OpaqueTokenResponderInterface;
 use GaaraHyperf\Token\TokenInterface;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use InvalidArgumentException;
@@ -18,11 +20,13 @@ use Psr\SimpleCache\CacheInterface;
 class OpaqueTokenManager implements OpaqueTokenManagerInterface
 {
     public function __construct(
+        private AccessTokenExtractorInterface $accessTokenExtractor,
+        private OpaqueTokenResponderInterface $opaqueTokenResponder,
         private CacheInterface $cache,
         private RequestInterface $request,
         private IPResolverInterface $ipResolver,
         private string $prefix,
-        private int $ttl,
+        private int $idleTtl,
         private int $maxTtl,
         private bool $tokenRefresh,
         private bool $singleSession,
@@ -34,19 +38,19 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
             throw new InvalidArgumentException('Access token length must be at least 32 characters.');
         }
 
-        if ($this->ttl > $this->maxTtl) {
-            throw new InvalidArgumentException('The ttl option must be less than or equal to max_ttl option.');
+        if ($this->idleTtl > $this->maxTtl) {
+            throw new InvalidArgumentException('The idle_ttl option must be less than or equal to max_ttl option.');
         }
     }
 
-    public function issue(TokenInterface $token): string
+    public function issue(TokenInterface $token): OpaqueToken
     {
         $accessToken = bin2hex(random_bytes($this->accessTokenLength / 2));
         $time = time();
         $data = [
             'token' => $token,
             'issued_at' => $time,
-            'expires_at' => $time + $this->maxTtl,
+            'expires_in' => $this->maxTtl,
         ];
 
         if ($this->ipBindEnabled) {
@@ -66,20 +70,15 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
             $this->cache->set($this->getUserKey($token->getUserIdentifier()), $accessToken, $this->maxTtl);
         }
 
-        $this->cache->set($this->getAccessTokenKey($accessToken), $data, $this->ttl);
+        $this->cache->set($this->getAccessTokenKey($accessToken), $data, $this->idleTtl);
 
-        return $accessToken;
+        return new OpaqueToken($token, $accessToken, $time, $this->maxTtl);
     }
 
-    public function resolve(string $accessToken): ?TokenInterface
+    public function resolve(string $accessToken): ?OpaqueToken
     {
         $data = $this->cache->get($this->getAccessTokenKey($accessToken));
         if (is_null($data)) {
-            return null;
-        }
-
-        if ($data['expires_at'] < time()) {
-            $this->revoke($accessToken);
             return null;
         }
 
@@ -91,10 +90,10 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
         }
 
         if ($this->tokenRefresh) {
-            $this->cache->set($this->getAccessTokenKey($accessToken), $data, $this->ttl);
+            $this->cache->set($this->getAccessTokenKey($accessToken), $data, $this->idleTtl);
         }
 
-        return $data['token'];
+        return new OpaqueToken($data['token'], $accessToken, $data['issued_at'], $data['expires_in']);
     }
 
     public function revoke(string $accessToken): void
@@ -107,6 +106,16 @@ class OpaqueTokenManager implements OpaqueTokenManagerInterface
         }
 
         $this->cache->delete($this->getAccessTokenKey($accessToken));
+    }
+
+    public function getExtractor(): AccessTokenExtractorInterface
+    {
+        return $this->accessTokenExtractor;
+    }
+
+    public function getResponder(): OpaqueTokenResponderInterface
+    {
+        return $this->opaqueTokenResponder;
     }
 
     /**
