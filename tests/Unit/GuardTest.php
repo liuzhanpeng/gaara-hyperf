@@ -11,6 +11,7 @@ use GaaraHyperf\Event\AuthenticationSuccessEvent;
 use GaaraHyperf\Event\CheckPassportEvent;
 use GaaraHyperf\Event\LogoutEvent;
 use GaaraHyperf\Exception\AuthenticationException;
+use GaaraHyperf\Exception\UserNotFoundException;
 use GaaraHyperf\Guard;
 use GaaraHyperf\GuardInterface;
 use GaaraHyperf\Passport\BadgeInterface;
@@ -272,6 +273,41 @@ it('uses response from authentication failure event when authenticator throws ex
     $deps['authenticator']->shouldReceive('onAuthenticationFailure')
         ->once()
         ->with('main', $deps['request'], Mockery::type(AuthenticationException::class), null)
+        ->andReturn($responseFromAuthenticator);
+    $deps['dispatcher']->shouldReceive('dispatch')
+        ->once()
+        ->with(Mockery::type(AuthenticationFailureEvent::class))
+        ->andReturnUsing(function (AuthenticationFailureEvent $event) use ($responseFromEvent): AuthenticationFailureEvent {
+            $event->setResponse($responseFromEvent);
+            return $event;
+        });
+
+    expect($guard->authenticate($deps['request']))->toBe($responseFromEvent);
+});
+
+it('dispatches check passport event before failing when passport user cannot be resolved', function (): void {
+    [$guard, $deps] = createGuardTestSubject();
+    /** @var MockInterface&ResponseInterface $responseFromAuthenticator */
+    $responseFromAuthenticator = Mockery::mock(ResponseInterface::class);
+    /** @var MockInterface&ResponseInterface $responseFromEvent */
+    $responseFromEvent = Mockery::mock(ResponseInterface::class);
+
+    $passport = new Passport('alice', fn () => throw new UserNotFoundException('User not found', 'alice'));
+
+    $deps['tokenStorage']->shouldReceive('get')->once()->with('main')->andReturn(null);
+    $deps['tokenContext']->shouldReceive('setToken')->once()->with(null);
+    $deps['requestMatcher']->shouldReceive('matchesExcluded')->once()->with($deps['request'])->andReturn(false);
+    $deps['authenticator']->shouldReceive('supports')->once()->with($deps['request'])->andReturn(true);
+    $deps['authenticator']->shouldReceive('authenticate')->once()->with($deps['request'])->andReturn($passport);
+    $deps['dispatcher']->shouldReceive('dispatch')->once()->with(Mockery::type(CheckPassportEvent::class))->andReturnUsing(fn ($event) => $event);
+    $deps['authenticator']->shouldReceive('createToken')->never();
+    $deps['authenticator']->shouldReceive('onAuthenticationFailure')
+        ->once()
+        ->with('main', $deps['request'], Mockery::on(function (AuthenticationException $exception): bool {
+            return $exception instanceof UserNotFoundException
+                && $exception->getMessage() === 'User not found'
+                && $exception->getUserIdentifier() === 'alice';
+        }), $passport)
         ->andReturn($responseFromAuthenticator);
     $deps['dispatcher']->shouldReceive('dispatch')
         ->once()

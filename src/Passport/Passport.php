@@ -40,7 +40,6 @@ class Passport
         private array $badges = [],
     ) {
         $this->userLoader = Closure::fromCallable($userLoader);
-        $this->getUser();
         foreach ($badges as $badge) {
             $this->addBadge($badge);
         }

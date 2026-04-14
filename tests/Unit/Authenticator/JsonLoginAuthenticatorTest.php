@@ -139,7 +139,8 @@ it('authenticates request and attaches password badge', function (): void {
     $passport = $authenticator->authenticate($request);
 
     expect($passport->getUserIdentifier())->toBe($username)
-        ->and($passport->getBadge(PasswordBadge::class))->toBeInstanceOf(PasswordBadge::class);
+        ->and($passport->getBadge(PasswordBadge::class))->toBeInstanceOf(PasswordBadge::class)
+        ->and($passport->getUser()->getIdentifier())->toBe($username);
 });
 
 it('throws exception when username is missing', function (): void {

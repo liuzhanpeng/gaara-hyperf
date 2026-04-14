@@ -53,7 +53,7 @@ class LoginAttemptLimitListener implements EventSubscriberInterface
         $passport = $event->getPassport();
         $request = $event->getRequest();
 
-        $userIdentifier = $passport->getUser()->getIdentifier();
+        $userIdentifier = $passport->getUserIdentifier();
         $ip = $this->ipResolver->resolve($request);
 
         $result = $this->rateLimiter->attempt($userIdentifier . $ip);

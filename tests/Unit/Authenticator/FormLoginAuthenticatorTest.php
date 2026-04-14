@@ -104,7 +104,8 @@ it('authenticates form request and adds password and csrf badges', function (): 
 
     expect($passport->getUserIdentifier())->toBe($username)
         ->and($passport->getBadge(PasswordBadge::class))->toBeInstanceOf(PasswordBadge::class)
-        ->and($passport->getBadge(CsrfTokenBadge::class))->toBeInstanceOf(CsrfTokenBadge::class);
+        ->and($passport->getBadge(CsrfTokenBadge::class))->toBeInstanceOf(CsrfTokenBadge::class)
+        ->and($passport->getUser()->getIdentifier())->toBe($username);
 });
 
 it('throws exception when csrf is enabled and csrf token is missing', function (): void {
@@ -165,7 +166,8 @@ it('authenticates without csrf badge when csrf check is disabled', function (): 
     $passport = $authenticator->authenticate($request);
 
     expect($passport->getBadge(PasswordBadge::class))->toBeInstanceOf(PasswordBadge::class)
-        ->and($passport->getBadge(CsrfTokenBadge::class))->toBeNull();
+        ->and($passport->getBadge(CsrfTokenBadge::class))->toBeNull()
+        ->and($passport->getUser()->getIdentifier())->toBe($username);
 });
 
 it('redirects to target path on authentication success by default', function (): void {

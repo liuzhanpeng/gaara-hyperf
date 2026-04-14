@@ -30,13 +30,30 @@ describe('Passport', function () {
         expect($passport->getUser())->toBe($user);
     });
 
+    it('does not load user during construction', function () {
+        $calls = 0;
+
+        $passport = new Passport('id3', function ($id) use (&$calls) {
+            ++$calls;
+            return mockUser($id);
+        }, []);
+
+        expect($calls)->toBe(0)
+            ->and($passport->getUser()->getIdentifier())->toBe('id3')
+            ->and($calls)->toBe(1);
+    });
+
     it('throws if user not found', function () {
-        expect(fn () => new Passport('id3', fn ($id) => null, []))
+        $passport = new Passport('id3', fn ($id) => null, []);
+
+        expect(fn () => $passport->getUser())
             ->toThrow(UserNotFoundException::class);
     });
 
     it('throws if userLoader returns non-UserInterface', function () {
-        expect(fn () => new Passport('id4', fn ($id) => 123, []))
+        $passport = new Passport('id4', fn ($id) => 123, []);
+
+        expect(fn () => $passport->getUser())
             ->toThrow(RuntimeException::class);
     });
 

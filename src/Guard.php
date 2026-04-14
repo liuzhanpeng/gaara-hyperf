@@ -191,11 +191,12 @@ class Guard implements GuardInterface
                 if (! $badge->isResolved()) {
                     throw new AuthenticationException(
                         message: 'Credential not resolved',
-                        userIdentifier: $passport->getUser()->getIdentifier(),
+                        userIdentifier: $passport->getUserIdentifier(),
                     );
                 }
             }
 
+            $passport->getUser(); // 确保用户存在
             $token = $authenticator->createToken($passport, $this->name);
 
             return $this->handleAuthenticationSuccess($request, $authenticator, $passport, $token);

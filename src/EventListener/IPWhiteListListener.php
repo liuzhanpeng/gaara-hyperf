@@ -41,7 +41,7 @@ class IPWhiteListListener implements EventSubscriberInterface
         if (! $this->whiteListChecker->isAllowed($ip, $whiteList)) {
             throw new IPNotInWhiteListException(
                 message: 'IP address not in white list',
-                userIdentifier: $passport->getUser()->getIdentifier(),
+                userIdentifier: $passport->getUserIdentifier(),
                 ip: $ip
             );
         }
