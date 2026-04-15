@@ -66,37 +66,33 @@ return [
 
 ### 2. 配置 Guard
 
-在 `config/autoload/gaara.php` 中配置至少一个 Guard：
+在 `config/autoload/gaara.php` 中配置至少一个 Guard。通常一个 Guard 至少包含：
+
+- `matcher`：用于匹配请求范围
+- `user_provider`：用于加载用户
+- `authenticators`：用于定义认证方式
+
+示例：
 
 ```php
 return [
     'guards' => [
         'api' => [
             'matcher' => [
-                'pattern' => '^/api/', // 匹配所有 /api/ 开头的路由
+                'pattern' => '^/api/',
             ],
             'user_provider' => [
-                'type' => 'model',
-                'class' => \App\Models\User::class,
-                'identifier' => 'email',
+                // 用户加载方式
             ],
             'authenticators' => [
-                'json_login' => [
-                    'check_path' => '/api/login',
-                    'success_handler' => [
-                        'class' => \GaaraHyperf\Authenticator\OpaqueTokenResponseHandler::class,
-                        'params' => [
-                            'token_manager' => 'default',
-                            'response_template' => '{"access_token":"#ACCESS_TOKEN#"}',
-                        ],
-                    ],
-                ],
-                'opaque_token' => [],
+                // 例如 json_login、form_login、opaque_token、api_key 等
             ],
         ],
     ],
 ];
 ```
+
+更完整的配置说明请查看 [docs/configuration.md](docs/configuration.md)。
 
 ### 3. 实现用户模型
 

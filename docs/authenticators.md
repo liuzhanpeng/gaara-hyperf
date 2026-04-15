@@ -80,10 +80,12 @@
         'check_path' => '/api/login',
         'success_handler' => [
             'class'  => \GaaraHyperf\Authenticator\OpaqueTokenResponseHandler::class,
-            'params' => ['token_manager' => 'default'],
+            'params' => ['token_manager' => 'default'], // 需与 opaque_token 中的 token_manager 保持一致
         ],
     ],
-    'opaque_token' => [],
+    'opaque_token' => [
+        'token_manager' => 'default',
+    ],
 ],
 'token_storage' => ['type' => 'null'],
 ```

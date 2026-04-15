@@ -268,22 +268,30 @@ class JsonFailureHandler implements AuthenticationFailureHandlerInterface
 
 ## 自定义事件监听器
 
-监听器会被注册为 PSR-14 事件订阅者，在认证各阶段触发。
+监听器会基于symfony/event-dispatcher组件的事件订阅机制实现的，在认证各阶段触发。
 
 ```php
 use GaaraHyperf\Event\AuthenticationSuccessEvent;
 use GaaraHyperf\Event\AuthenticationFailureEvent;
-use GaaraHyperf\Event\CheckPassportEvent;
 use GaaraHyperf\Event\LogoutEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class AuditLoginListener
+class AuditLoginListener implements EventSubscriberInterface
 {
     public function __construct(
         private \Psr\Log\LoggerInterface $logger,
     ) {}
 
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            AuthenticationSuccessEvent::class => ['onAuthenticationSuccess', Priority::LOW],
+            AuthenticationFailureEvent::class => ['onAuthenticationFailure', Priority::LOW],
+        ];
+    }
+
     // 监听认证成功事件
-    public function onSuccess(AuthenticationSuccessEvent $event): void
+    public function onAuthenticationSuccess(AuthenticationSuccessEvent $event): void
     {
         $this->logger->info('登录成功', [
             'guard'      => $event->getGuardName(),
@@ -293,21 +301,13 @@ class AuditLoginListener
     }
 
     // 监听认证失败事件
-    public function onFailure(AuthenticationFailureEvent $event): void
+    public function onAuthenticationFailure(AuthenticationFailureEvent $event): void
     {
         $this->logger->warning('登录失败', [
             'reason' => $event->getException()->getMessage(),
         ]);
     }
 }
-```
-
-须注册 Hyperf 事件订阅（实现 `EventSubscriberInterface`）或通过配置注册：
-
-```php
-'listeners' => [
-    \App\Auth\AuditLoginListener::class,
-],
 ```
 
 详见 [事件系统](events.md)。
@@ -428,18 +428,36 @@ class LegacyMd5PasswordHasher implements PasswordHasherInterface
 
 ---
 
-## 自定义不透明令牌管理器
+## 自定义不透明令牌颁发器
 
-实现 `OpaqueTokenManagerInterface`：
+如果你需要替换 Opaque Token 的签发、解析或撤销逻辑（例如接入数据库、远端会话服务或自定义存储），请实现 `OpaqueTokenIssuerInterface`。
+
+`OpaqueTokenManager` 本身仍由框架组装，负责：
+- 从请求中提取访问令牌
+- 调用自定义 issuer 进行签发 / 解析 / 撤销
+- 通过 responder 生成最终响应
 
 ```php
-use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerInterface;
+use GaaraHyperf\OpaqueTokenManager\OpaqueToken;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenIssuerInterface;
+use GaaraHyperf\Token\TokenInterface;
 
-class JwtTokenManager implements OpaqueTokenManagerInterface
+class CustomOpaqueTokenIssuer implements OpaqueTokenIssuerInterface
 {
-    public function issue(\GaaraHyperf\Token\TokenInterface $token): string { ... }
-    public function resolve(string $accessToken): ?\GaaraHyperf\Token\TokenInterface { ... }
-    public function revoke(string $accessToken): void { ... }
+    public function issue(TokenInterface $token): OpaqueToken
+    {
+        // 返回一个 OpaqueToken 对象
+    }
+
+    public function resolve(string $accessToken): ?OpaqueToken
+    {
+        // 根据 accessToken 解析出 OpaqueToken
+    }
+
+    public function revoke(string $accessToken): void
+    {
+        // 撤销 accessToken
+    }
 }
 ```
 
@@ -448,9 +466,17 @@ class JwtTokenManager implements OpaqueTokenManagerInterface
 ```php
 'services' => [
     'opaque_token_managers' => [
-        'jwt' => [
+        'custom' => [
             'type'  => 'custom',
-            'class' => \App\Auth\JwtTokenManager::class,
+            'class' => \App\Auth\CustomOpaqueTokenIssuer::class,
+            'token_extractor' => [
+                'type' => 'header',
+                'field' => 'Authorization',
+                'scheme' => 'Bearer',
+            ],
+            'token_responder' => [
+                'type' => 'body',
+            ],
         ],
     ],
 ],

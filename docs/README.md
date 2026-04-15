@@ -4,7 +4,7 @@
 
 `gaara-hyperf` 是一个基于 [Hyperf](https://hyperf.io/) 的认证库，设计思路参考 Symfony Security，强调可组合、可扩展与可观测。
 
-组件支持有状态与无状态两类认证场景，适用于后台系统与 API 服务；具体能力与实现范围见下方“特性”章节。
+组件支持有状态与无状态两类认证场景，适用于后台系统与 API 服务。
 
 ### 特性
 
@@ -26,8 +26,8 @@
 后续会以扩展包的形式提供更多认证方式：
 
 - [ ] JWT 认证
-- [ ] 2FA
-    - [ ] TOTP 认证
+- [ ] 2FA支持
+- [ ] TOTP 认证
 - [ ] WebAuthn 认证
 - [ ] OAuth 2.0/OpenID Connect
 - [ ] Step-up/Risk-based 认证
@@ -37,13 +37,13 @@
 ## 安装
 
 ```bash
-composer require gaara-hyperf/auth
+composer require lzpeng/gaara-hyperf
 ```
 
 发布配置文件：
 
 ```bash
-php bin/hyperf.php vendor:publish gaara-hyperf/auth
+php bin/hyperf.php vendor:publish lzpeng/gaara-hyperf
 ```
 
 配置文件将发布到 `config/autoload/gaara.php`。
@@ -64,38 +64,45 @@ return [
 ];
 ```
 
+也可以在路由定义中直接使用中间件：
+
+```php
+use GaaraHyperf\AuthMiddleware;
+
+Route::get('/profile', function () {
+    // 受保护的路由
+})->middleware([AuthMiddleware::class]);
+``` 
+
 ### 2. 配置 Guard
 
-在 `config/autoload/gaara.php` 中配置至少一个 Guard：
+在 [docs/configuration.md](configuration.md) 中可以看到完整配置。通常你至少需要为一个 Guard 指定：
+
+- 请求匹配规则（`matcher`）
+- 用户提供器（`user_provider`）
+- 一个或多个认证器（`authenticators`）
+
+示例：
 
 ```php
 return [
     'guards' => [
         'api' => [
             'matcher' => [
-                'pattern' => '^/api/', // 匹配所有 /api/ 开头的路由
+                'pattern' => '^/api/',
             ],
             'user_provider' => [
-                'type' => 'model',
-                'class' => \App\Models\User::class,
-                'identifier' => 'email',
+                // 用户加载方式
             ],
             'authenticators' => [
-                'json_login' => [
-                    'check_path' => '/api/login',
-                    'success_handler' => [
-                        'class' => \GaaraHyperf\Authenticator\OpaqueTokenResponseHandler::class,
-                        'params' => [
-                            'token_manager' => 'default',
-                        ],
-                    ],
-                ],
-                'opaque_token' => [],
+                // 例如 json_login、form_login、opaque_token、api_key 等
             ],
         ],
     ],
 ];
 ```
+
+你可以按业务场景自由组合认证器、Token 存储、监听器和授权组件。
 
 ### 3. 实现用户模型
 

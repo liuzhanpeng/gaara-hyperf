@@ -6,13 +6,13 @@ namespace GaaraHyperf\ServiceProvider;
 
 use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorFactory;
 use GaaraHyperf\Config\ConfigLoaderInterface;
-use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerFactory;
-use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerInterface;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenIssuerFactory;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenIssuerInterface;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenIssuerResolver;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenIssuerResolverInterface;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManager;
 use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerResolver;
 use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerResolverInterface;
-use GaaraHyperf\OpaqueTokenManager\OpaqueTokenProcessor;
-use GaaraHyperf\OpaqueTokenManager\OpaqueTokenProcessorResolver;
-use GaaraHyperf\OpaqueTokenManager\OpaqueTokenProcessorResolverInterface;
 use GaaraHyperf\OpaqueTokenManager\OpaqueTokenResponder\OpaqueTokenResponderFactory;
 use Hyperf\Contract\ContainerInterface;
 
@@ -35,45 +35,43 @@ class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
                 'single_session' => true,
                 'ip_bind_enabled' => false,
                 'user_agent_bind_enabled' => false,
+                'token_extractor' => [
+                    'type' => 'header',
+                    'field' => 'Authorization',
+                    'scheme' => 'Bearer',
+                ],
+                'token_responder' => [
+                    'type' => 'body',
+                    'template' => '{"code": 0, "message": "success", "data": {"access_token": "#ACCESS_TOKEN#", "expires_in": #EXPIRES_IN#, "user_identifier": "#USER_IDENTIFIER#"}}',
+                ],
             ],
         ];
 
         $factories = [];
         foreach ($configGroup as $name => $config) {
-            $factories[$name] = fn () => $container->get(OpaqueTokenManagerFactory::class)->create($config);
+            $factories[$name] = fn () => $container->get(OpaqueTokenIssuerFactory::class)->create($config);
         }
 
-        $container->set(OpaqueTokenManagerResolverInterface::class, new OpaqueTokenManagerResolver($factories));
+        $container->set(OpaqueTokenIssuerResolverInterface::class, new OpaqueTokenIssuerResolver($factories));
 
-        $processorFactories = [];
+        $managerFactories = [];
         foreach ($configGroup as $name => $config) {
-            $processorFactories[$name] = function () use ($container, $name, $config): OpaqueTokenProcessor {
-                $accessTokenExtractor = $container->get(AccessTokenExtractorFactory::class)->create(
-                    ($config['token_extractor'] ?? []) + [
-                        'type' => 'header',
-                        'field' => 'Authorization',
-                        'scheme' => 'Bearer',
-                    ]
-                );
+            $managerFactories[$name] = function () use ($container, $name, $config): OpaqueTokenManager {
+                $accessTokenExtractor = $container->get(AccessTokenExtractorFactory::class)->create($config['token_extractor']);
 
-                $opaqueTokenResponder = $container->get(OpaqueTokenResponderFactory::class)->create(
-                    ($config['token_responder'] ?? []) + [
-                        'type' => 'body',
-                        'template' => '{"code": 0, "message": "success", "data": {"access_token": "#ACCESS_TOKEN#", "expires_in": #EXPIRES_IN#, "user_identifier": "#USER_IDENTIFIER#"}}',
-                    ]
-                );
+                $opaqueTokenResponder = $container->get(OpaqueTokenResponderFactory::class)->create($config['token_responder']);
 
-                /** @var OpaqueTokenManagerInterface $opaqueTokenManager */
-                $opaqueTokenManager = $container->get(OpaqueTokenManagerResolverInterface::class)->resolve($name);
+                /** @var OpaqueTokenIssuerInterface $opaqueTokenIssuer */
+                $opaqueTokenIssuer = $container->get(OpaqueTokenIssuerResolverInterface::class)->resolve($name);
 
-                return new OpaqueTokenProcessor(
-                    opaqueTokenManager: $opaqueTokenManager,
+                return new OpaqueTokenManager(
+                    opaqueTokenIssuer: $opaqueTokenIssuer,
                     accessTokenExtractor: $accessTokenExtractor,
                     opaqueTokenResponder: $opaqueTokenResponder,
                 );
             };
         }
 
-        $container->set(OpaqueTokenProcessorResolverInterface::class, new OpaqueTokenProcessorResolver($processorFactories));
+        $container->set(OpaqueTokenManagerResolverInterface::class, new OpaqueTokenManagerResolver($managerFactories));
     }
 }

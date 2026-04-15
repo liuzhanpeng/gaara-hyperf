@@ -181,7 +181,10 @@ return [
             'white_list' => ['192.168.1.0/24', '127.0.0.1'],
         ],
     ],
-    \App\Auth\MyCustomListener::class,  // 无参数时可直接写类名
+    [
+        'class' => \App\Auth\MyCustomListener::class, 
+        'params' => [], // 无需参数时可省略
+    ]
 ],
 ```
 

@@ -1,6 +1,8 @@
 # 事件系统
 
-认证流程的各个阶段会通过 PSR-14 `EventDispatcherInterface` 分发事件。监听器可以在这些阶段注入额外逻辑（如日志、限流、校验），或修改认证结果。
+认证流程内部使用 Symfony 的 EventDispatcher 组件进行事件分发。每个 Guard 在初始化时都会创建一个独立的事件分发器，并将内置监听器与自定义监听器以 Subscriber 的方式注册进去。
+
+对外依赖的是 `EventDispatcherInterface` 抽象，但认证流程实际运行时使用的是 `symfony/event-dispatcher`。
 
 ---
 
@@ -14,21 +16,27 @@
 
 ```php
 use GaaraHyperf\Event\CheckPassportEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class MyPassportListener
+class MyPassportListener implements EventSubscriberInterface
 {
-    public function handle(CheckPassportEvent $event): void
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            CheckPassportEvent::class => 'onCheckPassport',
+        ];
+    }
+
+    public function onCheckPassport(CheckPassportEvent $event): void
     {
         $passport = $event->getPassport();
-        $request  = $event->getRequest();
+        $request = $event->getRequest();
 
-        // 检查 IP 是否在黑名单
         if ($this->isBlacklisted($request)) {
             throw new \GaaraHyperf\Exception\AuthenticationException('IP 已被封禁');
         }
 
-        // 标记自定义 Badge 为已验证
-        /** @var \App\Auth\EmailVerifiedBadge $badge */
+        /** @var \App\Auth\EmailVerifiedBadge|null $badge */
         $badge = $passport->getBadge(\App\Auth\EmailVerifiedBadge::class);
         if ($badge && ! $badge->isResolved()) {
             $badge->markResolved();
@@ -38,6 +46,7 @@ class MyPassportListener
 ```
 
 **可用方法**：
+- `getGuardName(): string` — 获取当前 Guard 名称
 - `getPassport(): Passport` — 获取当前 Passport
 - `getRequest(): ServerRequestInterface` — 获取当前请求
 - `getAuthenticator(): AuthenticatorInterface` — 获取触发认证的认证器
@@ -52,15 +61,23 @@ class MyPassportListener
 
 ```php
 use GaaraHyperf\Event\AuthenticationSuccessEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class LoginAuditListener
+class LoginAuditListener implements EventSubscriberInterface
 {
-    public function handle(AuthenticationSuccessEvent $event): void
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            AuthenticationSuccessEvent::class => 'onAuthenticationSuccess',
+        ];
+    }
+
+    public function onAuthenticationSuccess(AuthenticationSuccessEvent $event): void
     {
         $this->logger->info('用户登录', [
-            'guard'      => $event->getGuardName(),
-            'user'       => $event->getToken()->getUserIdentifier(),
-            'authenticator' => get_class($event->getAuthenticator()),
+            'guard' => $event->getGuardName(),
+            'user' => $event->getToken()->getUserIdentifier(),
+            'authenticator' => $event->getAuthenticator()::class,
         ]);
     }
 }
@@ -88,12 +105,21 @@ class LoginAuditListener
 ```php
 use GaaraHyperf\Event\AuthenticationFailureEvent;
 use GaaraHyperf\Exception\InvalidCredentialsException;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class LoginFailureListener
+class LoginFailureListener implements EventSubscriberInterface
 {
-    public function handle(AuthenticationFailureEvent $event): void
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            AuthenticationFailureEvent::class => 'onAuthenticationFailure',
+        ];
+    }
+
+    public function onAuthenticationFailure(AuthenticationFailureEvent $event): void
     {
         $exception = $event->getException();
+
         if ($exception instanceof InvalidCredentialsException) {
             $this->alertService->notify('密码错误次数过多');
         }
@@ -120,30 +146,35 @@ class LoginFailureListener
 
 ```php
 use GaaraHyperf\Event\LogoutEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class LogoutListener
+class LogoutListener implements EventSubscriberInterface
 {
-    public function handle(LogoutEvent $event): void
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            LogoutEvent::class => 'onLogout',
+        ];
+    }
+
+    public function onLogout(LogoutEvent $event): void
     {
         $token = $event->getToken();
-        if ($token) {
-            $this->logger->info('用户登出', [
-                'user' => $token->getUserIdentifier(),
-            ]);
-        }
 
-        // 设置登出响应
+        $this->logger->info('用户登出', [
+            'user' => $token->getUserIdentifier(),
+        ]);
+
         $event->setResponse($this->createLogoutResponse());
     }
 }
 ```
 
 **可用方法**：
-- `getGuardName(): string`
-- `getToken(): ?TokenInterface`
+- `getToken(): TokenInterface`
 - `getRequest(): ServerRequestInterface`
 - `getResponse(): ?ResponseInterface`
-- `setResponse(?ResponseInterface): void`
+- `setResponse(ResponseInterface): void
 
 ---
 
@@ -224,11 +255,14 @@ IP 解析优先级：`CF-Connecting-IP` > `X-Real-IP` > `X-Forwarded-For` > `rem
 
 在 `LogoutEvent` 触发时撤销当前 Opaque Token，防止令牌被重用。
 
+这个监听器会在使用 `opaque_token` 认证器时由框架自动注册，通常**不需要手动添加到 `listeners`**。它仅会在登出请求为 `POST` 时执行撤销逻辑。
+
+如果需要指定非默认的管理器，请直接在认证器中配置：
+
 ```php
-[
-    'class'  => \GaaraHyperf\EventListener\OpaqueTokenRevokeLogoutListener::class,
-    'params' => [
-        'token_manager' => 'default',  // 使用哪个令牌管理器
+'authenticators' => [
+    'opaque_token' => [
+        'token_manager' => 'default',
     ],
 ],
 ```
@@ -267,7 +301,7 @@ IP 解析优先级：`CF-Connecting-IP` > `X-Real-IP` > `X-Forwarded-For` > `rem
 
 ## 注册自定义监听器
 
-在 Guard 的 `listeners` 中配置，监听器会订阅所有四个事件：
+在 Guard 的 `listeners` 中配置即可：
 
 ```php
 'listeners' => [
@@ -275,6 +309,28 @@ IP 解析优先级：`CF-Connecting-IP` > `X-Real-IP` > `X-Forwarded-For` > `rem
 ],
 ```
 
-监听器类需实现对应的事件处理方法（方法名不限，须接受对应事件类型参数），并通过 Hyperf 的事件系统（`EventSubscriberInterface` 或注解）进行订阅。
+自定义监听器需要实现 Symfony 的 `EventSubscriberInterface`，并在 `getSubscribedEvents()` 中声明要监听的事件与处理方法。框架会在 Guard 初始化时调用 `addSubscriber()` 注册到对应的事件分发器。
 
-> **提示**：监听器按配置顺序触发。`CheckPassportEvent` 中抛出异常会立即中止认证流程并触发 `AuthenticationFailureEvent`。
+示例：
+
+```php
+use GaaraHyperf\Event\AuthenticationSuccessEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class MyListener implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            AuthenticationSuccessEvent::class => 'onSuccess',
+        ];
+    }
+
+    public function onSuccess(AuthenticationSuccessEvent $event): void
+    {
+        // 自定义处理逻辑
+    }
+}
+```
+
+> **提示**：监听器按注册顺序触发。`CheckPassportEvent` 中抛出异常会立即中止认证流程并触发 `AuthenticationFailureEvent`。

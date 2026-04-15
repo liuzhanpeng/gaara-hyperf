@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManager;
-use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerFactory;
-use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerInterface;
+use GaaraHyperf\OpaqueTokenManager\OpaqueToken;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenIssuer;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenIssuerFactory;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenIssuerInterface;
 use GaaraHyperf\Token\TokenInterface;
 use Hyperf\Contract\ContainerInterface;
 use Mockery\MockInterface;
@@ -16,12 +17,12 @@ afterEach(function (): void {
 it('creates default opaque token manager with default options', function (): void {
     /** @var ContainerInterface&MockInterface $container */
     $container = Mockery::mock(ContainerInterface::class);
-    /** @var MockInterface&OpaqueTokenManagerInterface $manager */
-    $manager = Mockery::mock(OpaqueTokenManagerInterface::class);
+    /** @var MockInterface&OpaqueTokenIssuerInterface $manager */
+    $manager = Mockery::mock(OpaqueTokenIssuerInterface::class);
 
-    $container->shouldReceive('make')->once()->with(OpaqueTokenManager::class, [
+    $container->shouldReceive('make')->once()->with(OpaqueTokenIssuer::class, [
         'prefix' => 'gaara:opaque_token:default',
-        'ttl' => 1200,
+        'idleTtl' => 1200,
         'maxTtl' => 86400,
         'tokenRefresh' => true,
         'singleSession' => true,
@@ -30,7 +31,7 @@ it('creates default opaque token manager with default options', function (): voi
         'accessTokenLength' => 64,
     ])->andReturn($manager);
 
-    $factory = new OpaqueTokenManagerFactory($container);
+    $factory = new OpaqueTokenIssuerFactory($container);
 
     expect($factory->create([]))->toBe($manager);
 });
@@ -38,12 +39,12 @@ it('creates default opaque token manager with default options', function (): voi
 it('creates default opaque token manager with custom options', function (): void {
     /** @var ContainerInterface&MockInterface $container */
     $container = Mockery::mock(ContainerInterface::class);
-    /** @var MockInterface&OpaqueTokenManagerInterface $manager */
-    $manager = Mockery::mock(OpaqueTokenManagerInterface::class);
+    /** @var MockInterface&OpaqueTokenIssuerInterface $manager */
+    $manager = Mockery::mock(OpaqueTokenIssuerInterface::class);
 
-    $container->shouldReceive('make')->once()->with(OpaqueTokenManager::class, [
+    $container->shouldReceive('make')->once()->with(OpaqueTokenIssuer::class, [
         'prefix' => 'gaara:opaque_token:api',
-        'ttl' => 300,
+        'idleTtl' => 300,
         'maxTtl' => 3600,
         'tokenRefresh' => false,
         'singleSession' => false,
@@ -52,12 +53,12 @@ it('creates default opaque token manager with custom options', function (): void
         'accessTokenLength' => 32,
     ])->andReturn($manager);
 
-    $factory = new OpaqueTokenManagerFactory($container);
+    $factory = new OpaqueTokenIssuerFactory($container);
 
     expect($factory->create([
         'type' => 'default',
         'prefix' => 'api',
-        'ttl' => 300,
+        'idle_ttl' => 300,
         'max_ttl' => 3600,
         'token_refresh' => false,
         'single_session' => false,
@@ -70,15 +71,15 @@ it('creates default opaque token manager with custom options', function (): void
 it('creates custom opaque token manager and maps params', function (): void {
     /** @var ContainerInterface&MockInterface $container */
     $container = Mockery::mock(ContainerInterface::class);
-    /** @var MockInterface&OpaqueTokenManagerInterface $manager */
-    $manager = Mockery::mock(OpaqueTokenManagerInterface::class);
+    /** @var MockInterface&OpaqueTokenIssuerInterface $manager */
+    $manager = Mockery::mock(OpaqueTokenIssuerInterface::class);
 
     $container->shouldReceive('make')->once()->with(
         CustomOpaqueTokenManagerForFactoryTest::class,
         ['tokenLength' => 64]
     )->andReturn($manager);
 
-    $factory = new OpaqueTokenManagerFactory($container);
+    $factory = new OpaqueTokenIssuerFactory($container);
 
     expect($factory->create([
         'type' => 'custom',
@@ -93,7 +94,7 @@ it('throws when custom opaque token manager does not implement interface', funct
 
     $container->shouldReceive('make')->once()->with(NotOpaqueTokenManagerForFactoryTest::class, [])->andReturn(new NotOpaqueTokenManagerForFactoryTest());
 
-    $factory = new OpaqueTokenManagerFactory($container);
+    $factory = new OpaqueTokenIssuerFactory($container);
 
     expect(fn () => $factory->create([
         'type' => 'custom',
@@ -105,20 +106,20 @@ it('throws when opaque token manager type is unsupported', function (): void {
     /** @var ContainerInterface&MockInterface $container */
     $container = Mockery::mock(ContainerInterface::class);
 
-    $factory = new OpaqueTokenManagerFactory($container);
+    $factory = new OpaqueTokenIssuerFactory($container);
 
     expect(fn () => $factory->create(['type' => 'unknown']))
         ->toThrow(InvalidArgumentException::class, 'Unsupported opaque token manager type');
 });
 
-class CustomOpaqueTokenManagerForFactoryTest implements OpaqueTokenManagerInterface
+class CustomOpaqueTokenManagerForFactoryTest implements OpaqueTokenIssuerInterface
 {
-    public function issue(TokenInterface $token): string
+    public function issue(TokenInterface $token): OpaqueToken
     {
-        return 'token';
+        return new OpaqueToken($token, 'token', time(), 300);
     }
 
-    public function resolve(string $accessToken): ?TokenInterface
+    public function resolve(string $accessToken): ?OpaqueToken
     {
         return null;
     }

@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorFactory;
-use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorInterface;
 use GaaraHyperf\Authenticator\Builder\OpaqueTokenAuthenticatorBuilder;
 use GaaraHyperf\Authenticator\OpaqueTokenAuthenticator;
 use GaaraHyperf\Event\LogoutEvent;
@@ -20,79 +18,92 @@ afterEach(function (): void {
     Mockery::close();
 });
 
-it('creates authenticator with default token extractor config and registers logout listener', function (): void {
+it('creates OpaqueTokenAuthenticator with default token manager', function (): void {
     /** @var ContainerInterface&MockInterface $container */
     $container = Mockery::mock(ContainerInterface::class);
     /** @var MockInterface&OpaqueTokenManagerResolverInterface $resolver */
     $resolver = Mockery::mock(OpaqueTokenManagerResolverInterface::class);
     /** @var MockInterface&OpaqueTokenManagerInterface $manager */
     $manager = Mockery::mock(OpaqueTokenManagerInterface::class);
-    /** @var AccessTokenExtractorFactory&MockInterface $extractorFactory */
-    $extractorFactory = Mockery::mock(AccessTokenExtractorFactory::class);
-    /** @var AccessTokenExtractorInterface&MockInterface $extractor */
-    $extractor = Mockery::mock(AccessTokenExtractorInterface::class);
     /** @var MockInterface&UserProviderInterface $userProvider */
     $userProvider = Mockery::mock(UserProviderInterface::class);
 
-    $resolver->shouldReceive('resolve')->once()->with('default')->andReturn($manager);
-    $extractorFactory->shouldReceive('create')->once()->with([
-        'type' => 'header',
-        'field' => 'Authorization',
-        'scheme' => 'Bearer',
-    ])->andReturn($extractor);
-
     $container->shouldReceive('get')->once()->with(OpaqueTokenManagerResolverInterface::class)->andReturn($resolver);
-    $container->shouldReceive('get')->once()->with(AccessTokenExtractorFactory::class)->andReturn($extractorFactory);
+    $resolver->shouldReceive('resolve')->once()->with('default')->andReturn($manager);
 
-    $dispatcher = new EventDispatcher();
-    $builder = new OpaqueTokenAuthenticatorBuilder($container);
-    $authenticator = $builder->create([], $userProvider, $dispatcher);
+    $authenticator = (new OpaqueTokenAuthenticatorBuilder($container))
+        ->create([], $userProvider, new EventDispatcher());
 
     expect($authenticator)->toBeInstanceOf(OpaqueTokenAuthenticator::class);
+});
 
-    /** @var MockInterface&ServerRequestInterface $request */
-    $request = Mockery::mock(ServerRequestInterface::class);
-    $request->shouldReceive('getMethod')->once()->andReturn('POST');
-    $extractor->shouldReceive('extract')->once()->with($request)->andReturn('logout-token');
-    $manager->shouldReceive('revoke')->once()->with('logout-token');
+it('creates OpaqueTokenAuthenticator with custom token manager name', function (): void {
+    /** @var ContainerInterface&MockInterface $container */
+    $container = Mockery::mock(ContainerInterface::class);
+    /** @var MockInterface&OpaqueTokenManagerResolverInterface $resolver */
+    $resolver = Mockery::mock(OpaqueTokenManagerResolverInterface::class);
+    /** @var MockInterface&OpaqueTokenManagerInterface $manager */
+    $manager = Mockery::mock(OpaqueTokenManagerInterface::class);
+    /** @var MockInterface&UserProviderInterface $userProvider */
+    $userProvider = Mockery::mock(UserProviderInterface::class);
 
+    $container->shouldReceive('get')->once()->with(OpaqueTokenManagerResolverInterface::class)->andReturn($resolver);
+    $resolver->shouldReceive('resolve')->once()->with('redis')->andReturn($manager);
+
+    $authenticator = (new OpaqueTokenAuthenticatorBuilder($container))
+        ->create(['token_manager' => 'redis'], $userProvider, new EventDispatcher());
+
+    expect($authenticator)->toBeInstanceOf(OpaqueTokenAuthenticator::class);
+});
+
+it('registers logout listener that revokes token on POST request', function (): void {
+    /** @var ContainerInterface&MockInterface $container */
+    $container = Mockery::mock(ContainerInterface::class);
+    /** @var MockInterface&OpaqueTokenManagerResolverInterface $resolver */
+    $resolver = Mockery::mock(OpaqueTokenManagerResolverInterface::class);
+    /** @var MockInterface&OpaqueTokenManagerInterface $manager */
+    $manager = Mockery::mock(OpaqueTokenManagerInterface::class);
+    /** @var MockInterface&UserProviderInterface $userProvider */
+    $userProvider = Mockery::mock(UserProviderInterface::class);
     /** @var MockInterface&TokenInterface $token */
     $token = Mockery::mock(TokenInterface::class);
+    /** @var MockInterface&ServerRequestInterface $request */
+    $request = Mockery::mock(ServerRequestInterface::class);
+
+    $container->shouldReceive('get')->once()->with(OpaqueTokenManagerResolverInterface::class)->andReturn($resolver);
+    $resolver->shouldReceive('resolve')->once()->with('default')->andReturn($manager);
+    $request->shouldReceive('getMethod')->once()->andReturn('POST');
+    $manager->shouldReceive('revoke')->once()->with($request);
+
+    $dispatcher = new EventDispatcher();
+    (new OpaqueTokenAuthenticatorBuilder($container))
+        ->create([], $userProvider, $dispatcher);
+
     $dispatcher->dispatch(new LogoutEvent($token, $request));
 });
 
-it('creates authenticator with custom token manager and extractor options', function (): void {
+it('registered logout listener ignores non-POST logout requests', function (): void {
     /** @var ContainerInterface&MockInterface $container */
     $container = Mockery::mock(ContainerInterface::class);
     /** @var MockInterface&OpaqueTokenManagerResolverInterface $resolver */
     $resolver = Mockery::mock(OpaqueTokenManagerResolverInterface::class);
     /** @var MockInterface&OpaqueTokenManagerInterface $manager */
     $manager = Mockery::mock(OpaqueTokenManagerInterface::class);
-    /** @var AccessTokenExtractorFactory&MockInterface $extractorFactory */
-    $extractorFactory = Mockery::mock(AccessTokenExtractorFactory::class);
-    /** @var AccessTokenExtractorInterface&MockInterface $extractor */
-    $extractor = Mockery::mock(AccessTokenExtractorInterface::class);
     /** @var MockInterface&UserProviderInterface $userProvider */
     $userProvider = Mockery::mock(UserProviderInterface::class);
-
-    $resolver->shouldReceive('resolve')->once()->with('custom')->andReturn($manager);
-    $extractorFactory->shouldReceive('create')->once()->with([
-        'type' => 'cookie',
-        'field' => 'my_token',
-    ])->andReturn($extractor);
+    /** @var MockInterface&TokenInterface $token */
+    $token = Mockery::mock(TokenInterface::class);
+    /** @var MockInterface&ServerRequestInterface $request */
+    $request = Mockery::mock(ServerRequestInterface::class);
 
     $container->shouldReceive('get')->once()->with(OpaqueTokenManagerResolverInterface::class)->andReturn($resolver);
-    $container->shouldReceive('get')->once()->with(AccessTokenExtractorFactory::class)->andReturn($extractorFactory);
+    $resolver->shouldReceive('resolve')->once()->with('default')->andReturn($manager);
+    $request->shouldReceive('getMethod')->once()->andReturn('GET');
+    $manager->shouldNotReceive('revoke');
 
     $dispatcher = new EventDispatcher();
-    $builder = new OpaqueTokenAuthenticatorBuilder($container);
-    $authenticator = $builder->create([
-        'token_manager' => 'custom',
-        'token_extractor' => [
-            'type' => 'cookie',
-            'field' => 'my_token',
-        ],
-    ], $userProvider, $dispatcher);
+    (new OpaqueTokenAuthenticatorBuilder($container))
+        ->create([], $userProvider, $dispatcher);
 
-    expect($authenticator)->toBeInstanceOf(OpaqueTokenAuthenticator::class);
+    $dispatcher->dispatch(new LogoutEvent($token, $request));
 });

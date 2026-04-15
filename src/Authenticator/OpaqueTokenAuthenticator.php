@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace GaaraHyperf\Authenticator;
 
 use GaaraHyperf\Exception\InvalidCredentialsException;
-use GaaraHyperf\OpaqueTokenManager\OpaqueTokenProcessorInterface;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerInterface;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\UserProvider\UserProviderInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,7 +17,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
 {
     public function __construct(
         private UserProviderInterface $userProvider,
-        private OpaqueTokenProcessorInterface $opaqueTokenProcessor,
+        private OpaqueTokenManagerInterface $opaqueTokenManager,
         ?AuthenticationSuccessHandlerInterface $successHandler,
         ?AuthenticationFailureHandlerInterface $failureHandler,
     ) {
@@ -26,24 +26,14 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
 
     public function supports(ServerRequestInterface $request): bool
     {
-        return $this->opaqueTokenProcessor->extract($request) !== null;
+        return $this->opaqueTokenManager->resolve($request) !== null;
     }
 
     public function authenticate(ServerRequestInterface $request): Passport
     {
-        $accessToken = $this->opaqueTokenProcessor->extract($request);
-        if (is_null($accessToken)) {
-            throw new InvalidCredentialsException('Access token is missing');
-        }
-
-        $opaqueToken = $this->opaqueTokenProcessor->resolve($accessToken);
+        $opaqueToken = $this->opaqueTokenManager->resolve($request);
         if (is_null($opaqueToken)) {
-            throw new InvalidCredentialsException('Invalid access token', $accessToken);
-        }
-
-        if ($opaqueToken->isExpired()) {
-            $this->opaqueTokenProcessor->revoke($accessToken);
-            throw new InvalidCredentialsException('Access token has expired', $accessToken);
+            throw new InvalidCredentialsException('Invalid access token');
         }
 
         $token = $opaqueToken->token();

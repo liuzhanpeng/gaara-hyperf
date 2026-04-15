@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace GaaraHyperf\EventListener;
 
 use GaaraHyperf\Event\LogoutEvent;
-use GaaraHyperf\OpaqueTokenManager\OpaqueTokenProcessorInterface;
+use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class OpaqueTokenRevokeLogoutListener implements EventSubscriberInterface
 {
     public function __construct(
-        private OpaqueTokenProcessorInterface $opaqueTokenProcessor,
+        private OpaqueTokenManagerInterface $opaqueTokenManager,
     ) {
     }
 
@@ -31,11 +31,6 @@ class OpaqueTokenRevokeLogoutListener implements EventSubscriberInterface
             return;
         }
 
-        $accessToken = $this->opaqueTokenProcessor->extract($event->getRequest());
-        if (is_null($accessToken)) {
-            return;
-        }
-
-        $this->opaqueTokenProcessor->revoke($accessToken);
+        $this->opaqueTokenManager->revoke($event->getRequest());
     }
 }

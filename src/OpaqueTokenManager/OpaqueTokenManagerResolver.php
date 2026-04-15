@@ -6,9 +6,6 @@ namespace GaaraHyperf\OpaqueTokenManager;
 
 use InvalidArgumentException;
 
-/**
- * OpaqueToken管理器解析器.
- */
 class OpaqueTokenManagerResolver implements OpaqueTokenManagerResolverInterface
 {
     private array $opaqueTokenManagers = [];

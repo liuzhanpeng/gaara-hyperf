@@ -10,23 +10,23 @@ use Hyperf\Contract\ContainerInterface;
 use InvalidArgumentException;
 
 /**
- * OpaqueToken管理器创建工厂
+ * OpaqueToken令牌颁发器创建工厂
  */
-class OpaqueTokenManagerFactory
+class OpaqueTokenIssuerFactory
 {
     public function __construct(
         private ContainerInterface $container,
     ) {
     }
 
-    public function create(array $config): OpaqueTokenManagerInterface
+    public function create(array $config): OpaqueTokenIssuerInterface
     {
         $type = $config['type'] ?? 'default';
         unset($config['type']);
 
         switch ($type) {
             case 'default':
-                return $this->container->make(OpaqueTokenManager::class, [
+                return $this->container->make(OpaqueTokenIssuer::class, [
                     'prefix' => sprintf('%s:opaque_token:%s', Constants::__PREFIX, $config['prefix'] ?? 'default'),
                     'idleTtl' => $config['idle_ttl'] ?? 60 * 20,
                     'maxTtl' => $config['max_ttl'] ?? 60 * 60 * 24,
@@ -39,12 +39,12 @@ class OpaqueTokenManagerFactory
             case 'custom':
                 $customConfig = CustomConfig::from($config);
 
-                $opaqueTokenManager = $this->container->make($customConfig->class(), $customConfig->params());
-                if (! $opaqueTokenManager instanceof OpaqueTokenManagerInterface) {
-                    throw new InvalidArgumentException(sprintf('The custom OpaqueTokenManager must implement %s.', OpaqueTokenManagerInterface::class));
+                $opaqueTokenIssuer = $this->container->make($customConfig->class(), $customConfig->params());
+                if (! $opaqueTokenIssuer instanceof OpaqueTokenIssuerInterface) {
+                    throw new InvalidArgumentException(sprintf('The custom OpaqueTokenIssuer must implement %s.', OpaqueTokenIssuerInterface::class));
                 }
 
-                return $opaqueTokenManager;
+                return $opaqueTokenIssuer;
             default:
                 throw new InvalidArgumentException('Unsupported opaque token manager type: ' . $type);
         }

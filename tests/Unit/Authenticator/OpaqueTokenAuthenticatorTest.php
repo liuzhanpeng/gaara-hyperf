@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use GaaraHyperf\AccessTokenExtractor\AccessTokenExtractorInterface;
 use GaaraHyperf\Authenticator\OpaqueTokenAuthenticator;
 use GaaraHyperf\Exception\AuthenticationException;
 use GaaraHyperf\Exception\InvalidCredentialsException;
+use GaaraHyperf\OpaqueTokenManager\OpaqueToken;
 use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerInterface;
-use GaaraHyperf\Token\AuthenticatedToken;
+use GaaraHyperf\Token\TokenInterface;
 use GaaraHyperf\User\UserInterface;
 use GaaraHyperf\UserProvider\UserProviderInterface;
 use Mockery\MockInterface;
@@ -17,81 +17,68 @@ afterEach(function (): void {
     Mockery::close();
 });
 
-it('supports request when access token can be extracted', function (): void {
+it('supports request when opaque token can be resolved', function (): void {
+    /** @var MockInterface&ServerRequestInterface $request */
     $request = Mockery::mock(ServerRequestInterface::class);
-    $extractor = Mockery::mock(AccessTokenExtractorInterface::class);
-    $extractor->shouldReceive('extract')->once()->with($request)->andReturn('token-1');
+    /** @var MockInterface&OpaqueTokenManagerInterface $manager */
+    $manager = Mockery::mock(OpaqueTokenManagerInterface::class);
+    /** @var MockInterface&TokenInterface $token */
+    $token = Mockery::mock(TokenInterface::class);
 
-    $authenticator = createOpaqueTokenAuthenticatorTestAuthenticator(accessTokenExtractor: $extractor);
+    $opaqueToken = new OpaqueToken($token, 'tok', time(), 3600);
+    $manager->shouldReceive('resolve')->once()->with($request)->andReturn($opaqueToken);
+
+    $authenticator = makeOpaqueTokenAuthenticator(opaqueTokenManager: $manager);
 
     expect($authenticator->supports($request))->toBeTrue();
 });
 
-it('does not support request when access token is missing', function (): void {
+it('does not support request when opaque token cannot be resolved', function (): void {
+    /** @var MockInterface&ServerRequestInterface $request */
     $request = Mockery::mock(ServerRequestInterface::class);
-    $extractor = Mockery::mock(AccessTokenExtractorInterface::class);
-    $extractor->shouldReceive('extract')->once()->with($request)->andReturnNull();
+    /** @var MockInterface&OpaqueTokenManagerInterface $manager */
+    $manager = Mockery::mock(OpaqueTokenManagerInterface::class);
+    $manager->shouldReceive('resolve')->once()->with($request)->andReturnNull();
 
-    $authenticator = createOpaqueTokenAuthenticatorTestAuthenticator(accessTokenExtractor: $extractor);
+    $authenticator = makeOpaqueTokenAuthenticator(opaqueTokenManager: $manager);
 
     expect($authenticator->supports($request))->toBeFalse();
 });
 
-it('throws exception when access token is missing during authenticate', function (): void {
+it('throws InvalidCredentialsException when resolve returns null during authenticate', function (): void {
+    /** @var MockInterface&ServerRequestInterface $request */
     $request = Mockery::mock(ServerRequestInterface::class);
-    $extractor = Mockery::mock(AccessTokenExtractorInterface::class);
-    $extractor->shouldReceive('extract')->once()->with($request)->andReturnNull();
-
-    $authenticator = createOpaqueTokenAuthenticatorTestAuthenticator(accessTokenExtractor: $extractor);
-
-    expect(fn () => $authenticator->authenticate($request))
-        ->toThrow(InvalidCredentialsException::class, 'Access token is missing');
-});
-
-it('throws exception when access token is invalid', function (): void {
-    $request = Mockery::mock(ServerRequestInterface::class);
-    $extractor = Mockery::mock(AccessTokenExtractorInterface::class);
+    /** @var MockInterface&OpaqueTokenManagerInterface $manager */
     $manager = Mockery::mock(OpaqueTokenManagerInterface::class);
+    $manager->shouldReceive('resolve')->once()->with($request)->andReturnNull();
 
-    $extractor->shouldReceive('extract')->once()->with($request)->andReturn('token-2');
-    $manager->shouldReceive('resolve')->once()->with('token-2')->andReturnNull();
-
-    $authenticator = createOpaqueTokenAuthenticatorTestAuthenticator(
-        opaqueTokenManager: $manager,
-        accessTokenExtractor: $extractor,
-    );
+    $authenticator = makeOpaqueTokenAuthenticator(opaqueTokenManager: $manager);
 
     expect(fn () => $authenticator->authenticate($request))
         ->toThrow(InvalidCredentialsException::class, 'Invalid access token');
 });
 
-it('authenticates request with valid opaque token', function (): void {
+it('returns passport with user identifier on successful authenticate', function (): void {
+    /** @var MockInterface&ServerRequestInterface $request */
     $request = Mockery::mock(ServerRequestInterface::class);
-    $extractor = Mockery::mock(AccessTokenExtractorInterface::class);
+    /** @var MockInterface&OpaqueTokenManagerInterface $manager */
     $manager = Mockery::mock(OpaqueTokenManagerInterface::class);
-
-    $user = new class('user-1') implements UserInterface {
-        public function __construct(private string $identifier)
-        {
-        }
-
-        public function getIdentifier(): string
-        {
-            return $this->identifier;
-        }
-    };
-
-    $extractor->shouldReceive('extract')->once()->with($request)->andReturn('token-3');
-    $manager->shouldReceive('resolve')->once()->with('token-3')->andReturn(new AuthenticatedToken('api', 'user-1'));
-
+    /** @var MockInterface&TokenInterface $token */
+    $token = Mockery::mock(TokenInterface::class);
     /** @var MockInterface&UserProviderInterface $userProvider */
     $userProvider = Mockery::mock(UserProviderInterface::class);
-    $userProvider->shouldReceive('findByIdentifier')->once()->with('user-1')->andReturn($user);
+    /** @var MockInterface&UserInterface $user */
+    $user = Mockery::mock(UserInterface::class);
 
-    $authenticator = createOpaqueTokenAuthenticatorTestAuthenticator(
+    $opaqueToken = new OpaqueToken($token, 'tok', time(), 3600);
+    $token->shouldReceive('getUserIdentifier')->andReturn('user-1');
+    $manager->shouldReceive('resolve')->once()->with($request)->andReturn($opaqueToken);
+    $userProvider->shouldReceive('findByIdentifier')->once()->with('user-1')->andReturn($user);
+    $user->shouldReceive('getIdentifier')->andReturn('user-1');
+
+    $authenticator = makeOpaqueTokenAuthenticator(
         userProvider: $userProvider,
         opaqueTokenManager: $manager,
-        accessTokenExtractor: $extractor,
     );
 
     $passport = $authenticator->authenticate($request);
@@ -100,47 +87,36 @@ it('authenticates request with valid opaque token', function (): void {
         ->and($passport->getUser()->getIdentifier())->toBe('user-1');
 });
 
-it('is non interactive authenticator', function (): void {
-    $authenticator = createOpaqueTokenAuthenticatorTestAuthenticator();
-
-    expect($authenticator->isInteractive())->toBeFalse();
+it('is non-interactive', function (): void {
+    expect(makeOpaqueTokenAuthenticator()->isInteractive())->toBeFalse();
 });
 
-it('returns 401 response on authentication failure by default', function (): void {
-    $authenticator = createOpaqueTokenAuthenticatorTestAuthenticator();
+it('returns 401 response on authentication failure when no failure handler is set', function (): void {
+    /** @var MockInterface&ServerRequestInterface $request */
     $request = Mockery::mock(ServerRequestInterface::class);
 
-    $response = $authenticator->onAuthenticationFailure('api', $request, new AuthenticationException('opaque denied'));
+    $response = makeOpaqueTokenAuthenticator()
+        ->onAuthenticationFailure('api', $request, new AuthenticationException('opaque denied'));
 
     expect($response)->not->toBeNull()
         ->and($response->getStatusCode())->toBe(401)
         ->and($response->getBody()->getContents())->toBe('opaque denied');
 });
 
-function createOpaqueTokenAuthenticatorTestAuthenticator(
+// ---------------------------------------------------------------------------
+
+function makeOpaqueTokenAuthenticator(
     ?UserProviderInterface $userProvider = null,
     ?OpaqueTokenManagerInterface $opaqueTokenManager = null,
-    ?AccessTokenExtractorInterface $accessTokenExtractor = null,
 ): OpaqueTokenAuthenticator {
-    if (is_null($userProvider)) {
-        /** @var MockInterface&UserProviderInterface $userProvider */
-        $userProvider = Mockery::mock(UserProviderInterface::class);
-    }
-
-    if (is_null($opaqueTokenManager)) {
-        /** @var MockInterface&OpaqueTokenManagerInterface $opaqueTokenManager */
-        $opaqueTokenManager = Mockery::mock(OpaqueTokenManagerInterface::class);
-    }
-
-    if (is_null($accessTokenExtractor)) {
-        /** @var AccessTokenExtractorInterface&MockInterface $accessTokenExtractor */
-        $accessTokenExtractor = Mockery::mock(AccessTokenExtractorInterface::class);
-    }
+    /** @var MockInterface&UserProviderInterface $userProvider */
+    $userProvider ??= Mockery::mock(UserProviderInterface::class);
+    /** @var MockInterface&OpaqueTokenManagerInterface $opaqueTokenManager */
+    $opaqueTokenManager ??= Mockery::mock(OpaqueTokenManagerInterface::class);
 
     return new OpaqueTokenAuthenticator(
         userProvider: $userProvider,
         opaqueTokenManager: $opaqueTokenManager,
-        accessTokenExtractor: $accessTokenExtractor,
         successHandler: null,
         failureHandler: null,
     );
