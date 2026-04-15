@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace GaaraHyperf\Authenticator;
 
-use GaaraHyperf\Exception\InvalidCredentialsException;
+use GaaraHyperf\Exception\InvalidAccessTokenException;
 use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerInterface;
 use GaaraHyperf\Passport\Passport;
 use GaaraHyperf\UserProvider\UserProviderInterface;
@@ -33,7 +33,7 @@ class OpaqueTokenAuthenticator extends AbstractAuthenticator
     {
         $opaqueToken = $this->opaqueTokenManager->resolve($request);
         if (is_null($opaqueToken)) {
-            throw new InvalidCredentialsException('Invalid access token');
+            throw new InvalidAccessTokenException('Invalid access token');
         }
 
         $token = $opaqueToken->token();
