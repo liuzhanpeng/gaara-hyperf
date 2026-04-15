@@ -267,7 +267,12 @@ return [
             ],
             'token_responder' => [                // 登录成功响应配置
                 'type'     => 'body',             // body | cookie | custom
-                'template' => '{"code":0,"message":"success","data":{"access_token":"#ACCESS_TOKEN#","expires_in":#EXPIRES_IN#,"user_identifier":"#USER_IDENTIFIER#"}}',
+                'template' => '{"code":0,"message":"success","data":{"access_token":"#ACCESS_TOKEN#","expires_in":#EXPIRES_IN#,"user_identifier":"#USER_IDENTIFIER#"}}',  // 可选;
+                'cookie_name' => 'access_token', // 可选; type==cookie时使用
+                'cookie_path' => '/', // 可选; type==cookie时使用
+                'cookie_domain' => '', // 可选; type==cookie时使用
+                'cookie_http_only' => true, // 可选; type==cookie时使用
+                'cookie_same_site' => 'lax', // 可选; type==cookie时使用
             ],
         ],
     ],
