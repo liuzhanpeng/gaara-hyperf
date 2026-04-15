@@ -26,33 +26,17 @@ class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
         $gaaraConfig = $container->get(ConfigLoaderInterface::class)->load();
 
         $configGroup = ($gaaraConfig->serviceConfig('opaque_token_managers') ?? []) + [
-            'default' => [],
-        ];
-
-        foreach ($configGroup as $name => &$config) {
-            $config += [
+            'default' => [
                 'type' => 'default',
-                'prefix' => $name,
+                'prefix' => 'default',
                 'idle_ttl' => 60 * 20,
                 'max_ttl' => 60 * 60 * 24,
                 'token_refresh' => true,
                 'single_session' => true,
                 'ip_bind_enabled' => false,
                 'user_agent_bind_enabled' => false,
-            ];
-
-            $config['token_extractor'] ??= [
-                'type' => 'header',
-                'field' => 'Authorization',
-                'scheme' => 'Bearer',
-            ];
-
-            $config['token_responder'] ??= [
-                'type' => 'body',
-                'template' => '{"code": 0, "message": "success", "data": {"access_token": "#ACCESS_TOKEN#", "expires_in": #EXPIRES_IN#, "user_identifier": "#USER_IDENTIFIER#"}}',
-            ];
-        }
-        unset($config);
+            ],
+        ];
 
         $factories = [];
         foreach ($configGroup as $name => $config) {
@@ -64,9 +48,20 @@ class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
         $managerFactories = [];
         foreach ($configGroup as $name => $config) {
             $managerFactories[$name] = function () use ($container, $name, $config): OpaqueTokenManager {
-                $accessTokenExtractor = $container->get(AccessTokenExtractorFactory::class)->create($config['token_extractor']);
+                $accessTokenExtractor = $container->get(AccessTokenExtractorFactory::class)->create(
+                    ($config['token_extractor'] ?? []) + [
+                        'type' => 'header',
+                        'field' => 'Authorization',
+                        'scheme' => 'Bearer',
+                    ]
+                );
 
-                $opaqueTokenResponder = $container->get(OpaqueTokenResponderFactory::class)->create($config['token_responder']);
+                $opaqueTokenResponder = $container->get(OpaqueTokenResponderFactory::class)->create(
+                    ($config['token_responder'] ?? []) + [
+                        'type' => 'body',
+                        'template' => '{"code": 0, "message": "success", "data": {"access_token": "#ACCESS_TOKEN#", "expires_in": #EXPIRES_IN#, "user_identifier": "#USER_IDENTIFIER#"}}',
+                    ]
+                );
 
                 /** @var OpaqueTokenIssuerInterface $opaqueTokenIssuer */
                 $opaqueTokenIssuer = $container->get(OpaqueTokenIssuerResolverInterface::class)->resolve($name);

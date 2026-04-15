@@ -162,6 +162,7 @@ it('creates a named opaque token manager from custom config', function (): void 
     $extractorFactory->shouldReceive('create')->once()->with([
         'type' => 'cookie',
         'field' => 'opaque_token',
+        'scheme' => 'Bearer',
     ])->andReturn($extractor);
 
     $responderFactory->shouldReceive('create')->once()->with([
