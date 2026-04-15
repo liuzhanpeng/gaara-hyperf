@@ -80,7 +80,6 @@ it('registers resolvers and lazily creates the default opaque token manager', fu
     $extractorFactory->shouldReceive('create')->once()->with([
         'type' => 'header',
         'field' => 'Authorization',
-        'scheme' => 'Bearer',
     ])->andReturn($extractor);
 
     $responderFactory->shouldReceive('create')->once()->with(Mockery::on(function (array $config): bool {
@@ -162,7 +161,6 @@ it('creates a named opaque token manager from custom config', function (): void 
     $extractorFactory->shouldReceive('create')->once()->with([
         'type' => 'cookie',
         'field' => 'opaque_token',
-        'scheme' => 'Bearer',
     ])->andReturn($extractor);
 
     $responderFactory->shouldReceive('create')->once()->with([
@@ -237,7 +235,6 @@ it('applies default extractor and responder config when a manager only defines b
     $extractorFactory->shouldReceive('create')->once()->with([
         'type' => 'header',
         'field' => 'Authorization',
-        'scheme' => 'Bearer',
     ])->andReturn($extractor);
 
     $responderFactory->shouldReceive('create')->once()->with(Mockery::on(function (array $config): bool {

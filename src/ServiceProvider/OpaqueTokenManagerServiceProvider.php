@@ -52,7 +52,6 @@ class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
                     ($config['token_extractor'] ?? []) + [
                         'type' => 'header',
                         'field' => 'Authorization',
-                        'scheme' => 'Bearer',
                     ]
                 );
 
