@@ -2,13 +2,12 @@
 
 ## 概述
 
-`gaara-hyperf` 是一个基于 [Hyperf](https://hyperf.io/) 的认证库，设计思路参考 Symfony Security，强调可组合、可扩展与可观测。
-
-组件支持有状态与无状态两类认证场景，适用于后台系统与 API 服务；具体能力与实现范围见下方“特性”章节。
+`gaara-hyperf` 是一个面向 Hyperf 的认证与授权组件库，整体设计参考 Symfony Security，提供清晰的 Guard、Authenticator 与事件机制, 适用于各种认证场景。
 
 ### 特性
 
 - [x] 表单登录认证
+    - [x] CSRF 防护
 - [x] JSON 登录认证
 - [x] 不透明令牌认证
     - [x] IP 绑定 / UA 绑定
@@ -21,13 +20,12 @@
     - [x] 登录尝试次数限制监听器
     - [x] 密码过期策略监听器
     - [x] 审计日志监听器
-    - [x] 登出撤销令牌监听器
 
-后续会以扩展包的形式提供更多认证方式：
+后续会以扩展库的形式提供更多认证方式：
 
 - [ ] JWT 认证
-- [ ] 2FA
-    - [ ] TOTP 认证
+- [ ] 2FA 支持
+- [ ] TOTP 认证
 - [ ] WebAuthn 认证
 - [ ] OAuth 2.0/OpenID Connect
 - [ ] Step-up/Risk-based 认证
@@ -64,13 +62,23 @@ return [
 ];
 ```
 
+也可以在路由定义中直接使用中间件：
+
+```php
+use GaaraHyperf\AuthMiddleware;
+
+Route::get('/profile', function () {
+    // 受保护的路由
+})->middleware([AuthMiddleware::class]);
+``` 
+
 ### 2. 配置 Guard
 
-在 `config/autoload/gaara.php` 中配置至少一个 Guard。通常一个 Guard 至少包含：
+在 [docs/configuration.md](configuration.md) 中可以看到完整配置。通常你至少需要为一个 Guard 指定：
 
-- `matcher`：用于匹配请求范围
-- `user_provider`：用于加载用户
-- `authenticators`：用于定义认证方式
+- 请求匹配规则（`matcher`）
+- 用户提供器（`user_provider`）
+- 一个或多个认证器（`authenticators`）
 
 示例：
 
@@ -92,7 +100,7 @@ return [
 ];
 ```
 
-更完整的配置说明请查看 [docs/configuration.md](docs/configuration.md)。
+你可以按业务场景自由组合认证器、Token 存储、监听器和授权组件。
 
 ### 3. 实现用户模型
 
