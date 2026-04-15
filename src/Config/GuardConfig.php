@@ -33,8 +33,9 @@ class GuardConfig
         $authenticatorConfigCollection = AuthenticatorConfigCollection::from($config['authenticators'] ?? throw new InvalidArgumentException('authenticators config is required'));
         $tokenStorageConfig = ComponentConfig::from($config['token_storage'] ?? ['type' => 'null']);
         $unauthenticatedHandlerConfig = ComponentConfig::from($config['unauthenticated_handler'] ?? ['type' => 'default']);
-        $authorizationCheckerConfig = CustomConfig::from($config['authorization']['checker'] ?? ['class' => NullAuthorizationChecker::class]);
-        $accessDeniedHandlerConfig = CustomConfig::from($config['authorization']['access_denied_handler'] ?? ['class' => DefaultAccessDeniedHandler::class]);
+        $authorizationConfig = $config['authorization'] ?? [];
+        $authorizationCheckerConfig = CustomConfig::from($authorizationConfig['checker'] ?? ['class' => NullAuthorizationChecker::class]);
+        $accessDeniedHandlerConfig = CustomConfig::from($authorizationConfig['access_denied_handler'] ?? ['class' => DefaultAccessDeniedHandler::class]);
         $listenerConfigCollection = ListenerConfigCollection::from($config['listeners'] ?? []);
         $passwordHasherId = $config['password_hasher'] ?? 'default';
 

@@ -27,6 +27,19 @@ it('creates guard config and applies defaults', function (): void {
         ->and(iterator_to_array($guardConfig->authenticatorConfigCollection()))->toHaveCount(1);
 });
 
+it('applies authorization defaults when authorization config is missing', function (): void {
+    $guardConfig = GuardConfig::from([
+        'matcher' => ['pattern' => '/api/*'],
+        'user_provider' => ['type' => 'memory', 'users' => []],
+        'authenticators' => [
+            'api_key' => ['api_key_field' => 'X-API-KEY'],
+        ],
+    ]);
+
+    expect($guardConfig->authorizationCheckerConfig()->class())->toBe(NullAuthorizationChecker::class)
+        ->and($guardConfig->accessDeniedHandlerConfig()->class())->toBe(DefaultAccessDeniedHandler::class);
+});
+
 it('throws when matcher config is missing', function (): void {
     expect(fn () => GuardConfig::from([
         'user_provider' => ['type' => 'memory', 'users' => []],

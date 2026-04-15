@@ -26,26 +26,33 @@ class OpaqueTokenManagerServiceProvider implements ServiceProviderInterface
         $gaaraConfig = $container->get(ConfigLoaderInterface::class)->load();
 
         $configGroup = ($gaaraConfig->serviceConfig('opaque_token_managers') ?? []) + [
-            'default' => [
+            'default' => [],
+        ];
+
+        foreach ($configGroup as $name => &$config) {
+            $config += [
                 'type' => 'default',
-                'prefix' => 'default',
+                'prefix' => $name,
                 'idle_ttl' => 60 * 20,
                 'max_ttl' => 60 * 60 * 24,
                 'token_refresh' => true,
                 'single_session' => true,
                 'ip_bind_enabled' => false,
                 'user_agent_bind_enabled' => false,
-                'token_extractor' => [
-                    'type' => 'header',
-                    'field' => 'Authorization',
-                    'scheme' => 'Bearer',
-                ],
-                'token_responder' => [
-                    'type' => 'body',
-                    'template' => '{"code": 0, "message": "success", "data": {"access_token": "#ACCESS_TOKEN#", "expires_in": #EXPIRES_IN#, "user_identifier": "#USER_IDENTIFIER#"}}',
-                ],
-            ],
-        ];
+            ];
+
+            $config['token_extractor'] ??= [
+                'type' => 'header',
+                'field' => 'Authorization',
+                'scheme' => 'Bearer',
+            ];
+
+            $config['token_responder'] ??= [
+                'type' => 'body',
+                'template' => '{"code": 0, "message": "success", "data": {"access_token": "#ACCESS_TOKEN#", "expires_in": #EXPIRES_IN#, "user_identifier": "#USER_IDENTIFIER#"}}',
+            ];
+        }
+        unset($config);
 
         $factories = [];
         foreach ($configGroup as $name => $config) {
