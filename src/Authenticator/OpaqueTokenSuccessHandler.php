@@ -11,9 +11,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * 不透明令牌响应处理器.
+ * 不透明令牌认证成功处理器.
  */
-class OpaqueTokenResponseHandler implements AuthenticationSuccessHandlerInterface
+class OpaqueTokenSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
     public function __construct(
         private OpaqueTokenManagerResolverInterface $opaqueTokenManagerResolver,

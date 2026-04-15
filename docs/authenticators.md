@@ -47,7 +47,7 @@
     'password_field'  => 'password',                     // 可选：JSON 中的密码字段
     'error_message'   => '用户名或密码错误',                // 可选：失败响应中的错误消息
     'success_handler' => [
-        'class'  => \GaaraHyperf\Authenticator\OpaqueTokenResponseHandler::class,
+        'class'  => \GaaraHyperf\Authenticator\OpaqueTokenSuccessHandler::class,
         'params' => [
             'token_manager' => 'default',
         ],
@@ -56,7 +56,7 @@
 ],
 ```
 
-`success_handler` 通常配置为 `OpaqueTokenResponseHandler`。响应格式由 `services.opaque_token_managers.<name>.token_responder` 控制。
+`success_handler` 通常配置为 `OpaqueTokenSuccessHandler`。响应格式由 `services.opaque_token_managers.<name>.token_responder` 控制。
 
 ---
 
@@ -79,7 +79,7 @@
     'json_login' => [
         'check_path' => '/api/login',
         'success_handler' => [
-            'class'  => \GaaraHyperf\Authenticator\OpaqueTokenResponseHandler::class,
+            'class'  => \GaaraHyperf\Authenticator\OpaqueTokenSuccessHandler::class,
             'params' => ['token_manager' => 'default'], // 需与 opaque_token 中的 token_manager 保持一致
         ],
     ],

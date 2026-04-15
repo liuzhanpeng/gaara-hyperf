@@ -53,7 +53,7 @@ return [
                 //     'password_field' => 'password', // 密码字段名
                 //     'error_message' => '用户名或密码错误', // 可选;登录失败错误消息; 支持字符串或回调函数; 回调函数参数为 AuthenticationException 实例
                 //     'success_handler' => [ // 可选，登录成功处理器配置; 无状态认证时一般都需要配置, 用于生成access token返回给客户端
-                //         'class' => OpaqueTokenResponseHandler::class,
+                //         'class' => OpaqueTokenSuccessHandler::class,
                 //         'params' => [
                 //             'token_manager' => 'default',
                 //         ],

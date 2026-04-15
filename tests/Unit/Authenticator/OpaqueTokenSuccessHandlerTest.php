@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use GaaraHyperf\Authenticator\OpaqueTokenResponseHandler;
+use GaaraHyperf\Authenticator\OpaqueTokenSuccessHandler;
 use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerInterface;
 use GaaraHyperf\OpaqueTokenManager\OpaqueTokenManagerResolverInterface;
 use GaaraHyperf\Passport\Passport;
@@ -28,7 +28,7 @@ it('resolves default token manager and returns issued response', function (): vo
     $resolver->shouldReceive('resolve')->once()->with('default')->andReturn($manager);
     $manager->shouldReceive('issue')->once()->with($token)->andReturn($response);
 
-    $result = (new OpaqueTokenResponseHandler($resolver))
+    $result = (new OpaqueTokenSuccessHandler($resolver))
         ->handle('api', Mockery::mock(ServerRequestInterface::class), $token, Mockery::mock(Passport::class));
 
     expect($result)->toBe($response);
@@ -47,7 +47,7 @@ it('resolves custom token manager when specified', function (): void {
     $resolver->shouldReceive('resolve')->once()->with('redis')->andReturn($manager);
     $manager->shouldReceive('issue')->once()->with($token)->andReturn($response);
 
-    $result = (new OpaqueTokenResponseHandler($resolver, 'redis'))
+    $result = (new OpaqueTokenSuccessHandler($resolver, 'redis'))
         ->handle('api', Mockery::mock(ServerRequestInterface::class), $token, Mockery::mock(Passport::class));
 
     expect($result)->toBe($response);
