@@ -2,7 +2,7 @@
 
 ## 概述
 
-`gaara-hyperf` 是一个面向 [Hyperf](https://hyperf.io/) 的认证与授权组件库，整体设计参考 Symfony Security，提供清晰的 Guard、Authenticator 与事件机制, 适用于各种认证场景。
+`gaara-hyperf` 是一个面向 [Hyperf](https://hyperf.io/) 的认证组件库，整体设计参考 Symfony Security，提供清晰的 Guard、Authenticator 与事件机制, 适用于各种认证场景。
 
 ### 特性
 
