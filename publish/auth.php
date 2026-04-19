@@ -76,7 +76,7 @@ return [
                 //     'nonce_field' => 'X-NONCE', // nonce_enabled==true必须; 请求头中的随机字符串参数名
                 //     'nonce_cache_prefix' => 'default', // nonce_enabled==true必须; 缓存前缀
                 //     'ttl' => 60, // 请求签名的有效期，单位秒
-                //     'leeway' => 300, // 允许的时间戳偏差，单位秒，默认300秒
+                //     'leeway' => 30, // 允许的时间戳偏差，单位秒，默认30秒
                 //     'algo' => 'sha256', // 签名算法
                 //     'secret_encrypto_enabled' => false, // 是否启用密钥加密
                 //     'secret_encryptor' => [ // secret_encrypto_enabled==true必须; 加密器配置

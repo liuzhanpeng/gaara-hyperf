@@ -36,7 +36,7 @@ class HmacAuthenticatorBuilder extends AbstractAuthenticatorBuilder
             nonceField: $options['nonce_field'] ?? 'X-NONCE',
             nonceCachePrefix: sprintf('%s:hmac_nonce:%s', Constants::__PREFIX, $options['nonce_cache_prefix'] ?? 'default'),
             ttl: $options['ttl'] ?? 60,
-            leeway: $options['leeway'] ?? 300,
+            leeway: $options['leeway'] ?? 30,
             algo: $algo,
             userProvider: $userProvider,
             cache: $this->container->get(CacheInterface::class),
