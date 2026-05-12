@@ -104,7 +104,7 @@ class AuthContext
     /**
      * 是否有权限.
      */
-    public function isGranted(mixed $attribute, mixed $resource = null): bool
+    public function isGranted(mixed $object, mixed $action = null): bool
     {
         if (! $this->isAuthenticated()) {
             return false;
@@ -113,6 +113,6 @@ class AuthContext
         $token = $this->getToken();
         $guard = $this->guardResolver->resolve($token->getGuardName());
 
-        return $guard->isGranted($token, $attribute, $resource);
+        return $guard->isGranted($token, $object, $action);
     }
 }

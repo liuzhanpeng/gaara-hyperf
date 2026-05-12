@@ -149,6 +149,9 @@ return [
             ],
 
             // 'authorization' => [
+            //     'rule_resolver' => [ // 可选，授权规则解析器配置; 默认从HTTP请求解析 object(path)/action(method)
+            //         'class' => \GaaraHyperf\Authorization\HttpAuthorizationRuleResolver::class,
+            //     ],
             //     'checker' => [ // 可选，授权检查器配置; 默认使用内置的空授权检查器
             //         'class' => NullAuthorizationChecker::class,
             //     ],

@@ -13,7 +13,7 @@ use GaaraHyperf\Token\TokenInterface;
  */
 class NullAuthorizationChecker implements AuthorizationCheckerInterface
 {
-    public function check(TokenInterface $token, mixed $attribute, mixed $resource = null): bool
+    public function check(TokenInterface $token, mixed $object, mixed $action = null): bool
     {
         if (is_null($token)) {
             return false;

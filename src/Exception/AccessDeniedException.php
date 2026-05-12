@@ -14,8 +14,8 @@ class AccessDeniedException extends Exception
 {
     public function __construct(
         private TokenInterface $token,
-        private mixed $attribute,
-        private mixed $resource = null
+        private mixed $object,
+        private mixed $action = null
     ) {
         parent::__construct('access denied');
     }
@@ -29,18 +29,18 @@ class AccessDeniedException extends Exception
     }
 
     /**
-     * 返回访问属性.
+     * 返回访问对象.
      */
-    public function getAttribute(): mixed
+    public function getObject(): mixed
     {
-        return $this->attribute;
+        return $this->object;
     }
 
     /**
-     * 返回访问主体.
+     * 返回访问动作.
      */
-    public function getResource(): mixed
+    public function getAction(): mixed
     {
-        return $this->resource;
+        return $this->action;
     }
 }

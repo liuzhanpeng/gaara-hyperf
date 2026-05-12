@@ -25,7 +25,7 @@ it('throws access denied exception with context', function (): void {
     } catch (AccessDeniedException $exception) {
         expect($exception->getMessage())->toBe('access denied')
             ->and($exception->getToken())->toBe($token)
-            ->and($exception->getAttribute())->toBe('ROLE_ADMIN')
-            ->and($exception->getResource())->toBe('post:1');
+            ->and($exception->getObject())->toBe('ROLE_ADMIN')
+            ->and($exception->getAction())->toBe('post:1');
     }
 });

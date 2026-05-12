@@ -62,6 +62,9 @@ class GuardServiceProvider implements ServiceProviderInterface
         $tokenStorage = $container->get(TokenStorageFactory::class)->create($guardConfig->tokenStorageConfig());
         $unauthenticatedHandler = $container->get(UnauthenticatedHandlerFactory::class)->create($guardConfig->unauthenticatedHandlerConfig());
 
+        $authorizationRuleResolverConfig = $guardConfig->authorizationRuleResolverConfig();
+        $authorizationRuleResolver = $container->make($authorizationRuleResolverConfig->class(), $authorizationRuleResolverConfig->params());
+
         $authorizationCheckerConfig = $guardConfig->authorizationCheckerConfig();
         $authorizationChecker = $container->make($authorizationCheckerConfig->class(), $authorizationCheckerConfig->params());
 
@@ -103,6 +106,7 @@ class GuardServiceProvider implements ServiceProviderInterface
             userProvider: $userProvider,
             authenticators: $authenticators,
             unauthenticatedHandler: $unauthenticatedHandler,
+            authorizationRuleResolver: $authorizationRuleResolver,
             authorizationChecker: $authorizationChecker,
             accessDeniedHandler: $accessDeniedHandler,
             eventDispatcher: $eventDispatcher,

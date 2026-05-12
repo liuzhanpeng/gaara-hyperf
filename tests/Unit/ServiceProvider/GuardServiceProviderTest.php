@@ -6,6 +6,7 @@ use GaaraHyperf\Authenticator\AuthenticatorFactory;
 use GaaraHyperf\Authenticator\AuthenticatorInterface;
 use GaaraHyperf\Authorization\AccessDeniedHandlerInterface;
 use GaaraHyperf\Authorization\AuthorizationCheckerInterface;
+use GaaraHyperf\Authorization\AuthorizationRuleResolverInterface;
 use GaaraHyperf\Config\Config;
 use GaaraHyperf\Config\ConfigLoaderInterface;
 use GaaraHyperf\Config\GuardConfig;
@@ -55,6 +56,8 @@ it('registers token context and guard resolver and resolves guard', function ():
     $tokenStorage = Mockery::mock(TokenStorageInterface::class);
     /** @var MockInterface&UnauthenticatedHandlerInterface $unauthenticatedHandler */
     $unauthenticatedHandler = Mockery::mock(UnauthenticatedHandlerInterface::class);
+    /** @var AuthorizationRuleResolverInterface&MockInterface $authorizationRuleResolver */
+    $authorizationRuleResolver = Mockery::mock(AuthorizationRuleResolverInterface::class);
     /** @var AuthorizationCheckerInterface&MockInterface $authorizationChecker */
     $authorizationChecker = Mockery::mock(AuthorizationCheckerInterface::class);
     /** @var AccessDeniedHandlerInterface&MockInterface $accessDeniedHandler */
@@ -110,7 +113,11 @@ it('registers token context and guard resolver and resolves guard', function ():
         return $tokenContext;
     });
 
-    $container->shouldReceive('make')->andReturnUsing(function (string $class, array $params = []) use ($authorizationChecker, $accessDeniedHandler): mixed {
+    $container->shouldReceive('make')->andReturnUsing(function (string $class, array $params = []) use ($authorizationRuleResolver, $authorizationChecker, $accessDeniedHandler): mixed {
+        if (str_contains($class, 'HttpAuthorizationRuleResolver')) {
+            return $authorizationRuleResolver;
+        }
+
         if (str_contains($class, 'NullAuthorizationChecker')) {
             return $authorizationChecker;
         }
@@ -127,6 +134,10 @@ it('registers token context and guard resolver and resolves guard', function ():
 
     expect($tokenContext)->toBeInstanceOf(TokenContextInterface::class)
         ->and($guardResolver)->toBeInstanceOf(GuardResolver::class);
+
+    if (! $guardResolver instanceof GuardResolver) {
+        throw new InvalidArgumentException('guard resolver not registered');
+    }
 
     $guard = $guardResolver->resolve('main');
     expect($guard)->toBeInstanceOf(GuardInterface::class)
@@ -158,6 +169,8 @@ it('throws when custom listener does not implement event subscriber interface', 
     $tokenStorage = Mockery::mock(TokenStorageInterface::class);
     /** @var MockInterface&UnauthenticatedHandlerInterface $unauthenticatedHandler */
     $unauthenticatedHandler = Mockery::mock(UnauthenticatedHandlerInterface::class);
+    /** @var AuthorizationRuleResolverInterface&MockInterface $authorizationRuleResolver */
+    $authorizationRuleResolver = Mockery::mock(AuthorizationRuleResolverInterface::class);
     /** @var AuthorizationCheckerInterface&MockInterface $authorizationChecker */
     $authorizationChecker = Mockery::mock(AuthorizationCheckerInterface::class);
     /** @var AccessDeniedHandlerInterface&MockInterface $accessDeniedHandler */
@@ -216,7 +229,11 @@ it('throws when custom listener does not implement event subscriber interface', 
         return $tokenContext;
     });
 
-    $container->shouldReceive('make')->andReturnUsing(function (string $class, array $params = []) use ($authorizationChecker, $accessDeniedHandler): mixed {
+    $container->shouldReceive('make')->andReturnUsing(function (string $class, array $params = []) use ($authorizationRuleResolver, $authorizationChecker, $accessDeniedHandler): mixed {
+        if (str_contains($class, 'HttpAuthorizationRuleResolver')) {
+            return $authorizationRuleResolver;
+        }
+
         if (str_contains($class, 'NullAuthorizationChecker')) {
             return $authorizationChecker;
         }
@@ -234,6 +251,10 @@ it('throws when custom listener does not implement event subscriber interface', 
 
     $provider = new GuardServiceProvider();
     $provider->register($container);
+
+    if (! $guardResolver instanceof GuardResolver) {
+        throw new InvalidArgumentException('guard resolver not registered');
+    }
 
     expect(fn () => $guardResolver->resolve('main'))
         ->toThrow(InvalidArgumentException::class, 'must implement EventSubscriberInterface');

@@ -5,7 +5,7 @@ declare(strict_types=1);
 use GaaraHyperf\Authenticator\AuthenticatorInterface;
 use GaaraHyperf\Authorization\AccessDeniedHandlerInterface;
 use GaaraHyperf\Authorization\AuthorizationCheckerInterface;
-use GaaraHyperf\Constants;
+use GaaraHyperf\Authorization\AuthorizationRuleResolverInterface;
 use GaaraHyperf\Event\AuthenticationFailureEvent;
 use GaaraHyperf\Event\AuthenticationSuccessEvent;
 use GaaraHyperf\Event\CheckPassportEvent;
@@ -116,8 +116,7 @@ it('authenticates interactively and persists token before authorization check', 
 
     $deps['tokenContext']->shouldReceive('getToken')->once()->andReturn($token);
     $deps['requestMatcher']->shouldReceive('matchesLogout')->once()->with($deps['request'])->andReturn(false);
-    $deps['request']->shouldReceive('getAttribute')->once()->with(Constants::REQUEST_AUTHORIZATION_ATTRIBUTE, '')->andReturn('ROLE_USER');
-    $deps['request']->shouldReceive('getAttribute')->once()->with(Constants::REQUEST_AUTHORIZATION_RESOURCE, null)->andReturn('doc:1');
+    $deps['authorizationRuleResolver']->shouldReceive('resolve')->once()->with($deps['request'])->andReturn(['object' => 'ROLE_USER', 'action' => 'doc:1']);
     $deps['authorizationChecker']->shouldReceive('check')->once()->with($token, 'ROLE_USER', 'doc:1')->andReturn(true);
 
     expect($guard->authenticate($deps['request']))->toBeNull();
@@ -135,8 +134,7 @@ it('returns access denied handler response when authorization fails', function (
     $deps['authenticator']->shouldReceive('supports')->once()->with($deps['request'])->andReturn(false);
     $deps['tokenContext']->shouldReceive('getToken')->once()->andReturn($token);
     $deps['requestMatcher']->shouldReceive('matchesLogout')->once()->with($deps['request'])->andReturn(false);
-    $deps['request']->shouldReceive('getAttribute')->once()->with(Constants::REQUEST_AUTHORIZATION_ATTRIBUTE, '')->andReturn('ROLE_ADMIN');
-    $deps['request']->shouldReceive('getAttribute')->once()->with(Constants::REQUEST_AUTHORIZATION_RESOURCE, null)->andReturn('doc:2');
+    $deps['authorizationRuleResolver']->shouldReceive('resolve')->once()->with($deps['request'])->andReturn(['object' => 'ROLE_ADMIN', 'action' => 'doc:2']);
     $deps['authorizationChecker']->shouldReceive('check')->once()->with($token, 'ROLE_ADMIN', 'doc:2')->andReturn(false);
     $deps['accessDeniedHandler']->shouldReceive('handle')->once()->with($deps['request'], $token, 'ROLE_ADMIN', 'doc:2')->andReturn($denied);
 
@@ -187,6 +185,8 @@ it('throws when authenticating user without configured authenticators', function
     $userProvider = Mockery::mock(UserProviderInterface::class);
     /** @var MockInterface&UnauthenticatedHandlerInterface $unauthenticatedHandler */
     $unauthenticatedHandler = Mockery::mock(UnauthenticatedHandlerInterface::class);
+    /** @var AuthorizationRuleResolverInterface&MockInterface $authorizationRuleResolver */
+    $authorizationRuleResolver = Mockery::mock(AuthorizationRuleResolverInterface::class);
     /** @var AuthorizationCheckerInterface&MockInterface $authorizationChecker */
     $authorizationChecker = Mockery::mock(AuthorizationCheckerInterface::class);
     /** @var AccessDeniedHandlerInterface&MockInterface $accessDeniedHandler */
@@ -208,6 +208,7 @@ it('throws when authenticating user without configured authenticators', function
         userProvider: $userProvider,
         authenticators: [],
         unauthenticatedHandler: $unauthenticatedHandler,
+        authorizationRuleResolver: $authorizationRuleResolver,
         authorizationChecker: $authorizationChecker,
         accessDeniedHandler: $accessDeniedHandler,
         eventDispatcher: $dispatcher,
@@ -335,6 +336,8 @@ function createGuardTestSubject(): array
     $userProvider = Mockery::mock(UserProviderInterface::class);
     /** @var MockInterface&UnauthenticatedHandlerInterface $unauthenticatedHandler */
     $unauthenticatedHandler = Mockery::mock(UnauthenticatedHandlerInterface::class);
+    /** @var AuthorizationRuleResolverInterface&MockInterface $authorizationRuleResolver */
+    $authorizationRuleResolver = Mockery::mock(AuthorizationRuleResolverInterface::class);
     /** @var AuthorizationCheckerInterface&MockInterface $authorizationChecker */
     $authorizationChecker = Mockery::mock(AuthorizationCheckerInterface::class);
     /** @var AccessDeniedHandlerInterface&MockInterface $accessDeniedHandler */
@@ -354,6 +357,7 @@ function createGuardTestSubject(): array
         userProvider: $userProvider,
         authenticators: ['api' => $authenticator],
         unauthenticatedHandler: $unauthenticatedHandler,
+        authorizationRuleResolver: $authorizationRuleResolver,
         authorizationChecker: $authorizationChecker,
         accessDeniedHandler: $accessDeniedHandler,
         eventDispatcher: $dispatcher,
@@ -365,6 +369,7 @@ function createGuardTestSubject(): array
         'tokenContext' => $tokenContext,
         'userProvider' => $userProvider,
         'unauthenticatedHandler' => $unauthenticatedHandler,
+        'authorizationRuleResolver' => $authorizationRuleResolver,
         'authorizationChecker' => $authorizationChecker,
         'accessDeniedHandler' => $accessDeniedHandler,
         'dispatcher' => $dispatcher,

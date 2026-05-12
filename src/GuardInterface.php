@@ -58,5 +58,5 @@ interface GuardInterface
     /**
      * 检查令牌所属用户是否具有指定的权限.
      */
-    public function isGranted(TokenInterface $token, mixed $attribute, mixed $resource = null): bool;
+    public function isGranted(TokenInterface $token, mixed $object, mixed $action = null): bool;
 }

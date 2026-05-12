@@ -7,6 +7,7 @@ namespace GaaraHyperf;
 use GaaraHyperf\Authenticator\AuthenticatorInterface;
 use GaaraHyperf\Authorization\AccessDeniedHandlerInterface;
 use GaaraHyperf\Authorization\AuthorizationCheckerInterface;
+use GaaraHyperf\Authorization\AuthorizationRuleResolverInterface;
 use GaaraHyperf\Event\AuthenticationFailureEvent;
 use GaaraHyperf\Event\AuthenticationSuccessEvent;
 use GaaraHyperf\Event\CheckPassportEvent;
@@ -42,6 +43,7 @@ class Guard implements GuardInterface
         private UserProviderInterface $userProvider,
         private array $authenticators,
         private UnauthenticatedHandlerInterface $unauthenticatedHandler,
+        private AuthorizationRuleResolverInterface $authorizationRuleResolver,
         private AuthorizationCheckerInterface $authorizationChecker,
         private AccessDeniedHandlerInterface $accessDeniedHandler,
         private EventDispatcherInterface $eventDispatcher
@@ -135,9 +137,9 @@ class Guard implements GuardInterface
     /**
      * 检查令牌所属用户是否具有指定的权限.
      */
-    public function isGranted(TokenInterface $token, mixed $attribute, mixed $resource = null): bool
+    public function isGranted(TokenInterface $token, mixed $object, mixed $action = null): bool
     {
-        return $this->authorizationChecker->check($token, $attribute, $resource);
+        return $this->authorizationChecker->check($token, $object, $action);
     }
 
     /**
@@ -240,10 +242,9 @@ class Guard implements GuardInterface
      */
     private function checkAuthorization(ServerRequestInterface $request, TokenInterface $token): ?ResponseInterface
     {
-        $attribute = $request->getAttribute(Constants::REQUEST_AUTHORIZATION_ATTRIBUTE, '');
-        $resource = $request->getAttribute(Constants::REQUEST_AUTHORIZATION_RESOURCE, null);
-        if (! $this->authorizationChecker->check($token, $attribute, $resource)) {
-            return $this->accessDeniedHandler->handle($request, $token, $attribute, $resource);
+        ['object' => $object, 'action' => $action] = $this->authorizationRuleResolver->resolve($request);
+        if (! $this->authorizationChecker->check($token, $object, $action)) {
+            return $this->accessDeniedHandler->handle($request, $token, $object, $action);
         }
 
         return null;

@@ -364,14 +364,15 @@ class CasbinAuthorizationChecker implements AuthorizationCheckerInterface
     ) {}
 
     /**
-     * @param mixed $attribute 权限属性（如 HTTP 方法、权限名称）
-     * @param mixed $resource  资源（如路由路径、对象 ID），可为 null
+     * @param mixed $object 访问对象（如路由路径、资源名称等）
+     * @param mixed $action 访问动作（如 HTTP 方法、权限名称等），可为 null
      */
-    public function check(TokenInterface $token, mixed $attribute, mixed $resource = null): bool
+    public function check(TokenInterface $token, mixed $object, mixed $action = null): bool
     {
         $user = $token->getUserIdentifier();
-        $obj  = $resource ?? '*';
-        return $this->enforcer->enforce($user, $obj, $attribute);
+        $obj  = $object ?? '*';
+        $act  = $action ?? '*';
+        return $this->enforcer->enforce($user, $obj, $act);
     }
 }
 ```

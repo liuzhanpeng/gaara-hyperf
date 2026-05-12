@@ -192,10 +192,13 @@ return [
 
 ---
 
-## authorization（授权检查器）
+## authorization（授权）
 
 ```php
 'authorization' => [
+    'rule_resolver' => [
+        'class' => \GaaraHyperf\Authorization\HttpAuthorizationRuleResolver::class,
+    ],
     'checker' => [
         'class' => \GaaraHyperf\Authorization\NullAuthorizationChecker::class,
     ],
@@ -205,7 +208,7 @@ return [
 ],
 ```
 
-默认使用 `NullAuthorizationChecker`（任何已认证用户均可通过）。如需使用 Casbin 等授权框架，实现 `AuthorizationCheckerInterface` 并配置即可。
+默认使用 `HttpAuthorizationRuleResolver` 从 HTTP 请求解析 object/path 与 action/method，并使用 `NullAuthorizationChecker`（任何已认证用户均可通过）。如需使用 Casbin 等授权框架，实现 `AuthorizationCheckerInterface`，或实现自定义 `AuthorizationRuleResolverInterface` 并配置即可。
 
 ---
 

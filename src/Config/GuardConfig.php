@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GaaraHyperf\Config;
 
 use GaaraHyperf\Authorization\DefaultAccessDeniedHandler;
+use GaaraHyperf\Authorization\HttpAuthorizationRuleResolver;
 use GaaraHyperf\Authorization\NullAuthorizationChecker;
 use InvalidArgumentException;
 
@@ -19,6 +20,7 @@ class GuardConfig
         private AuthenticatorConfigCollection $authenticatorConfigCollection,
         private ComponentConfig $tokenStorageConfig,
         private ComponentConfig $unauthenticatedHandlerConfig,
+        private CustomConfig $authorizationRuleResolverConfig,
         private CustomConfig $authorizationCheckerConfig,
         private CustomConfig $accessDeniedHandlerConfig,
         private ListenerConfigCollection $listenerConfigCollection,
@@ -34,6 +36,7 @@ class GuardConfig
         $tokenStorageConfig = ComponentConfig::from($config['token_storage'] ?? ['type' => 'null']);
         $unauthenticatedHandlerConfig = ComponentConfig::from($config['unauthenticated_handler'] ?? ['type' => 'default']);
         $authorizationConfig = $config['authorization'] ?? [];
+        $authorizationRuleResolverConfig = CustomConfig::from($authorizationConfig['rule_resolver'] ?? ['class' => HttpAuthorizationRuleResolver::class]);
         $authorizationCheckerConfig = CustomConfig::from($authorizationConfig['checker'] ?? ['class' => NullAuthorizationChecker::class]);
         $accessDeniedHandlerConfig = CustomConfig::from($authorizationConfig['access_denied_handler'] ?? ['class' => DefaultAccessDeniedHandler::class]);
         $listenerConfigCollection = ListenerConfigCollection::from($config['listeners'] ?? []);
@@ -45,6 +48,7 @@ class GuardConfig
             $authenticatorConfigCollection,
             $tokenStorageConfig,
             $unauthenticatedHandlerConfig,
+            $authorizationRuleResolverConfig,
             $authorizationCheckerConfig,
             $accessDeniedHandlerConfig,
             $listenerConfigCollection,
@@ -98,6 +102,14 @@ class GuardConfig
     public function authorizationCheckerConfig(): CustomConfig
     {
         return $this->authorizationCheckerConfig;
+    }
+
+    /**
+     * 返回授权规则解析器配置.
+     */
+    public function authorizationRuleResolverConfig(): CustomConfig
+    {
+        return $this->authorizationRuleResolverConfig;
     }
 
     /**

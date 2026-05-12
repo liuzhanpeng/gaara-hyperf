@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use GaaraHyperf\Authorization\DefaultAccessDeniedHandler;
+use GaaraHyperf\Authorization\HttpAuthorizationRuleResolver;
 use GaaraHyperf\Authorization\NullAuthorizationChecker;
 use GaaraHyperf\Config\GuardConfig;
 
@@ -20,6 +21,7 @@ it('creates guard config and applies defaults', function (): void {
         ->and($guardConfig->userProviderConfig()->type())->toBe('memory')
         ->and($guardConfig->tokenStorageConfig()->type())->toBe('null')
         ->and($guardConfig->unauthenticatedHandlerConfig()->type())->toBe('default')
+        ->and($guardConfig->authorizationRuleResolverConfig()->class())->toBe(HttpAuthorizationRuleResolver::class)
         ->and($guardConfig->authorizationCheckerConfig()->class())->toBe(NullAuthorizationChecker::class)
         ->and($guardConfig->accessDeniedHandlerConfig()->class())->toBe(DefaultAccessDeniedHandler::class)
         ->and($guardConfig->passwordHasherId())->toBe('default')
@@ -36,7 +38,8 @@ it('applies authorization defaults when authorization config is missing', functi
         ],
     ]);
 
-    expect($guardConfig->authorizationCheckerConfig()->class())->toBe(NullAuthorizationChecker::class)
+    expect($guardConfig->authorizationRuleResolverConfig()->class())->toBe(HttpAuthorizationRuleResolver::class)
+        ->and($guardConfig->authorizationCheckerConfig()->class())->toBe(NullAuthorizationChecker::class)
         ->and($guardConfig->accessDeniedHandlerConfig()->class())->toBe(DefaultAccessDeniedHandler::class);
 });
 
