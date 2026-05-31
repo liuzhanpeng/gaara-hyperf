@@ -1,5 +1,7 @@
 # 事件系统
 
+> [English](events.en.md)
+
 认证流程内部使用 Symfony 的 EventDispatcher 组件进行事件分发。每个 Guard 在初始化时都会创建一个独立的事件分发器，并将内置监听器与自定义监听器以 Subscriber 的方式注册进去。
 
 对外依赖的是 `EventDispatcherInterface` 抽象，但认证流程实际运行时使用的是 `symfony/event-dispatcher`。

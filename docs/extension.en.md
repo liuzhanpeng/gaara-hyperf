@@ -1,14 +1,14 @@
-# 扩展指南
+# Extension Guide
 
-> [English](extension.en.md)
+> 中文文档请查看 [extension.md](extension.md)
 
-本库的所有核心组件均基于接口设计，可以通过实现对应接口来替换或扩展任意部分。
+All core components in this library are interface-based. You can replace or extend any part by implementing the corresponding interface.
 
 ---
 
-## 自定义认证器
+## Custom Authenticator
 
-### 实现 AuthenticatorInterface
+### Implementing AuthenticatorInterface
 
 ```php
 use GaaraHyperf\Authenticator\AuthenticatorInterface;
@@ -25,8 +25,8 @@ class SmsCodeAuthenticator implements AuthenticatorInterface
     ) {}
 
     /**
-     * 判断当前请求是否由此认证器处理。
-     * 此方法应轻量，避免执行耗时操作。
+     * Determines whether this authenticator should handle the current request.
+     * Keep this method lightweight — avoid expensive operations here.
      */
     public function supports(ServerRequestInterface $request): bool
     {
@@ -35,16 +35,16 @@ class SmsCodeAuthenticator implements AuthenticatorInterface
     }
 
     /**
-     * 执行认证逻辑，返回 Passport 或抛出 AuthenticationException。
+     * Performs the authentication logic. Returns a Passport or throws AuthenticationException.
      */
     public function authenticate(ServerRequestInterface $request): Passport
     {
-        $body   = (array) json_decode((string) $request->getBody(), true);
-        $phone  = $body['phone'] ?? '';
-        $code   = $body['code']  ?? '';
+        $body  = (array) json_decode((string) $request->getBody(), true);
+        $phone = $body['phone'] ?? '';
+        $code  = $body['code']  ?? '';
 
         if (! $this->smsService->verifyCode($phone, $code)) {
-            throw new \GaaraHyperf\Exception\InvalidCredentialsException('验证码错误');
+            throw new \GaaraHyperf\Exception\InvalidCredentialsException('Invalid verification code');
         }
 
         $userIdentifier = $phone;
@@ -56,8 +56,8 @@ class SmsCodeAuthenticator implements AuthenticatorInterface
     }
 
     /**
-     * 根据 Passport 创建 Token。
-     * 通常直接使用 AuthenticatedToken。
+     * Creates a Token from the Passport.
+     * Usually just instantiate AuthenticatedToken.
      */
     public function createToken(Passport $passport, string $guardName): TokenInterface
     {
@@ -73,7 +73,7 @@ class SmsCodeAuthenticator implements AuthenticatorInterface
         TokenInterface $token,
         Passport $passport,
     ): ?ResponseInterface {
-        return null; // 返回 null 表示由框架继续处理请求
+        return null; // Returning null lets the framework continue processing the request
     }
 
     public function onAuthenticationFailure(
@@ -82,19 +82,19 @@ class SmsCodeAuthenticator implements AuthenticatorInterface
         \GaaraHyperf\Exception\AuthenticationException $exception,
         ?Passport $passport,
     ): ?ResponseInterface {
-        return null; // 返回 null 则交给 UnauthenticatedHandler 处理
+        return null; // Returning null delegates to UnauthenticatedHandler
     }
 
     public function isInteractive(): bool
     {
-        return true; // 交互式认证器（登录接口）
+        return true; // Interactive authenticator (login endpoint)
     }
 }
 ```
 
-### 继承 AbstractAuthenticator（推荐）
+### Extending AbstractAuthenticator (Recommended)
 
-`AbstractAuthenticator` 已处理 `successHandler`/`failureHandler` 的委托逻辑，继承后只需关注核心业务：
+`AbstractAuthenticator` already handles the delegation logic for `successHandler` / `failureHandler`. Extending it lets you focus on the core business logic:
 
 ```php
 use GaaraHyperf\Authenticator\AbstractAuthenticator;
@@ -120,14 +120,14 @@ class SmsCodeAuthenticator extends AbstractAuthenticator
 }
 ```
 
-### 在配置中注册
+### Register in Configuration
 
 ```php
 'authenticators' => [
     'custom' => [
         [
             'class'  => \App\Auth\SmsCodeAuthenticator::class,
-            'params' => [],  // 额外构造参数（DI 容器已注入的依赖无需列出）
+            'params' => [],  // additional constructor params (DI-injected dependencies do not need to be listed)
         ],
     ],
 ],
@@ -135,9 +135,9 @@ class SmsCodeAuthenticator extends AbstractAuthenticator
 
 ---
 
-## 自定义用户提供者
+## Custom User Provider
 
-实现 `UserProviderInterface`：
+Implement `UserProviderInterface`:
 
 ```php
 use GaaraHyperf\UserProvider\UserProviderInterface;
@@ -160,7 +160,7 @@ class RedisUserProvider implements UserProviderInterface
 }
 ```
 
-配置：
+Configuration:
 
 ```php
 'user_provider' => [
@@ -171,9 +171,9 @@ class RedisUserProvider implements UserProviderInterface
 
 ---
 
-## 自定义用户对象
+## Custom User Object
 
-实现相应接口以启用对应功能：
+Implement the appropriate interfaces to enable the corresponding features:
 
 ```php
 use GaaraHyperf\User\UserInterface;
@@ -184,19 +184,19 @@ class AppUser implements UserInterface, PasswordAwareUserInterface, PasswordExpi
 {
     public function __construct(private array $data) {}
 
-    // 必须：用户唯一标识符（用于存储到 Token 中）
+    // Required: unique user identifier (stored in the Token)
     public function getIdentifier(): string
     {
         return $this->data['email'];
     }
 
-    // PasswordAwareUserInterface：启用密码验证
+    // PasswordAwareUserInterface: enables password verification
     public function getPassword(): string
     {
         return $this->data['password'];
     }
 
-    // PasswordExpirationAwareUserInterface：启用密码过期检查
+    // PasswordExpirationAwareUserInterface: enables password expiration checks
     public function getExpiresAt(): \DateTimeInterface
     {
         return new \DateTimeImmutable($this->data['password_changed_at'] . ' +90 days');
@@ -206,9 +206,9 @@ class AppUser implements UserInterface, PasswordAwareUserInterface, PasswordExpi
 
 ---
 
-## 自定义认证成功/失败处理器
+## Custom Authentication Success / Failure Handlers
 
-### 成功处理器
+### Success Handler
 
 ```php
 use GaaraHyperf\Authenticator\AuthenticationSuccessHandlerInterface;
@@ -228,15 +228,15 @@ class JsonTokenSuccessHandler implements AuthenticationSuccessHandlerInterface
         $response = new \Hyperf\HttpMessage\Server\Response();
         return $response
             ->withHeader('Content-Type', 'application/json')
-            ->withBody(new \GaaraHyperf\..., json_encode([
-                'user' => $token->getUserIdentifier(),
+            ->withBody(new \Hyperf\HttpMessage\Stream\SwooleStream(json_encode([
+                'user'  => $token->getUserIdentifier(),
                 'guard' => $guardName,
-            ]));
+            ])));
     }
 }
 ```
 
-### 失败处理器
+### Failure Handler
 
 ```php
 use GaaraHyperf\Authenticator\AuthenticationFailureHandlerInterface;
@@ -250,13 +250,13 @@ class JsonFailureHandler implements AuthenticationFailureHandlerInterface
         AuthenticationException $exception,
         ?Passport $passport,
     ): ?ResponseInterface {
-        // 返回 null 则交给 UnauthenticatedHandler 继续处理
+        // Return null to let UnauthenticatedHandler continue
         return null;
     }
 }
 ```
 
-在认证器中配置：
+Configure in the authenticator:
 
 ```php
 'json_login' => [
@@ -268,9 +268,9 @@ class JsonFailureHandler implements AuthenticationFailureHandlerInterface
 
 ---
 
-## 自定义事件监听器
+## Custom Event Listeners
 
-监听器会基于symfony/event-dispatcher组件的事件订阅机制实现的，在认证各阶段触发。
+Listeners are implemented using Symfony's event-subscriber mechanism and fire at various stages of the authentication flow.
 
 ```php
 use GaaraHyperf\Event\AuthenticationSuccessEvent;
@@ -292,33 +292,31 @@ class AuditLoginListener implements EventSubscriberInterface
         ];
     }
 
-    // 监听认证成功事件
     public function onAuthenticationSuccess(AuthenticationSuccessEvent $event): void
     {
-        $this->logger->info('登录成功', [
-            'guard'      => $event->getGuardName(),
-            'user'       => $event->getToken()->getUserIdentifier(),
-            'ip'         => $event->getRequest()->getServerParams()['remote_addr'] ?? '',
+        $this->logger->info('Login successful', [
+            'guard' => $event->getGuardName(),
+            'user'  => $event->getToken()->getUserIdentifier(),
+            'ip'    => $event->getRequest()->getServerParams()['remote_addr'] ?? '',
         ]);
     }
 
-    // 监听认证失败事件
     public function onAuthenticationFailure(AuthenticationFailureEvent $event): void
     {
-        $this->logger->warning('登录失败', [
+        $this->logger->warning('Login failed', [
             'reason' => $event->getException()->getMessage(),
         ]);
     }
 }
 ```
 
-详见 [事件系统](events.md)。
+See [Event System](events.en.md) for full details.
 
 ---
 
-## 自定义 IP 白名单提供者
+## Custom IP Whitelist Provider
 
-当白名单需要动态从数据库/Redis 加载时，实现 `IPWhiteListProviderInterface`：
+When the whitelist needs to be loaded dynamically from a database or Redis, implement `IPWhiteListProviderInterface`:
 
 ```php
 use GaaraHyperf\IPWhiteListChecker\IPWhiteListProviderInterface;
@@ -336,7 +334,7 @@ class DbIpWhiteListProvider implements IPWhiteListProviderInterface
 }
 ```
 
-配置：
+Configuration:
 
 ```php
 'listeners' => [
@@ -351,9 +349,9 @@ class DbIpWhiteListProvider implements IPWhiteListProviderInterface
 
 ---
 
-## 自定义授权检查器
+## Custom Authorization Checker
 
-实现 `AuthorizationCheckerInterface` 以接入 Casbin、Spatie Permission 等授权框架：
+Implement `AuthorizationCheckerInterface` to integrate Casbin, Spatie Permission, or any other authorization framework:
 
 ```php
 use GaaraHyperf\Authorization\AuthorizationCheckerInterface;
@@ -366,8 +364,8 @@ class CasbinAuthorizationChecker implements AuthorizationCheckerInterface
     ) {}
 
     /**
-     * @param mixed $object 访问对象（如路由路径、资源名称等）
-     * @param mixed $action 访问动作（如 HTTP 方法、权限名称等），可为 null
+     * @param mixed $object The access object (e.g. route path, resource name)
+     * @param mixed $action The access action (e.g. HTTP method, permission name); may be null
      */
     public function check(TokenInterface $token, mixed $object, mixed $action = null): bool
     {
@@ -379,7 +377,7 @@ class CasbinAuthorizationChecker implements AuthorizationCheckerInterface
 }
 ```
 
-配置：
+Configuration:
 
 ```php
 'authorization' => [
@@ -391,7 +389,7 @@ class CasbinAuthorizationChecker implements AuthorizationCheckerInterface
 
 ---
 
-## 自定义密码哈希器
+## Custom Password Hasher
 
 ```php
 use GaaraHyperf\PasswordHasher\PasswordHasherInterface;
@@ -410,7 +408,7 @@ class LegacyMd5PasswordHasher implements PasswordHasherInterface
 }
 ```
 
-配置：
+Configuration:
 
 ```php
 'services' => [
@@ -423,7 +421,7 @@ class LegacyMd5PasswordHasher implements PasswordHasherInterface
 ],
 ```
 
-在 Guard 中指定：
+Specify it in the guard:
 
 ```php
 'password_hasher' => 'legacy',
@@ -431,14 +429,14 @@ class LegacyMd5PasswordHasher implements PasswordHasherInterface
 
 ---
 
-## 自定义不透明令牌颁发器
+## Custom Opaque Token Issuer
 
-如果你需要替换 Opaque Token 的签发、解析或撤销逻辑（例如接入数据库、远端会话服务或自定义存储），请实现 `OpaqueTokenIssuerInterface`。
+If you need to replace the issuance, resolution, or revocation logic for Opaque Tokens (e.g. to use a database, remote session service, or custom storage), implement `OpaqueTokenIssuerInterface`.
 
-`OpaqueTokenManager` 本身仍由框架组装，负责：
-- 从请求中提取访问令牌
-- 调用自定义 issuer 进行签发 / 解析 / 撤销
-- 通过 responder 生成最终响应
+The `OpaqueTokenManager` itself is still assembled by the framework and handles:
+- Extracting the access token from the request
+- Calling the custom issuer for issuance / resolution / revocation
+- Generating the final response via the responder
 
 ```php
 use GaaraHyperf\OpaqueTokenManager\OpaqueToken;
@@ -449,22 +447,22 @@ class CustomOpaqueTokenIssuer implements OpaqueTokenIssuerInterface
 {
     public function issue(TokenInterface $token): OpaqueToken
     {
-        // 返回一个 OpaqueToken 对象
+        // Return an OpaqueToken object
     }
 
     public function resolve(string $accessToken): ?OpaqueToken
     {
-        // 根据 accessToken 解析出 OpaqueToken
+        // Resolve the OpaqueToken from the access token string
     }
 
     public function revoke(string $accessToken): void
     {
-        // 撤销 accessToken
+        // Revoke the access token
     }
 }
 ```
 
-配置：
+Configuration:
 
 ```php
 'services' => [
@@ -473,8 +471,8 @@ class CustomOpaqueTokenIssuer implements OpaqueTokenIssuerInterface
             'type'  => 'custom',
             'class' => \App\Auth\CustomOpaqueTokenIssuer::class,
             'token_extractor' => [
-                'type' => 'header',
-                'field' => 'Authorization',
+                'type'   => 'header',
+                'field'  => 'Authorization',
                 'scheme' => 'Bearer',
             ],
             'token_responder' => [
@@ -487,7 +485,7 @@ class CustomOpaqueTokenIssuer implements OpaqueTokenIssuerInterface
 
 ---
 
-## 自定义请求匹配器
+## Custom Request Matcher
 
 ```php
 use GaaraHyperf\RequestMatcher\RequestMatcherInterface;
@@ -512,7 +510,7 @@ class TenantRequestMatcher implements RequestMatcherInterface
 }
 ```
 
-配置：
+Configuration:
 
 ```php
 'matcher' => [

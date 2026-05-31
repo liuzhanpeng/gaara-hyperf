@@ -1,5 +1,7 @@
 # 认证器
 
+> [English](authenticators.en.md)
+
 认证器（Authenticator）是认证流程的核心。每个请求到达 Guard 时，Guard 会依次调用每个认证器的 `supports()` 方法，第一个返回 `true` 的认证器将负责完成认证。
 
 ---

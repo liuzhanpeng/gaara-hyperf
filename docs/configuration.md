@@ -1,5 +1,7 @@
 # 配置参考
 
+> [English](configuration.en.md)
+
 完整配置结构位于 `config/autoload/gaara.php`，顶层分为 `guards` 和 `services` 两个部分。
 
 ---

@@ -1,5 +1,7 @@
 # 注意事项
 
+> [English](notes.en.md)
+
 ---
 
 ## 安全建议
