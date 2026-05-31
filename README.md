@@ -74,7 +74,7 @@ Route::get('/profile', function () {
 
 ### 2. 配置 Guard
 
-在 [docs/configuration.md](configuration.md) 中可以看到完整配置。通常你至少需要为一个 Guard 指定：
+推荐先阅读 [5 分钟快速开始](docs/quickstart.md)，再参考 [配置参考](docs/configuration.md) 做扩展。通常你至少需要为一个 Guard 指定：
 
 - 请求匹配规则（`matcher`）
 - 用户提供器（`user_provider`）
@@ -85,26 +85,44 @@ Route::get('/profile', function () {
 ```php
 return [
     'guards' => [
-        'api' => [
+        'admin' => [
             'matcher' => [
-                'pattern' => '^/api/',
+                'pattern' => '^/admin/',
+                'logout_path' => '/admin/logout',
+                'exclusions' => ['^/admin/login$'],
             ],
             'user_provider' => [
-                // 用户加载方式
+                'type' => 'model',
+                'class' => \App\Model\User::class,
+                'identifier' => 'email',
             ],
             'authenticators' => [
-                // 例如 json_login、form_login、opaque_token、api_key 等
+                'form_login' => [
+                    'check_path' => '/admin/login',
+                    'target_path' => '/admin/dashboard',
+                    'failure_path' => '/admin/login',
+                    'csrf_enabled' => true,
+                    'csrf_id' => 'authenticate',
+                    'csrf_field' => '_csrf_token',
+                ],
+            ],
+            'token_storage' => [
+                'type' => 'session',
+                'prefix' => 'admin',
             ],
         ],
     ],
 ];
 ```
 
-你可以按业务场景自由组合认证器、Token 存储、监听器和授权组件。
+你可以按业务场景自由组合认证器、Token 存储、监听器和授权组件。更多场景组合见 [场景化配置](docs/scenarios.md)。
 
 ### 3. 实现用户模型
 
 ```php
+namespace App\Model;
+
+use Hyperf\DbConnection\Model\Model;
 use GaaraHyperf\User\UserInterface;
 use GaaraHyperf\User\PasswordAwareUserInterface;
 
@@ -139,7 +157,9 @@ $user = $context->getUser();
 
 ## 文档目录
 
+- [5 分钟快速开始](docs/quickstart.md) — 复制配置并完成首个可运行认证流程
 - [配置参考](docs/configuration.md) — 完整的配置项说明
+- [场景化配置](docs/scenarios.md) — 按业务场景选择认证器组合
 - [认证器](docs/authenticators.md) — 内置认证器的配置与使用
 - [扩展指南](docs/extension.md) — 自定义认证器、用户提供者、监听器等
 - [事件系统](docs/events.md) — 事件与监听器详解

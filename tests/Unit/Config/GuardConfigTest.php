@@ -47,19 +47,19 @@ it('throws when matcher config is missing', function (): void {
     expect(fn () => GuardConfig::from([
         'user_provider' => ['type' => 'memory', 'users' => []],
         'authenticators' => ['api_key' => []],
-    ]))->toThrow(InvalidArgumentException::class, 'matcher config is required');
+    ]))->toThrow(InvalidArgumentException::class, 'guards.default.matcher');
 });
 
 it('throws when user provider config is missing', function (): void {
     expect(fn () => GuardConfig::from([
         'matcher' => ['pattern' => '/api/*'],
         'authenticators' => ['api_key' => []],
-    ]))->toThrow(InvalidArgumentException::class, 'user_provider config is required');
+    ]))->toThrow(InvalidArgumentException::class, 'guards.default.user_provider');
 });
 
 it('throws when authenticators config is missing', function (): void {
     expect(fn () => GuardConfig::from([
         'matcher' => ['pattern' => '/api/*'],
         'user_provider' => ['type' => 'memory', 'users' => []],
-    ]))->toThrow(InvalidArgumentException::class, 'authenticators config is required');
+    ]))->toThrow(InvalidArgumentException::class, 'guards.default.authenticators');
 });

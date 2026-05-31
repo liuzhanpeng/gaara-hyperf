@@ -24,12 +24,12 @@ class Config
     public static function from(array $config): self
     {
         if (! isset($config['guards']) || count($config['guards']) === 0) {
-            throw new InvalidArgumentException('guards config is required');
+            throw new InvalidArgumentException('`guards` config is required and must contain at least one guard. See docs/quickstart.md and docs/configuration.md.');
         }
 
         $guardConfigCollection = [];
         foreach ($config['guards'] as $guardName => $guardConfig) {
-            $guardConfigCollection[$guardName] = GuardConfig::from($guardConfig);
+            $guardConfigCollection[$guardName] = GuardConfig::from($guardConfig, (string) $guardName);
         }
 
         return new self($guardConfigCollection, $config['services'] ?? []);

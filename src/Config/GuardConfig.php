@@ -28,11 +28,19 @@ class GuardConfig
     ) {
     }
 
-    public static function from(array $config): self
+    public static function from(array $config, string $guardName = 'default'): self
     {
-        $requestMatcherConfig = ComponentConfig::from($config['matcher'] ?? throw new InvalidArgumentException('matcher config is required'), 'default');
-        $userProviderConfig = ComponentConfig::from($config['user_provider'] ?? throw new InvalidArgumentException('user_provider config is required'));
-        $authenticatorConfigCollection = AuthenticatorConfigCollection::from($config['authenticators'] ?? throw new InvalidArgumentException('authenticators config is required'));
+        $missing = static function (string $key, string $guardName): never {
+            throw new InvalidArgumentException(sprintf(
+                'Missing required config `guards.%s.%s`. See docs/quickstart.md for a minimal example and docs/configuration.md for full options.',
+                $guardName,
+                $key,
+            ));
+        };
+
+        $requestMatcherConfig = ComponentConfig::from($config['matcher'] ?? $missing('matcher', $guardName), 'default');
+        $userProviderConfig = ComponentConfig::from($config['user_provider'] ?? $missing('user_provider', $guardName));
+        $authenticatorConfigCollection = AuthenticatorConfigCollection::from($config['authenticators'] ?? $missing('authenticators', $guardName));
         $tokenStorageConfig = ComponentConfig::from($config['token_storage'] ?? ['type' => 'null']);
         $unauthenticatedHandlerConfig = ComponentConfig::from($config['unauthenticated_handler'] ?? ['type' => 'default']);
         $authorizationConfig = $config['authorization'] ?? [];

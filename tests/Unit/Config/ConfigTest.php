@@ -15,11 +15,11 @@ it('creates config from valid array', function (): void {
 });
 
 it('throws exception when guards config is missing', function (): void {
-    expect(fn () => Config::from([]))->toThrow(InvalidArgumentException::class, 'guards config is required');
+    expect(fn () => Config::from([]))->toThrow(InvalidArgumentException::class, '`guards` config is required');
 });
 
 it('throws exception when guards config is empty', function (): void {
-    expect(fn () => Config::from(['guards' => []]))->toThrow(InvalidArgumentException::class, 'guards config is required');
+    expect(fn () => Config::from(['guards' => []]))->toThrow(InvalidArgumentException::class, '`guards` config is required');
 });
 
 it('returns service config by name and empty array for unknown service', function (): void {

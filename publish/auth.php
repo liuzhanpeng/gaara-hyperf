@@ -1,15 +1,17 @@
 <?php
 
 declare(strict_types=1);
+use GaaraHyperf\Authenticator\OpaqueTokenSuccessHandler;
 
 return [
     'guards' => [
+        // 最小可用示例 1：Web 表单登录（Session）
         'admin' => [
             'matcher' => [
                 // 'type' => 'default', // 可选，暂时只支持default和custom，默认default
                 'pattern' => '^/admin/', // type == default时必填，请求路径正则表达式
-                // 'logout_path' => '/admin/logout', // type == default时可选，登出路径
-                // 'exclusions' => [], // type == default时可选，排除的请求路径列表
+                'logout_path' => '/admin/logout', // type == default时可选，登出路径
+                'exclusions' => ['^/admin/login$'], // type == default时可选，排除的请求路径列表
             ],
 
             'user_provider' => [
@@ -19,34 +21,33 @@ return [
                 //         'password' => 'admin',
                 //     ],
                 // ],
-                // 'class' => User::class, // type == model时必填，用户模型类名
-                // 'identifier' => 'username', // type == model时必填，用户模型标识字段
+                'class' => 'App\Model\User', // type == model时必填，用户模型类名
+                'identifier' => 'email', // type == model时必填，用户模型标识字段
             ],
 
             'authenticators' => [
-                //  'form_login' => [ // 内置表单登录认证器
-                //      'check_path' => '/admin/login', // 必须; 登录表单提交路径
-                //      'target_path' => '/admin/dashboard', // 可选; 登录成功跳转路径
-                //      'failure_path' => '/admin/login', // 可选;登录失败跳转路径
-                //      'redirect_enabled' => true, // 可选;是否启用登录成功后的重定向
-                //      'redirect_field' => 'redirect_to', // 可选;重定向目标路径参数名
-                //      'username_field' => 'username', // 可选;用户名参数名
-                //      'password_field' => 'password', // 可选;密码参数名
-                //      'error_message' => '用户名或密码错误', // 可选;登录失败错误消息; 支持字符串或回调函数; 回调函数参数为 AuthenticationException 实例
-                //      'csrf_enabled' => true, // 可选;是否启用CSRF保护
-                //      'csrf_id' => 'authenticate', // 可选;CSRF令牌ID
-                //      'csrf_field' => '_csrf_token', // 可选;CSRF令牌参数名
-                //      'csrf_token_manager' => 'default', // 可选;CSRF令牌管理器服务名称
-                //      'success_handler' => [ // 可选，登录成功处理器配置; 没有参数时可以直接配置类名字符串
-                //          'class' => CustomSuccessHandler::class,
-                //          'params' => []
-                //      ],
-                //      'success_handler' => CustomSuccessHandler::class, // 可选; 没有参数时可以直接配置类名字符串
-                //      'failure_handler' => [ // 可选，登录失败处理器配置
-                //          'class' => CustomFailureHandler::class,
-                //          'params' => []
-                //      ],
-                //  ],
+                'form_login' => [ // 内置表单登录认证器
+                    'check_path' => '/admin/login', // 必须; 登录表单提交路径
+                    'target_path' => '/admin/dashboard', // 可选; 登录成功跳转路径
+                    'failure_path' => '/admin/login', // 可选;登录失败跳转路径
+                    'redirect_enabled' => true, // 可选;是否启用登录成功后的重定向
+                    'redirect_field' => 'redirect_to', // 可选;重定向目标路径参数名
+                    'username_field' => 'email', // 可选;用户名参数名
+                    'password_field' => 'password', // 可选;密码参数名
+                    'error_message' => '用户名或密码错误', // 可选;登录失败错误消息; 支持字符串或回调函数; 回调函数参数为 AuthenticationException 实例
+                    'csrf_enabled' => true, // 可选;是否启用CSRF保护
+                    'csrf_id' => 'authenticate', // 可选;CSRF令牌ID
+                    'csrf_field' => '_csrf_token', // 可选;CSRF令牌参数名
+                    'csrf_token_manager' => 'default', // 可选;CSRF令牌管理器服务名称
+                    // 'success_handler' => [ // 可选，登录成功处理器配置; 没有参数时可以直接配置类名字符串
+                    //     'class' => CustomSuccessHandler::class,
+                    //     'params' => []
+                    // ],
+                    // 'failure_handler' => [ // 可选，登录失败处理器配置
+                    //     'class' => CustomFailureHandler::class,
+                    //     'params' => []
+                    // ],
+                ],
                 // 'json_login' => [ // 内置JSON登录认证器
                 //     'check_path' => '/admin/check_login', // JSON登录请求路径
                 //     'username_field' => 'username', // 用户名字段名
@@ -97,10 +98,10 @@ return [
                 // ]
             ],
 
-            // 'token_storage' => [ // Token存储器配置
-            //     'type' => 'null', // 支持 session, null, custom; 默认null
-            //     'prefix' => 'admin', // type == session时必填，存储前缀
-            // ],
+            'token_storage' => [ // Token存储器配置
+                'type' => 'session', // 支持 session, null, custom; 默认null
+                'prefix' => 'admin', // type == session时必填，存储前缀
+            ],
 
             // 'unauthenticated_handler' => [ // 未认证处理器配置
             //     'type' => 'default', // 支持 default, redirect, custom; 默认default
@@ -159,6 +160,35 @@ return [
             //         'class' => DefaultAccessDeniedHandler::class,
             //     ],
             // ],
+        ],
+
+        // 最小可用示例 2：API 无状态登录（JSON 登录 + Opaque Token）
+        'api' => [
+            'matcher' => [
+                'pattern' => '^/api/',
+                'exclusions' => ['^/api/login$'],
+            ],
+            'user_provider' => [
+                'type' => 'model',
+                'class' => 'App\Model\User',
+                'identifier' => 'email',
+            ],
+            'authenticators' => [
+                'json_login' => [
+                    'check_path' => '/api/login',
+                    'username_field' => 'email',
+                    'password_field' => 'password',
+                    'success_handler' => [
+                        'class' => OpaqueTokenSuccessHandler::class,
+                        'params' => [
+                            'token_manager' => 'default',
+                        ],
+                    ],
+                ],
+                'opaque_token' => [
+                    'token_manager' => 'default',
+                ],
+            ],
         ],
     ],
 

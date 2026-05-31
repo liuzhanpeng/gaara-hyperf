@@ -28,7 +28,7 @@ it('throws exception when gaara guards config is invalid', function (): void {
 
     $loader = new ConfigLoader($hyperfConfig);
 
-    expect(fn () => $loader->load())->toThrow(InvalidArgumentException::class, 'guards config is required');
+    expect(fn () => $loader->load())->toThrow(InvalidArgumentException::class, '`guards` config is required');
 });
 
 function validConfigLoaderTestGaaraConfig(): array

@@ -174,7 +174,7 @@ class LogoutListener implements EventSubscriberInterface
 - `getToken(): TokenInterface`
 - `getRequest(): ServerRequestInterface`
 - `getResponse(): ?ResponseInterface`
-- `setResponse(ResponseInterface): void
+- `setResponse(ResponseInterface): void`
 
 ---
 
