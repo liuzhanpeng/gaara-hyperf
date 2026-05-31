@@ -36,9 +36,10 @@ class SessionCsrfTokenManager implements CsrfTokenManagerInterface
         $key = $this->getKey($token->getId());
         $tokenValue = $this->session->get($key);
 
+        $result = $token->getValue() === $tokenValue;
         $this->session->remove($key);
 
-        return $token->getValue() === $tokenValue;
+        return $result;
     }
 
     /**

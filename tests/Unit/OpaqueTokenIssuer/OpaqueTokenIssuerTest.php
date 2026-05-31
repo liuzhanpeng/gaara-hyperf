@@ -89,7 +89,7 @@ it('issues token and stores access token payload and user mapping for single ses
         ->and($cache->ttls[$userKey])->toBe(300)
         ->and($payload['token'])->toBe($token)
         ->and($payload['ip'])->toBe('10.0.0.1')
-        ->and($payload['user_agent'])->toBe(md5('Mozilla/5.0'))
+        ->and($payload['user_agent'])->toBe(hash('sha256', 'Mozilla/5.0'))
         ->and($payload['expires_in'])->toBe(300);
 });
 

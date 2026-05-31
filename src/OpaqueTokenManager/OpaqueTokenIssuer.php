@@ -54,7 +54,7 @@ class OpaqueTokenIssuer implements OpaqueTokenIssuerInterface
         }
 
         if ($this->userAgentBindEnabled) {
-            $data['user_agent'] = md5($this->request->getHeaderLine('User-Agent'));
+            $data['user_agent'] = hash('sha256', $this->request->getHeaderLine('User-Agent'));
         }
 
         if ($this->singleSession) {
@@ -81,7 +81,7 @@ class OpaqueTokenIssuer implements OpaqueTokenIssuerInterface
         if ($this->ipBindEnabled && (! isset($data['ip']) || $data['ip'] !== $this->ipResolver->resolve($this->request))) {
             return null;
         }
-        if ($this->userAgentBindEnabled && (! isset($data['user_agent']) || $data['user_agent'] !== md5($this->request->getHeaderLine('User-Agent')))) {
+        if ($this->userAgentBindEnabled && (! isset($data['user_agent']) || $data['user_agent'] !== hash('sha256', $this->request->getHeaderLine('User-Agent')))) {
             return null;
         }
 
